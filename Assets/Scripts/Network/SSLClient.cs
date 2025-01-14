@@ -46,7 +46,8 @@ public class SSLClient : MonoBehaviour
             isConnected = true;
 
             // Send an initial message to the server
-            SendMessageToServer("Hello, secure server!");
+            SendMessageToServer("Decoding string messages still works, now attempting to send test data byte arrays!");
+            SendTestData();
         }
         catch (AuthenticationException ex)
         {
@@ -75,6 +76,61 @@ public class SSLClient : MonoBehaviour
         }
     }
 
+    private void SendTestData()
+    {
+        // Send a byte
+        SendMessageToServer(new byte[] { 0xFF }, 0x02); // Example OpCode: 0x02
+
+        // Send an int
+        SendMessageToServer(BitConverter.GetBytes(123456), 0x03); // Example OpCode: 0x03
+
+        // Send a long
+        SendMessageToServer(BitConverter.GetBytes(123456789012345L), 0x04); // Example OpCode: 0x04
+
+        // Send a ulong
+        SendMessageToServer(BitConverter.GetBytes(9876543210987654321UL), 0x05); // Example OpCode: 0x05
+
+        // Send a float
+        SendMessageToServer(BitConverter.GetBytes(123.45f), 0x06); // Example OpCode: 0x06
+
+        // Send a double
+        SendMessageToServer(BitConverter.GetBytes(12345.6789), 0x07); // Example OpCode: 0x07
+
+        // Send a bool (as a byte)
+        SendMessageToServer(new byte[] { true ? (byte)1 : (byte)0 }, 0x08); // Example OpCode: 0x08
+    }
+
+    /// <summary>
+    /// Send byte array messages to server with corresponding OpCode
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="opCode"></param>
+    private void SendMessageToServer(byte[] data, byte opCode)
+    {
+        try
+        {
+            ushort length = (ushort)data.Length;
+            byte[] packet = new byte[5 + length];
+            packet[0] = 0x16; // Signature
+            packet[1] = (byte)((length >> 8) & 0xFF); // High byte of length (big-endian)
+            packet[2] = (byte)(length & 0xFF);        // Low byte of length
+            packet[3] = opCode; // OpCode
+            packet[4] = 0x00;   // Sequence
+            Array.Copy(data, 0, packet, 5, data.Length);
+
+            sslStream.Write(packet);
+            Debug.Log($"Packet sent to server: {BitConverter.ToString(packet).Replace("-", " ")}");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to send packet: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Send String Messages to server
+    /// </summary>
+    /// <param name="message"></param>
     private void SendMessageToServer(string message)
     {
         try
@@ -178,8 +234,9 @@ public class SSLClient : MonoBehaviour
         tcpSocket.Blocking = true;
         tcpSocket.ReceiveBufferSize = 32768;
         tcpSocket.SendBufferSize = 32768;
-        tcpSocket.ReceiveTimeout = 5000;
-        tcpSocket.SendTimeout = 5000;
+        // ToDo: Adjust timeout to be double the expected ping time - for now leave it at 30 seconds
+        tcpSocket.ReceiveTimeout = 30000;
+        tcpSocket.SendTimeout = 30000;
         tcpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
     }
 }
