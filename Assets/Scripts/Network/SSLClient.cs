@@ -7,236 +7,279 @@ using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using System.Security.Authentication;
 using System.Text;
+using System.Collections.Generic;
+using Assets.Scripts.Network.Converters;
+using Assets.Scripts.Network.OpCodes;
+using Assets.Scripts.Network.PacketArgs;
 
-public class SSLClient : MonoBehaviour
+namespace Assets.Scripts.Network
 {
-    private SslStream sslStream;
-    private TcpClient tcpClient;
-    private StreamReader reader;
-    private StreamWriter writer;
-
-    public string serverIp = "127.0.0.1"; // Server IP address
-    public int serverPort = 4200; // Server port
-    private bool isConnected;
-
-    void Start()
+    public class SSLClient : MonoBehaviour
     {
-        Debug.Log("Attempting to connect...");
-        ConnectToServer();
-    }
+        private bool isConnected;
+        private SslStream sslStream;
+        private TcpClient tcpClient;
+        private StreamReader reader;
+        private StreamWriter writer;
+        private readonly Dictionary<byte, IPacketConverter> Converters = new();
 
-    void ConnectToServer()
-    {
-        try
+        public string serverIp = "127.0.0.1"; // Server IP address
+        public int serverPort = 4200; // Server port
+
+        private void Start()
         {
-            // Initialize the TCP client and SSL stream
-            tcpClient = new TcpClient(serverIp, serverPort);
-            ConfigureTcpSocket(tcpClient.Client);
-            sslStream = new SslStream(tcpClient.GetStream(), false, ValidateServerCertificate);
-
-            // Perform SSL handshake
-            sslStream.AuthenticateAsClient("localhost", null, SslProtocols.Tls12, false);
-
-            Debug.Log("Connected securely to the server.");
-
-            // Initialize reader and writer for the stream
-            writer = new StreamWriter(sslStream) { AutoFlush = true };
-            reader = new StreamReader(sslStream);
-
-            isConnected = true;
-
-            // Send an initial message to the server
-            SendMessageToServer("Decoding string messages still works, now attempting to send test data byte arrays!");
-            SendTestData();
+            Debug.Log("Attempting to connect...");
+            IndexConverters();
+            ConnectToServer();
         }
-        catch (AuthenticationException ex)
+
+        private void Update() { }
+
+        private void OnApplicationQuit() => Cleanup();
+
+        private void Cleanup()
         {
-            Debug.LogError($"SSL Authentication failed: {ex.Message}");
-            Cleanup();
-        }
-        catch (SocketException ex)
-        {
-            Debug.LogError($"SocketException: {ex.Message}");
-            Debug.LogError($"Ensure the server is running at {serverIp}:{serverPort}.");
-            Cleanup();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Connection error: {ex.Message}");
-            Cleanup();
-        }
-    }
+            isConnected = false;
 
-    void Update()
-    {
-        if (isConnected && tcpClient.Connected)
-        {
-            // Attempt to read from the server
-            ReceiveMessageFromServer();
-        }
-    }
-
-    private void SendTestData()
-    {
-        // Send a byte
-        SendMessageToServer(new byte[] { 0xFF }, 0x02); // Example OpCode: 0x02
-
-        // Send an int
-        SendMessageToServer(BitConverter.GetBytes(123456), 0x03); // Example OpCode: 0x03
-
-        // Send a long
-        SendMessageToServer(BitConverter.GetBytes(123456789012345L), 0x04); // Example OpCode: 0x04
-
-        // Send a ulong
-        SendMessageToServer(BitConverter.GetBytes(9876543210987654321UL), 0x05); // Example OpCode: 0x05
-
-        // Send a float
-        SendMessageToServer(BitConverter.GetBytes(123.45f), 0x06); // Example OpCode: 0x06
-
-        // Send a double
-        SendMessageToServer(BitConverter.GetBytes(12345.6789), 0x07); // Example OpCode: 0x07
-
-        // Send a bool (as a byte)
-        SendMessageToServer(new byte[] { true ? (byte)1 : (byte)0 }, 0x08); // Example OpCode: 0x08
-    }
-
-    /// <summary>
-    /// Send byte array messages to server with corresponding OpCode
-    /// </summary>
-    /// <param name="data"></param>
-    /// <param name="opCode"></param>
-    private void SendMessageToServer(byte[] data, byte opCode)
-    {
-        try
-        {
-            ushort length = (ushort)data.Length;
-            byte[] packet = new byte[5 + length];
-            packet[0] = 0x16; // Signature
-            packet[1] = (byte)((length >> 8) & 0xFF); // High byte of length (big-endian)
-            packet[2] = (byte)(length & 0xFF);        // Low byte of length
-            packet[3] = opCode; // OpCode
-            packet[4] = 0x00;   // Sequence
-            Array.Copy(data, 0, packet, 5, data.Length);
-
-            sslStream.Write(packet);
-            Debug.Log($"Packet sent to server: {BitConverter.ToString(packet).Replace("-", " ")}");
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Failed to send packet: {ex.Message}");
-        }
-    }
-
-    /// <summary>
-    /// Send String Messages to server
-    /// </summary>
-    /// <param name="message"></param>
-    private void SendMessageToServer(string message)
-    {
-        try
-        {
-            // Create the payload
-            byte[] payload = Encoding.UTF8.GetBytes(message);
-
-            ushort length = (ushort)payload.Length; // Payload size only
-
-            byte[] packet = new byte[5 + length];
-            packet[0] = 0x16; // Signature
-            packet[1] = (byte)((length >> 8) & 0xFF); // High byte of length (big-endian)
-            packet[2] = (byte)(length & 0xFF);        // Low byte of length
-            packet[3] = 0x01; // OpCode
-            packet[4] = 0x00; // Sequence
-            Array.Copy(payload, 0, packet, 5, payload.Length);
-
-            // Send the packet
-            sslStream.Write(packet);
-            Debug.Log($"Packet sent to server: {BitConverter.ToString(packet).Replace("-", " ")}");
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Failed to send packet: {ex.Message}");
-        }
-    }
-
-    private void ReceiveMessageFromServer()
-    {
-        try
-        {
-            // Read a single line from the server (blocking call)
-            if (tcpClient.GetStream().CanRead)
+            try
             {
-                string response = reader.ReadLine();
-                if (!string.IsNullOrEmpty(response))
+                writer?.Close();
+                reader?.Close();
+                sslStream?.Close();
+                tcpClient?.Close();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error during cleanup: {ex.Message}");
+            }
+        }
+
+        #region Client -> Server
+
+        private void SendTestData()
+        {
+            // Send a byte
+            SendDataToServer(new byte[] { 0xFF }, 0x02); // Example OpCode: 0x02
+
+            // Send an int
+            SendDataToServer(BitConverter.GetBytes(123456), 0x03); // Example OpCode: 0x03
+
+            // Send a long
+            SendDataToServer(BitConverter.GetBytes(123456789012345L), 0x04); // Example OpCode: 0x04
+
+            // Send a ulong
+            SendDataToServer(BitConverter.GetBytes(9876543210987654321UL), 0x05); // Example OpCode: 0x05
+
+            // Send a float
+            SendDataToServer(BitConverter.GetBytes(123.45f), 0x06); // Example OpCode: 0x06
+
+            // Send a double
+            SendDataToServer(BitConverter.GetBytes(12345.6789), 0x07); // Example OpCode: 0x07
+
+            // Send a bool (as a byte)
+            SendDataToServer(new byte[] { true ? (byte)1 : (byte)0 }, 0x08); // Example OpCode: 0x08
+        }
+
+        private void SendPacket(byte opCode, Span<byte> payload)
+        {
+            try
+            {
+                var packet = new Packet(opCode, payload);
+                var data = packet.ToArray();
+                sslStream.Write(data, 0, data.Length);
+                Debug.Log($"Packet sent to server: {BitConverter.ToString(data).Replace("-", " ")}");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to send packet: {ex.Message}");
+            }
+        }
+
+        private void SendMessageToServer(string message)
+        {
+            var payload = Encoding.UTF8.GetBytes(message);
+            SendPacket(0x01, payload); // OpCode for string messages
+        }
+
+        private void SendDataToServer(byte[] data, byte opCode)
+        {
+            SendPacket(opCode, data);
+        }
+
+        #endregion
+
+        #region Server -> Client
+
+        private async void BeginReceive()
+        {
+            try
+            {
+                byte[] buffer = new byte[ushort.MaxValue]; // Adjust size as needed
+                while (isConnected)
                 {
-                    Debug.Log($"Server: {response}");
+                    int bytesRead = await sslStream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
+
+                    if (bytesRead > 0)
+                    {
+                        ProcessServerPacket(buffer.AsSpan(0, bytesRead).ToArray());
+                    }
                 }
             }
-        }
-        catch (IOException ex)
-        {
-            Debug.LogError($"Error reading from server: {ex.Message}");
-        }
-    }
-
-    void OnApplicationQuit()
-    {
-        Cleanup();
-    }
-
-    private void Cleanup()
-    {
-        isConnected = false;
-
-        try
-        {
-            writer?.Close();
-            reader?.Close();
-            sslStream?.Close();
-            tcpClient?.Close();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Error during cleanup: {ex.Message}");
-        }
-    }
-
-    private static bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-    {
-        if (certificate is X509Certificate2 cert2)
-        {
-            if (sslPolicyErrors == SslPolicyErrors.None)
+            catch
             {
-                Debug.Log("Server certificate is valid.");
-                return true;
+                Cleanup();
             }
+        }
 
-            // Allow self-signed certificates for development/testing
+        private void ProcessServerPacket(byte[] buffer)
+        {
+            try
+            {
+                var span = buffer.AsSpan();
+                if (span[0] != 0x16) // Verify signature
+                {
+                    Debug.LogError("Invalid packet signature.");
+                    return;
+                }
+
+                var packet = new Packet(span);
+                Debug.Log($"Packet received: OpCode={packet.OpCode}, Sequence={packet.Sequence}, Length={packet.Length}");
+                Debug.Log($"Raw Payload: {BitConverter.ToString(packet.Payload)}");
+
+                if (Converters.TryGetValue(packet.OpCode, out var converter))
+                {
+                    var spanReader = new SpanReader(packet.Payload);
+                    var args = converter.Deserialize(ref spanReader);
+                    HandlePacket(packet.OpCode, args);
+                }
+                else
+                {
+                    Debug.LogWarning($"Unhandled OpCode: {packet.OpCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error processing server packet: {ex.Message}");
+            }
+        }
+
+        private void HandlePacket(byte opCode, object args)
+        {
+            switch (opCode)
+            {
+                case (byte)ServerOpCode.AcceptConnection: // Login message
+                    var acceptArgs = (AcceptConnectionArgs)args;
+                    Debug.Log($"Accept connection message: {acceptArgs.Message}");
+                    break;
+                case (byte)ServerOpCode.LoginMessage: // Login message
+                    var loginArgs = (LoginMessageArgs)args;
+                    Debug.Log($"Login message: {loginArgs.LoginMessageType} - {loginArgs.Message}");
+                    break;
+                default:
+                    Debug.LogWarning($"Unhandled OpCode: {opCode}");
+                    break;
+            }
+        }
+
+        #endregion
+
+        #region Configuration
+
+        private void IndexConverters()
+        {
+            Converters.Add((byte)ServerOpCode.AcceptConnection, new AcceptConnectionConverter());
+            Converters.Add((byte)ServerOpCode.LoginMessage, new LoginMessageConverter());
+            Converters.Add((byte)ServerOpCode.RemoveEntity, new RemoveEntityConverter());
+            Converters.Add((byte)ServerOpCode.ServerMessage, new ServerMessageConverter());
+            Converters.Add((byte)ServerOpCode.Sound, new SoundConverter());
+        }
+
+        private void ConnectToServer()
+        {
+            try
+            {
+                // Initialize the TCP client and SSL stream
+                tcpClient = new TcpClient(serverIp, serverPort);
+                ConfigureTcpSocket(tcpClient.Client);
+                sslStream = new SslStream(tcpClient.GetStream(), false, ValidateServerCertificate);
+
+                // Perform SSL handshake
+                sslStream.AuthenticateAsClient("localhost", null, SslProtocols.Tls12, false);
+
+                Debug.Log("Connected securely to the server.");
+
+                // Initialize reader and writer for the stream
+                writer = new StreamWriter(sslStream) { AutoFlush = true };
+                reader = new StreamReader(sslStream);
+
+                isConnected = true;
+
+                // Send an initial message to the server
+                SendMessageToServer("Decoding string messages still works, now attempting to send test data byte arrays!");
+                SendTestData();
+            }
+            catch (AuthenticationException ex)
+            {
+                Debug.LogError($"SSL Authentication failed: {ex.Message}");
+                Cleanup();
+            }
+            catch (SocketException ex)
+            {
+                Debug.LogError($"SocketException: {ex.Message}");
+                Debug.LogError($"Ensure the server is running at {serverIp}:{serverPort}.");
+                Cleanup();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Connection error: {ex.Message}");
+                Cleanup();
+            }
+            finally
+            {
+                BeginReceive();
+            }
+        }
+
+        private static bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            if (certificate is X509Certificate2 cert2)
+            {
+                if (sslPolicyErrors == SslPolicyErrors.None)
+                {
+                    Debug.Log("Server certificate is valid.");
+                    return true;
+                }
+
+                // Allow self-signed certificates for development/testing
 #if DEBUG
-            if (sslPolicyErrors.HasFlag(SslPolicyErrors.RemoteCertificateChainErrors) && chain.ChainStatus.Any(status => status.Status == X509ChainStatusFlags.UntrustedRoot))
-            {
-                Debug.LogWarning("Allowing self-signed certificate.");
-                return true;
-            }
+                if (sslPolicyErrors.HasFlag(SslPolicyErrors.RemoteCertificateChainErrors) && chain.ChainStatus.Any(status => status.Status == X509ChainStatusFlags.UntrustedRoot))
+                {
+                    Debug.LogWarning("Allowing self-signed certificate.");
+                    return true;
+                }
 #endif
 
-            Debug.LogError($"Certificate validation failed: {sslPolicyErrors}");
+                Debug.LogError($"Certificate validation failed: {sslPolicyErrors}");
+                return false;
+            }
+
+            Debug.LogError("The provided certificate is not an X509Certificate2.");
             return false;
         }
 
-        Debug.LogError("The provided certificate is not an X509Certificate2.");
-        return false;
-    }
+        private static void ConfigureTcpSocket(Socket tcpSocket)
+        {
+            tcpSocket.LingerState = new LingerOption(false, 0);
+            tcpSocket.NoDelay = true;
+            tcpSocket.Blocking = true;
+            tcpSocket.ReceiveBufferSize = 32768;
+            tcpSocket.SendBufferSize = 32768;
+            // ToDo: Adjust timeout to be double the expected ping time - for now leave it at 30 seconds
+            tcpSocket.ReceiveTimeout = 30000;
+            tcpSocket.SendTimeout = 30000;
+            tcpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+        }
 
-    private static void ConfigureTcpSocket(Socket tcpSocket)
-    {
-        tcpSocket.LingerState = new LingerOption(false, 0);
-        tcpSocket.NoDelay = true;
-        tcpSocket.Blocking = true;
-        tcpSocket.ReceiveBufferSize = 32768;
-        tcpSocket.SendBufferSize = 32768;
-        // ToDo: Adjust timeout to be double the expected ping time - for now leave it at 30 seconds
-        tcpSocket.ReceiveTimeout = 30000;
-        tcpSocket.SendTimeout = 30000;
-        tcpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+        #endregion
     }
 }
