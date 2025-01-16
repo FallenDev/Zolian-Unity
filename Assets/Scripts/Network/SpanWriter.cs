@@ -1,99 +1,301 @@
 ﻿using System.Text;
 using System;
+using System.Collections.Generic;
+using System.Numerics;
 
 namespace Assets.Scripts.Network
 {
+    /// <summary>
+    /// A ref struct for writing primitive types, strings, and other data to a <see cref="Span{T}" />.
+    /// </summary>
     public ref struct SpanWriter
     {
-        private Span<byte> _span;
+        private Span<byte> _buffer;
         private int _position;
 
-        public SpanWriter(Span<byte> span)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SpanWriter" /> struct.
+        /// </summary>
+        /// <param name="buffer">The span of bytes to write to.</param>
+        public SpanWriter(Span<byte> buffer)
         {
-            _span = span;
+            _buffer = buffer;
             _position = 0;
         }
 
-        // Write a single byte
-        public void WriteByte(byte value)
+        /// <summary>
+        /// Gets a value indicating whether the writer has reached or exceeded the end of the span.
+        /// </summary>
+        public bool EndOfSpan => _position >= _buffer.Length;
+
+        /// <summary>
+        /// Ensures there is enough space to write the specified number of bytes.
+        /// If not, resizes the buffer dynamically.
+        /// </summary>
+        /// <param name="count">The number of bytes to check for.</param>
+        private void EnsureCapacity(int count)
         {
-            if (_position >= _span.Length) throw new IndexOutOfRangeException("Cannot write beyond the end of the span.");
-            _span[_position++] = value;
+            if (_position + count > _buffer.Length)
+            {
+                ResizeBuffer(_position + count);
+            }
         }
 
-        // Write a 16-bit integer (short)
-        public void WriteInt16(short value)
+        /// <summary>
+        /// Dynamically resizes the buffer to accommodate additional data.
+        /// </summary>
+        /// <param name="requiredSize">The minimum required size for the buffer.</param>
+        private void ResizeBuffer(int requiredSize)
         {
-            WriteByte((byte)(value >> 8));
-            WriteByte((byte)value);
+            var newSize = Math.Max(_buffer.Length * 2, requiredSize);
+            var newBuffer = new byte[newSize];
+            _buffer[.._position].CopyTo(newBuffer);
+            _buffer = newBuffer;
         }
 
-        // Write a 32-bit integer (int)
-        public void WriteInt32(int value)
+        /// <summary>
+        /// Writes a boolean value to the buffer.
+        /// </summary>
+        public void WriteBoolean(bool value) => WriteByte(value ? (byte)1 : (byte)0);
+
+        // Write Unsigned Numeric Types
+        public void WriteUInt16(ushort value)
         {
-            WriteByte((byte)(value >> 24));
-            WriteByte((byte)(value >> 16));
-            WriteByte((byte)(value >> 8));
-            WriteByte((byte)value);
+            EnsureCapacity(2);
+            _buffer[_position++] = (byte)(value >> 8);
+            _buffer[_position++] = (byte)(value & 0xFF);
         }
 
-        // Write a 64-bit integer (long)
-        public void WriteInt64(long value)
-        {
-            for (int i = 7; i >= 0; i--) WriteByte((byte)(value >> (i * 8)));
-        }
-
-        // Write a 32-bit unsigned integer (uint)
         public void WriteUInt32(uint value)
         {
-            WriteInt32((int)value);
+            EnsureCapacity(4);
+            _buffer[_position++] = (byte)(value >> 24);
+            _buffer[_position++] = (byte)((value >> 16) & 0xFF);
+            _buffer[_position++] = (byte)((value >> 8) & 0xFF);
+            _buffer[_position++] = (byte)(value & 0xFF);
         }
 
-        // Write a single-precision float
-        public void WriteSingle(float value)
+        public void WriteUInt64(ulong value)
         {
-            WriteUInt32((uint)BitConverter.SingleToInt32Bits(value));
+            EnsureCapacity(8);
+            for (var i = 7; i >= 0; i--)
+            {
+                _buffer[_position++] = (byte)(value >> (i * 8));
+            }
         }
 
-        // Write a double-precision float
-        public void WriteDouble(double value)
+        // Write Signed Numeric Types
+        public void WriteInt16(short value) => WriteUInt16((ushort)value);
+
+        public void WriteInt32(int value) => WriteUInt32((uint)value);
+
+        public void WriteInt64(long value) => WriteUInt64((ulong)value);
+
+        // Write Floating Point Types
+        public void WriteFloat(float value) => WriteInt32(BitConverter.SingleToInt32Bits(value));
+
+        public void WriteDouble(double value) => WriteInt64(BitConverter.DoubleToInt64Bits(value));
+
+        // Write Vectors
+        public void WriteVector2(Vector2 value)
         {
-            WriteInt64(BitConverter.DoubleToInt64Bits(value));
+            WriteFloat(value.X);
+            WriteFloat(value.Y);
         }
 
-        // Write a Vector2 (two floats)
-        public void WriteVector2(UnityEngine.Vector2 value)
+        public void WriteVector3(Vector3 value)
         {
-            WriteSingle(value.x);
-            WriteSingle(value.y);
+            WriteFloat(value.X);
+            WriteFloat(value.Y);
+            WriteFloat(value.Z);
         }
 
-        // Write a Vector3 (three floats)
-        public void WriteVector3(UnityEngine.Vector3 value)
+        // Write Points
+        public void WritePoint8(byte x, byte y)
         {
-            WriteSingle(value.x);
-            WriteSingle(value.y);
-            WriteSingle(value.z);
+            WriteByte(x);
+            WriteByte(y);
         }
 
-        // Write a string (prefixed with length as byte)
+        public void WritePoint16(short x, short y)
+        {
+            WriteInt16(x);
+            WriteInt16(y);
+        }
+
+        public void WritePoint16(ushort x, ushort y)
+        {
+            WriteUInt16(x);
+            WriteUInt16(y);
+        }
+
+        public void WritePoint32(int x, int y)
+        {
+            WriteInt32(x);
+            WriteInt32(y);
+        }
+
+        public void WritePoint32(uint x, uint y)
+        {
+            WriteUInt32(x);
+            WriteUInt32(y);
+        }
+
+        public void WritePoint64(long x, long y)
+        {
+            WriteInt64(x);
+            WriteInt64(y);
+        }
+
+        public void WritePoint64(ulong x, ulong y)
+        {
+            WriteUInt64(x);
+            WriteUInt64(y);
+        }
+
+        // Write String with Dynamic Length Prefix
         public void WriteString(string value)
         {
-            var bytes = Encoding.ASCII.GetBytes(value);
+            var bytes = Encoding.UTF8.GetBytes(value);
+            switch (bytes.Length)
+            {
+                case <= byte.MaxValue:
+                    WriteByte(0);
+                    WriteString8(bytes);
+                    break;
+                case <= ushort.MaxValue:
+                    WriteByte(1);
+                    WriteString16(bytes);
+                    break;
+                default:
+                    WriteByte(2);
+                    WriteString32(bytes);
+                    break;
+            }
+        }
+
+        // Write String with 8-bit Length Prefix
+        private void WriteString8(byte[] bytes)
+        {
             if (bytes.Length > byte.MaxValue)
-                throw new ArgumentException("String is too long to write (maximum 255 characters).");
+            {
+                WriteString16(bytes);
+                return;
+            }
 
             WriteByte((byte)bytes.Length);
             WriteBytes(bytes);
         }
 
-        // Write raw bytes
+        // Write String with 16-bit Length Prefix
+        private void WriteString16(byte[] bytes)
+        {
+            if (bytes.Length > ushort.MaxValue)
+            {
+                WriteString32(bytes);
+                return;
+            }
+
+            WriteUInt16((ushort)bytes.Length);
+            WriteBytes(bytes);
+        }
+
+        // Write String with 32-bit Length Prefix
+        private void WriteString32(byte[] bytes)
+        {
+            WriteUInt32((uint)bytes.Length);
+            WriteBytes(bytes);
+        }
+
+        // Write Bytes
+        public void WriteBytes(params byte[] bytes)
+        {
+            foreach (var b in bytes)
+            {
+                WriteByte(b);
+            }
+        }
+
         public void WriteBytes(ReadOnlySpan<byte> bytes)
         {
-            if (_position + bytes.Length > _span.Length)
-                throw new IndexOutOfRangeException("Not enough space in the span.");
-            bytes.CopyTo(_span.Slice(_position));
+            EnsureCapacity(bytes.Length);
+            bytes.CopyTo(_buffer[_position..]);
             _position += bytes.Length;
         }
+
+        // Write Raw Data
+        private void WriteData8(ReadOnlySpan<byte> data)
+        {
+            WriteByte((byte)data.Length);
+            WriteBytes(data);
+        }
+
+        private void WriteData16(ReadOnlySpan<byte> data)
+        {
+            WriteUInt16((ushort)data.Length);
+            WriteBytes(data);
+        }
+
+        private void WriteData32(ReadOnlySpan<byte> data)
+        {
+            WriteUInt32((uint)data.Length);
+            WriteBytes(data);
+        }
+
+        public void WriteData(ReadOnlySpan<byte> data)
+        {
+            switch (data.Length)
+            {
+                case <= byte.MaxValue:
+                    WriteByte(0);
+                    WriteData8(data);
+                    break;
+                case <= ushort.MaxValue:
+                    WriteByte(1);
+                    WriteData16(data);
+                    break;
+                default:
+                    WriteByte(2);
+                    WriteData32(data);
+                    break;
+            }
+        }
+
+        // Write Arguments
+        public void WriteArgs8(List<string> args)
+        {
+            foreach (var arg in args)
+            {
+                WriteString(arg);
+            }
+        }
+
+        public void WriteArgs(List<string> args)
+        {
+            foreach (var arg in args)
+            {
+                WriteString(arg);
+            }
+        }
+
+        // Write Single Byte
+        public void WriteByte(byte value)
+        {
+            EnsureCapacity(1);
+            _buffer[_position++] = value;
+        }
+
+        // Write Signed Byte
+        public void WriteSByte(sbyte value)
+        {
+            EnsureCapacity(1);
+            _buffer[_position++] = (byte)value;
+        }
+
+        /// <summary>
+        /// Trims the buffer to the written content and returns it as a span.
+        /// </summary>
+        /// <returns>A span containing the written content.</returns>
+        public Span<byte> ToSpan() => _buffer[.._position];
     }
 }

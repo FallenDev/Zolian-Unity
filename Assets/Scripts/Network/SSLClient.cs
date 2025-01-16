@@ -87,7 +87,6 @@ namespace Assets.Scripts.Network
                 var packet = new Packet(opCode, payload);
                 var data = packet.ToArray();
                 sslStream.Write(data, 0, data.Length);
-                Debug.Log($"Packet sent to server: {BitConverter.ToString(data).Replace("-", " ")}");
             }
             catch (Exception ex)
             {

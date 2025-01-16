@@ -1,5 +1,6 @@
 using Assets.Scripts.Network.PacketArgs;
 using Assets.Scripts.Network.OpCodes;
+using UnityEngine;
 
 namespace Assets.Scripts.Network.Converters
 {
@@ -9,12 +10,9 @@ namespace Assets.Scripts.Network.Converters
 
         public override AcceptConnectionArgs Deserialize(ref SpanReader reader)
         {
-            string message = reader.ReadString();
-
-            return new AcceptConnectionArgs
-            {
-                Message = message
-            };
+            var message = reader.ReadString();
+            return new AcceptConnectionArgs { Message = message };
         }
     }
+
 }
