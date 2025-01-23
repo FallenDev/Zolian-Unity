@@ -1,4 +1,6 @@
-﻿namespace Assets.Scripts.Network
+﻿using Assets.Scripts.Network.Span;
+
+namespace Assets.Scripts.Network
 {
     /// <summary>
     /// A base packet converter that provides shared logic for packet deserialization.
@@ -6,16 +8,11 @@
     /// <typeparam name="T">The serializable type the converter is for.</typeparam>
     public abstract class PacketConverterBase<T> : IPacketConverter<T> where T : IPacketSerializable
     {
-        /// <inheritdoc />
         public abstract byte OpCode { get; }
 
-        /// <inheritdoc />
-        object IPacketConverter.Deserialize(ref SpanReader reader)
-        {
-            return Deserialize(ref reader);
-        }
-
-        /// <inheritdoc />
-        public abstract T Deserialize(ref SpanReader reader);
+        object IPacketConverter.Deserialize(ref SpanReader reader) => Deserialize(ref reader);
+        public virtual T Deserialize(ref SpanReader reader) => default;
+        void IPacketConverter.Serialize(ref SpanWriter writer, object args) => Serialize(ref writer, (T)args);
+        public virtual void Serialize(ref SpanWriter writer, T args) { }
     }
 }

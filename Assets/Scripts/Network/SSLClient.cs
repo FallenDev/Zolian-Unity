@@ -8,9 +8,12 @@ using UnityEngine;
 using System.Security.Authentication;
 using System.Text;
 using System.Collections.Generic;
-using Assets.Scripts.Network.Converters;
+using Assets.Scripts.Network.Converters.SendToServer;
+using Assets.Scripts.Network.Converters.ReceiveFromServer;
 using Assets.Scripts.Network.OpCodes;
-using Assets.Scripts.Network.PacketArgs;
+using Assets.Scripts.Network.PacketArgs.SendToServer;
+using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
+using Assets.Scripts.Network.Span;
 
 namespace Assets.Scripts.Network
 {
@@ -21,16 +24,18 @@ namespace Assets.Scripts.Network
         private TcpClient tcpClient;
         private StreamReader reader;
         private StreamWriter writer;
-        private readonly Dictionary<byte, IPacketConverter> Converters = new();
+        private readonly Dictionary<byte, IPacketConverter> ServerConverters = new();
+        private readonly Dictionary<byte, IPacketConverter> ClientConverters = new();
 
         public string serverIp = "127.0.0.1"; // Server IP address
-        public int serverPort = 4200; // Server port
+        public ushort serverPort = 4200; // Server port
 
         private void Start()
         {
             Debug.Log("Attempting to connect...");
-            IndexConverters();
-            ConnectToServer();
+            IndexServerConverters();
+            IndexClientConverters();
+            ConnectToServer(serverPort);
         }
 
         private void Update() { }
@@ -54,32 +59,38 @@ namespace Assets.Scripts.Network
             }
         }
 
-        #region Client -> Server
+        #region Client-Handlers
 
-        private void SendTestData()
+        private void SendVersionNumber()
         {
-            // Send a byte
-            SendDataToServer(new byte[] { 0xFF }, 0x02); // Example OpCode: 0x02
-
-            // Send an int
-            SendDataToServer(BitConverter.GetBytes(123456), 0x03); // Example OpCode: 0x03
-
-            // Send a long
-            SendDataToServer(BitConverter.GetBytes(123456789012345L), 0x04); // Example OpCode: 0x04
-
-            // Send a ulong
-            SendDataToServer(BitConverter.GetBytes(9876543210987654321UL), 0x05); // Example OpCode: 0x05
-
-            // Send a float
-            SendDataToServer(BitConverter.GetBytes(123.45f), 0x06); // Example OpCode: 0x06
-
-            // Send a double
-            SendDataToServer(BitConverter.GetBytes(12345.6789), 0x07); // Example OpCode: 0x07
-
-            // Send a bool (as a byte)
-            SendDataToServer(new byte[] { true ? (byte)1 : (byte)0 }, 0x08); // Example OpCode: 0x08
+            var args = new VersionArgs();
+            SendPacket(args.OpCode, args);
         }
 
+        private void SendConnectionConfirmation()
+        {
+            var args = new ConfirmConnectionArgs();
+            SendPacket(args.OpCode, args);
+        }
+
+        #endregion
+
+        #region Client -> Server
+
+        private void SendMessageToServer(string message)
+        {
+            var payload = Encoding.UTF8.GetBytes(message);
+            SendPacket(0x01, payload); // OpCode for string messages
+        }
+
+        private void SendDataToServer(byte[] data, byte opCode)
+        {
+            SendPacket(opCode, data);
+        }
+
+        /// <summary>
+        /// Sends a packet to the server, using the provided OpCode and payload.
+        /// </summary>
         private void SendPacket(byte opCode, Span<byte> payload)
         {
             try
@@ -94,15 +105,45 @@ namespace Assets.Scripts.Network
             }
         }
 
-        private void SendMessageToServer(string message)
+        /// <summary>
+        /// Sends a packet to the server, using the provided OpCode and arguments.
+        /// </summary>
+        private void SendPacket<T>(byte opCode, T args) where T : IPacketSerializable
         {
-            var payload = Encoding.UTF8.GetBytes(message);
-            SendPacket(0x01, payload); // OpCode for string messages
-        }
+            try
+            {
+                // Fetch the appropriate converter from the indexer
+                if (!ClientConverters.TryGetValue(opCode, out var converter))
+                {
+                    Debug.LogError($"No converter found for OpCode {opCode}.");
+                    return;
+                }
 
-        private void SendDataToServer(byte[] data, byte opCode)
-        {
-            SendPacket(opCode, data);
+                // Cast the converter to the appropriate type
+                if (converter is not PacketConverterBase<T> typedConverter)
+                {
+                    Debug.LogError($"Converter for OpCode {opCode} does not match type {typeof(T).Name}.");
+                    return;
+                }
+
+                // Serialize the arguments into a payload
+                Span<byte> buffer = stackalloc byte[ushort.MaxValue]; // Allocate a large enough buffer
+                var packetWriter = new SpanWriter(buffer);
+                typedConverter.Serialize(ref packetWriter, args);
+
+                // Trim the buffer to the written content
+                var payload = packetWriter.ToSpan();
+
+                // Create and send the packet
+                var packet = new Packet(opCode, payload);
+                var data = packet.ToArray();
+                sslStream.Write(data, 0, data.Length);
+                Debug.Log($"Packet with OpCode {opCode} sent successfully.");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to send packet: {ex.Message}");
+            }
         }
 
         #endregion
@@ -145,7 +186,7 @@ namespace Assets.Scripts.Network
                 Debug.Log($"Packet received: OpCode={packet.OpCode}, Sequence={packet.Sequence}, Length={packet.Length}");
                 Debug.Log($"Raw Payload: {BitConverter.ToString(packet.Payload)}");
 
-                if (Converters.TryGetValue(packet.OpCode, out var converter))
+                if (ServerConverters.TryGetValue(packet.OpCode, out var converter))
                 {
                     var spanReader = new SpanReader(packet.Payload);
                     var args = converter.Deserialize(ref spanReader);
@@ -167,13 +208,23 @@ namespace Assets.Scripts.Network
             switch (opCode)
             {
                 case (byte)ServerOpCode.AcceptConnection: // Login message
-                    var acceptArgs = (AcceptConnectionArgs)args;
-                    Debug.Log($"Accept connection message: {acceptArgs.Message}");
-                    break;
+                    {
+                        var acceptArgs = (AcceptConnectionArgs)args;
+                        Debug.Log($"Accept connection message: {acceptArgs.Message}");
+                        break;
+                    }
                 case (byte)ServerOpCode.LoginMessage: // Login message
-                    var loginArgs = (LoginMessageArgs)args;
-                    Debug.Log($"Login message: {loginArgs.LoginMessageType} - {loginArgs.Message}");
-                    break;
+                    {
+                        var loginArgs = (LoginMessageArgs)args;
+                        Debug.Log($"Login message: {loginArgs.LoginMessageType} - {loginArgs.Message}");
+                        break;
+                    }
+                case (byte)ServerOpCode.ConnectionInfo: // Redirect
+                    {
+                        var connectionInfoArgs = (ConnectionInfoArgs)args;
+                        ConnectToServer(connectionInfoArgs.PortNumber);
+                        break;
+                    }
                 default:
                     Debug.LogWarning($"Unhandled OpCode: {opCode}");
                     break;
@@ -184,38 +235,42 @@ namespace Assets.Scripts.Network
 
         #region Configuration
 
-        private void IndexConverters()
+        private void IndexServerConverters()
         {
-            Converters.Add((byte)ServerOpCode.AcceptConnection, new AcceptConnectionConverter());
-            Converters.Add((byte)ServerOpCode.LoginMessage, new LoginMessageConverter());
-            Converters.Add((byte)ServerOpCode.RemoveEntity, new RemoveEntityConverter());
-            Converters.Add((byte)ServerOpCode.ServerMessage, new ServerMessageConverter());
-            Converters.Add((byte)ServerOpCode.Sound, new SoundConverter());
+            ServerConverters.Add((byte)ServerOpCode.AcceptConnection, new AcceptConnectionConverter());
+            ServerConverters.Add((byte)ServerOpCode.LoginMessage, new LoginMessageConverter());
+            ServerConverters.Add((byte)ServerOpCode.RemoveEntity, new RemoveEntityConverter());
+            ServerConverters.Add((byte)ServerOpCode.ServerMessage, new ServerMessageConverter());
+            ServerConverters.Add((byte)ServerOpCode.Sound, new SoundConverter());
+            ServerConverters.Add((byte)ServerOpCode.ConnectionInfo, new ConnectionInfoConverter());
         }
 
-        private void ConnectToServer()
+        private void IndexClientConverters()
+        {
+            ClientConverters.Add((byte)ClientOpCode.Version, new VersionConverter());
+            ClientConverters.Add((byte)ClientOpCode.ClientRedirected, new ConfirmConnectionConverter());
+        }
+
+        private void ConnectToServer(ushort port)
         {
             try
             {
                 // Initialize the TCP client and SSL stream
-                tcpClient = new TcpClient(serverIp, serverPort);
+                tcpClient = new TcpClient(serverIp, port);
                 ConfigureTcpSocket(tcpClient.Client);
                 sslStream = new SslStream(tcpClient.GetStream(), false, ValidateServerCertificate);
 
                 // Perform SSL handshake
                 sslStream.AuthenticateAsClient("localhost", null, SslProtocols.Tls12, false);
 
-                Debug.Log("Connected securely to the server.");
-
                 // Initialize reader and writer for the stream
                 writer = new StreamWriter(sslStream) { AutoFlush = true };
                 reader = new StreamReader(sslStream);
-
                 isConnected = true;
-
-                // Send an initial message to the server
-                SendMessageToServer("Decoding string messages still works, now attempting to send test data byte arrays!");
-                SendTestData();
+                if (port == serverPort)
+                    SendVersionNumber();
+                else
+                    SendConnectionConfirmation();
             }
             catch (AuthenticationException ex)
             {
@@ -225,7 +280,7 @@ namespace Assets.Scripts.Network
             catch (SocketException ex)
             {
                 Debug.LogError($"SocketException: {ex.Message}");
-                Debug.LogError($"Ensure the server is running at {serverIp}:{serverPort}.");
+                Debug.LogError($"Ensure the server is running at {serverIp}:{port}.");
                 Cleanup();
             }
             catch (Exception ex)

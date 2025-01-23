@@ -401,4 +401,10 @@
         /// </summary>
         AcceptConnection = 126
     }
+
+    public enum ClientOpCode : byte
+    {
+        Version = 0x0A,
+        ClientRedirected = 0x0B,
+    }
 }
