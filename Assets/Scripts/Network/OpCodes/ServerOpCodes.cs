@@ -406,5 +406,6 @@
     {
         Version = 0x0A,
         ClientRedirected = 0x0B,
+        Login = 0x01,
     }
 }

@@ -17,7 +17,7 @@ using Assets.Scripts.Network.Span;
 
 namespace Assets.Scripts.Network
 {
-    public class SSLClient : MonoBehaviour
+    public class WorldClient : MonoBehaviour
     {
         private bool isConnected;
         private SslStream sslStream;
@@ -28,14 +28,33 @@ namespace Assets.Scripts.Network
         private readonly Dictionary<byte, IPacketConverter> ClientConverters = new();
 
         public string serverIp = "127.0.0.1"; // Server IP address
-        public ushort serverPort = 4200; // Server port
+        public ushort serverPort = 4202; // Server port
+
+        // Static instance of NetworkClient
+        private static WorldClient _instance;
+
+        // Public property to access the instance
+        public static WorldClient Instance
+        {
+            get
+            {
+                if (_instance != null) return _instance;
+                // Look for an existing NetworkClient in the scene
+                _instance = FindFirstObjectByType<WorldClient>();
+                if (_instance != null) return _instance;
+
+                // If no instance is found, create one
+                var singletonObject = new GameObject("WorldClient");
+                _instance = singletonObject.AddComponent<WorldClient>();
+
+                return _instance;
+            }
+        }
 
         private void Start()
         {
-            Debug.Log("Attempting to connect...");
             IndexServerConverters();
             IndexClientConverters();
-            ConnectToServer(serverPort);
         }
 
         private void Update() { }
@@ -73,6 +92,17 @@ namespace Assets.Scripts.Network
             SendPacket(args.OpCode, args);
         }
 
+        public void SendLoginCredentials(string username, string password)
+        {
+            var args = new LoginArgs
+            {
+                Username = username,
+                Password = password
+            };
+
+            SendPacket(args.OpCode, args);
+        }
+        
         #endregion
 
         #region Client -> Server
@@ -154,10 +184,10 @@ namespace Assets.Scripts.Network
         {
             try
             {
-                byte[] buffer = new byte[ushort.MaxValue]; // Adjust size as needed
+                var buffer = new byte[ushort.MaxValue]; // Adjust size as needed
                 while (isConnected)
                 {
-                    int bytesRead = await sslStream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
+                    var bytesRead = await sslStream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
 
                     if (bytesRead > 0)
                     {
@@ -222,7 +252,7 @@ namespace Assets.Scripts.Network
                 case (byte)ServerOpCode.ConnectionInfo: // Redirect
                     {
                         var connectionInfoArgs = (ConnectionInfoArgs)args;
-                        ConnectToServer(connectionInfoArgs.PortNumber);
+                        //ConnectToServer(connectionInfoArgs.PortNumber);
                         break;
                     }
                 default:
@@ -249,9 +279,10 @@ namespace Assets.Scripts.Network
         {
             ClientConverters.Add((byte)ClientOpCode.Version, new VersionConverter());
             ClientConverters.Add((byte)ClientOpCode.ClientRedirected, new ConfirmConnectionConverter());
+            ClientConverters.Add((byte)ClientOpCode.Login, new LoginConverter());
         }
 
-        private void ConnectToServer(ushort port)
+        public void ConnectToServer(ushort port)
         {
             try
             {
@@ -268,8 +299,6 @@ namespace Assets.Scripts.Network
                 reader = new StreamReader(sslStream);
                 isConnected = true;
                 if (port == serverPort)
-                    SendVersionNumber();
-                else
                     SendConnectionConfirmation();
             }
             catch (AuthenticationException ex)

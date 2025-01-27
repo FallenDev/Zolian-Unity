@@ -12,9 +12,8 @@ namespace Assets.Scripts.Network.PacketArgs.ReceiveFromServer
     public enum LoginMessageType : byte
     {
         Confirm = 0,
-        ClearNameMessage = 3,
-        ClearPswdMessage = 5,
-        CharacterDoesntExist = 14,
-        WrongPassword = 15
+        WrongPassword = 1,
+        CheckName = 2,
+        CheckPassword = 3
     }
 }
