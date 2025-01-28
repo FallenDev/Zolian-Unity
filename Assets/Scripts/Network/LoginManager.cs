@@ -21,9 +21,15 @@ namespace Assets.Scripts.Network
             var username = usernameInput.text;
             var password = passwordInput.text;
 
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(username))
             {
-                Debug.LogWarning("Username or Password cannot be empty!");
+                PopupManager.Instance.ShowMessage("Username cannot be empty!");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(password))
+            {
+                PopupManager.Instance.ShowMessage("Password cannot be empty!");
                 return;
             }
 

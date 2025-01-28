@@ -210,18 +210,23 @@ namespace Assets.Scripts.Network
                 case (byte)ServerOpCode.LoginMessage: // Login message
                     {
                         var loginArgs = (LoginMessageArgs)args;
-                        Debug.Log($"Login message: {loginArgs.LoginMessageType} - {loginArgs.Message}");
+                        MainThreadDispatcher.RunOnMainThread(() =>
+                        {
+                            PopupManager.Instance.ShowMessage(loginArgs.Message);
+                        });
                         break;
                     }
                 case (byte)ServerOpCode.ConnectionInfo: // Redirect
                     {
                         var connectionInfoArgs = (ConnectionInfoArgs)args;
-                        var world = new WorldClient();
-                        world.ConnectToServer(connectionInfoArgs.PortNumber);
+                        // Redirect to World Scene
                         break;
                     }
                 default:
-                    Debug.LogWarning($"Unhandled OpCode: {opCode}");
+                    MainThreadDispatcher.RunOnMainThread(() =>
+                    {
+                        PopupManager.Instance.ShowMessage($"Unhandled OpCode: {opCode}");
+                    });
                     break;
             }
         }
@@ -265,18 +270,17 @@ namespace Assets.Scripts.Network
             }
             catch (AuthenticationException ex)
             {
-                Debug.LogError($"SSL Authentication failed: {ex.Message}");
+                PopupManager.Instance.ShowMessage($"SSL Authentication failed: {ex.Message}");
                 Cleanup();
             }
             catch (SocketException ex)
             {
-                Debug.LogError($"SocketException: {ex.Message}");
-                Debug.LogError($"Ensure the server is running at {_serverIp}:{port}.");
+                PopupManager.Instance.ShowMessage("Server Offline");
                 Cleanup();
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Connection error: {ex.Message}");
+                PopupManager.Instance.ShowMessage($"Connection error: {ex.Message}");
                 Cleanup();
             }
             finally
@@ -304,11 +308,11 @@ namespace Assets.Scripts.Network
                 }
 #endif
 
-                Debug.LogError($"Certificate validation failed: {sslPolicyErrors}");
+                PopupManager.Instance.ShowMessage($"Certificate validation failed: {sslPolicyErrors}");
                 return false;
             }
 
-            Debug.LogError("The provided certificate is not an X509Certificate2.");
+            PopupManager.Instance.ShowMessage("The provided certificate is not an X509Certificate2.");
             return false;
         }
 

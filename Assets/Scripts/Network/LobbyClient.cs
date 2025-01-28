@@ -7,6 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using System.Security.Authentication;
 using System.Collections.Generic;
+using System.Threading;
 using Assets.Scripts.Network.Converters.SendToServer;
 using Assets.Scripts.Network.Converters.ReceiveFromServer;
 using Assets.Scripts.Network.OpCodes;
@@ -27,6 +28,7 @@ namespace Assets.Scripts.Network
         private StreamWriter writer;
         private readonly Dictionary<byte, IPacketConverter> ServerConverters = new();
         private readonly Dictionary<byte, IPacketConverter> ClientConverters = new();
+        private static SynchronizationContext _mainThreadContext;
 
         [SerializeField] private string _serverIp = "127.0.0.1";
         [SerializeField] private ushort _lobbyPort = 4200;
@@ -52,6 +54,13 @@ namespace Assets.Scripts.Network
 
                 return _instance;
             }
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void Initialize()
+        {
+            // Save the main thread context
+            _mainThreadContext = SynchronizationContext.Current;
         }
 
         private void Start()
@@ -212,7 +221,10 @@ namespace Assets.Scripts.Network
                 case (byte)ServerOpCode.LoginMessage: // Login message
                     {
                         var loginArgs = (LoginMessageArgs)args;
-                        Debug.Log($"Login message: {loginArgs.LoginMessageType} - {loginArgs.Message}");
+                        MainThreadDispatcher.RunOnMainThread(() =>
+                        {
+                            PopupManager.Instance.ShowMessage(loginArgs.Message);
+                        });
                         break;
                     }
                 case (byte)ServerOpCode.ConnectionInfo: // Redirection
@@ -223,7 +235,10 @@ namespace Assets.Scripts.Network
                         break;
                     }
                 default:
-                    Debug.LogWarning($"Unhandled OpCode: {opCode}");
+                    MainThreadDispatcher.RunOnMainThread(() =>
+                    {
+                        PopupManager.Instance.ShowMessage($"Unhandled OpCode: {opCode}");
+                    });
                     break;
             }
         }
@@ -268,18 +283,17 @@ namespace Assets.Scripts.Network
             }
             catch (AuthenticationException ex)
             {
-                Debug.LogError($"SSL Authentication failed: {ex.Message}");
+                PopupManager.Instance.ShowMessage($"SSL Authentication failed: {ex.Message}");
                 Cleanup();
             }
             catch (SocketException ex)
             {
-                Debug.LogError($"SocketException: {ex.Message}");
-                Debug.LogError($"Ensure the server is running at {_serverIp}:{port}.");
+                PopupManager.Instance.ShowMessage("Server Offline");
                 Cleanup();
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Connection error: {ex.Message}");
+                PopupManager.Instance.ShowMessage($"Connection error: {ex.Message}");
                 Cleanup();
             }
             finally
@@ -307,11 +321,11 @@ namespace Assets.Scripts.Network
                 }
 #endif
 
-                Debug.LogError($"Certificate validation failed: {sslPolicyErrors}");
+                PopupManager.Instance.ShowMessage($"Certificate validation failed: {sslPolicyErrors}");
                 return false;
             }
 
-            Debug.LogError("The provided certificate is not an X509Certificate2.");
+            PopupManager.Instance.ShowMessage("The provided certificate is not an X509Certificate2.");
             return false;
         }
 
