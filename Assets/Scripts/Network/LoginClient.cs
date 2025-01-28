@@ -98,7 +98,7 @@ namespace Assets.Scripts.Network
 
             SendPacket(args.OpCode, args);
         }
-        
+
         #endregion
 
         /// <summary>
@@ -106,8 +106,8 @@ namespace Assets.Scripts.Network
         /// </summary>
         private void SendPacket<T>(byte opCode, T args) where T : IPacketSerializable
         {
-            //try
-            //{
+            try
+            {
                 // Fetch the appropriate converter from the indexer
                 if (!ClientConverters.TryGetValue(opCode, out var converter))
                 {
@@ -135,11 +135,11 @@ namespace Assets.Scripts.Network
                 var data = packet.ToArray();
                 sslStream.Write(data, 0, data.Length);
                 Debug.Log($"Packet with OpCode {opCode} sent successfully.");
-            //}
-            //catch (Exception ex)
-            //{
-            //    Debug.LogError($"Failed to send packet: {ex.Message}");
-            //}
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to send packet: {ex.Message}");
+            }
         }
 
         #region Server -> Client

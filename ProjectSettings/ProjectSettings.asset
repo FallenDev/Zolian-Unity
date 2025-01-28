@@ -889,7 +889,7 @@ PlayerSettings:
   projectName: Zolian Client
   organizationId: paulbuck86
   cloudEnabled: 0
-  legacyClampBlendShapeWeights: 1
+  legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
   platformRequiresReadableAssets: 0
   virtualTexturingSupportEnabled: 0
