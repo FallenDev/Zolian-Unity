@@ -4,7 +4,7 @@ using Assets.Scripts.Network.Span;
 
 namespace Assets.Scripts.Network.Converters.ReceiveFromServer
 {
-    public class AcceptConnectionConverter : PacketConverterBase<AcceptConnectionArgs>
+    public sealed class AcceptConnectionConverter : PacketConverterBase<AcceptConnectionArgs>
     {
         public override byte OpCode => (byte)ServerOpCode.AcceptConnection;
 

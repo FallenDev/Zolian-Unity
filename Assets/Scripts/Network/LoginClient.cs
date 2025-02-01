@@ -14,6 +14,8 @@ using Assets.Scripts.Network.OpCodes;
 using Assets.Scripts.Network.PacketArgs.SendToServer;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using Assets.Scripts.Network.Span;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 namespace Assets.Scripts.Network
 {
@@ -88,12 +90,11 @@ namespace Assets.Scripts.Network
             SendPacket(args.OpCode, args);
         }
 
-        public void SendLoginCredentials(string username, string password)
+        public void SendLoginCredentials(long steamId)
         {
             var args = new LoginArgs
             {
-                Username = username,
-                Password = password
+                SteamId = steamId
             };
 
             SendPacket(args.OpCode, args);
@@ -222,6 +223,16 @@ namespace Assets.Scripts.Network
                         // Redirect to World Scene
                         break;
                     }
+                case (byte)ServerOpCode.PlayerList:
+                    {
+                        var playerListArgs = (PlayerListArgs)args;
+
+                        MainThreadDispatcher.RunOnMainThread(() =>
+                        {
+                            CharacterSelectionManager.Instance.ShowCharacterSelection(playerListArgs.Players);
+                        });
+                        break;
+                    }
                 default:
                     MainThreadDispatcher.RunOnMainThread(() =>
                     {
@@ -241,6 +252,7 @@ namespace Assets.Scripts.Network
             ServerConverters.Add((byte)ServerOpCode.LoginMessage, new LoginMessageConverter());
             ServerConverters.Add((byte)ServerOpCode.ServerMessage, new ServerMessageConverter());
             ServerConverters.Add((byte)ServerOpCode.ConnectionInfo, new ConnectionInfoConverter());
+            ServerConverters.Add((byte)ServerOpCode.PlayerList, new PlayerListConverter());
         }
 
         private void IndexClientConverters()

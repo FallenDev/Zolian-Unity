@@ -91,17 +91,6 @@ namespace Assets.Scripts.Network
             var args = new ConfirmConnectionArgs();
             SendPacket(args.OpCode, args);
         }
-
-        public void SendLoginCredentials(string username, string password)
-        {
-            var args = new LoginArgs
-            {
-                Username = username,
-                Password = password
-            };
-
-            SendPacket(args.OpCode, args);
-        }
         
         #endregion
 

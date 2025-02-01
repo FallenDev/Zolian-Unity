@@ -6,8 +6,7 @@ namespace Assets.Scripts.Network
 {
     public class LoginManager : MonoBehaviour
     {
-        public TMP_InputField usernameInput;
-        public TMP_InputField passwordInput;
+        public TMP_InputField steamId;
         public Button loginButton;
 
         private void Start()
@@ -18,23 +17,16 @@ namespace Assets.Scripts.Network
 
         private void OnLoginButtonClick()
         {
-            var username = usernameInput.text;
-            var password = passwordInput.text;
+            var successful = int.TryParse(steamId.text, out var localSteamId);
 
-            if (string.IsNullOrEmpty(username))
+            if (!successful)
             {
-                PopupManager.Instance.ShowMessage("Username cannot be empty!");
-                return;
-            }
-
-            if (string.IsNullOrEmpty(password))
-            {
-                PopupManager.Instance.ShowMessage("Password cannot be empty!");
+                PopupManager.Instance.ShowMessage("No account exists, would you like to create one?");
                 return;
             }
 
             // Call your networking logic here for authentication
-            LoginClient.Instance.SendLoginCredentials(username, password);
+            LoginClient.Instance.SendLoginCredentials(localSteamId);
         }
     }
 }

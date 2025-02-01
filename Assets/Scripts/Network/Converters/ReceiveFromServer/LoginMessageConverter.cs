@@ -4,7 +4,7 @@ using Assets.Scripts.Network.Span;
 
 namespace Assets.Scripts.Network.Converters.ReceiveFromServer
 {
-    public class LoginMessageConverter : PacketConverterBase<LoginMessageArgs>
+    public sealed class LoginMessageConverter : PacketConverterBase<LoginMessageArgs>
     {
         public override byte OpCode => (byte)ServerOpCode.LoginMessage;
 

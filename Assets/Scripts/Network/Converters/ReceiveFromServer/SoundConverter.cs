@@ -4,15 +4,10 @@ using Assets.Scripts.Network.Span;
 
 namespace Assets.Scripts.Network.Converters.ReceiveFromServer
 {
-    /// <summary>
-    ///     Provides deserialization logic for <see cref="SoundArgs" />
-    /// </summary>
     public sealed class SoundConverter : PacketConverterBase<SoundArgs>
     {
-        /// <inheritdoc />
         public override byte OpCode => (byte)ServerOpCode.Sound;
 
-        /// <inheritdoc />
         public override SoundArgs Deserialize(ref SpanReader reader)
         {
             var indicatorOrIndex = reader.ReadByte();

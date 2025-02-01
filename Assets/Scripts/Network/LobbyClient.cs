@@ -283,17 +283,26 @@ namespace Assets.Scripts.Network
             }
             catch (AuthenticationException ex)
             {
-                PopupManager.Instance.ShowMessage($"SSL Authentication failed: {ex.Message}");
+                MainThreadDispatcher.RunOnMainThread(() =>
+                {
+                    PopupManager.Instance.ShowMessage($"SSL Authentication failed: {ex.Message}");
+                });
                 Cleanup();
             }
             catch (SocketException ex)
             {
-                PopupManager.Instance.ShowMessage("Server Offline");
+                MainThreadDispatcher.RunOnMainThread(() =>
+                {
+                    PopupManager.Instance.ShowMessage("Server Offline");
+                });
                 Cleanup();
             }
             catch (Exception ex)
             {
-                PopupManager.Instance.ShowMessage($"Connection error: {ex.Message}");
+                MainThreadDispatcher.RunOnMainThread(() =>
+                {
+                    PopupManager.Instance.ShowMessage($"Connection error: {ex.Message}");
+                });
                 Cleanup();
             }
             finally

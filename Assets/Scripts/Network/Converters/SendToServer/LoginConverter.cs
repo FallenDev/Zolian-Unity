@@ -10,8 +10,7 @@ namespace Assets.Scripts.Network.Converters.SendToServer
         
         public override void Serialize(ref SpanWriter writer, LoginArgs args)
         {
-            writer.WriteString(args.Username);
-            writer.WriteString(args.Password);
+            writer.WriteInt64(args.SteamId);
         }
     }
 }
