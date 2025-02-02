@@ -8,6 +8,7 @@ using UnityEngine;
 using System.Security.Authentication;
 using System.Text;
 using System.Collections.Generic;
+using Assets.Scripts.Managers;
 using Assets.Scripts.Network.Converters.SendToServer;
 using Assets.Scripts.Network.Converters.ReceiveFromServer;
 using Assets.Scripts.Network.OpCodes;
@@ -229,7 +230,17 @@ namespace Assets.Scripts.Network
 
                         MainThreadDispatcher.RunOnMainThread(() =>
                         {
-                            CharacterSelectionManager.Instance.ShowCharacterSelection(playerListArgs.Players);
+                            CreationAndAuthManager.Instance.loginButton.gameObject.SetActive(false);
+                            CreationAndAuthManager.Instance.steamId.gameObject.SetActive(false);
+
+                            if (playerListArgs.Players.Count != 0)
+                            {
+                                CharacterSelectionManager.Instance.ShowCharacterSelection(playerListArgs.Players);
+                                return;
+                            }
+
+                            PopupManager.Instance.ShowMessage("No characters found, create one below!");
+                            CreationAndAuthManager.Instance.createButton.gameObject.SetActive(true);
                         });
                         break;
                     }
