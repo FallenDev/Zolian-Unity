@@ -6,7 +6,7 @@ namespace Assets.Scripts.Managers
 {
     public class PopupManager : MonoBehaviour
     {
-        [SerializeField] private GameObject popupPanel;
+        public GameObject popupPanel;
         [SerializeField] private TMP_Text messageText;
 
         private static PopupManager _instance;

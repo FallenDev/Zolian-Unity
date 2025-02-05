@@ -91,11 +91,15 @@ namespace Assets.Scripts.Network
             SendPacket(args.OpCode, args);
         }
 
+        /// <summary>
+        /// Obtained SteamID sent to the server for login
+        /// </summary>
         public void SendLoginCredentials(long steamId)
         {
+            // ToDo: Mock ID used for now 123456
             var args = new LoginArgs
             {
-                SteamId = steamId
+                SteamId = 1
             };
 
             SendPacket(args.OpCode, args);
@@ -207,6 +211,9 @@ namespace Assets.Scripts.Network
                     {
                         var acceptArgs = (AcceptConnectionArgs)args;
                         Debug.Log($"Accept connection message: {acceptArgs.Message}");
+
+                        // ToDo: Obtain SteamID and send it here
+                        SendLoginCredentials(1);
                         break;
                     }
                 case (byte)ServerOpCode.LoginMessage: // Login message
@@ -230,9 +237,6 @@ namespace Assets.Scripts.Network
 
                         MainThreadDispatcher.RunOnMainThread(() =>
                         {
-                            CreationAndAuthManager.Instance.loginButton.gameObject.SetActive(false);
-                            CreationAndAuthManager.Instance.steamId.gameObject.SetActive(false);
-
                             if (playerListArgs.Players.Count != 0)
                             {
                                 CharacterSelectionManager.Instance.ShowCharacterSelection(playerListArgs.Players);

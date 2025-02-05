@@ -7,8 +7,6 @@ namespace Assets.Scripts.Managers
 {
     public class CreationAndAuthManager : MonoBehaviour
     {
-        public TMP_InputField steamId;
-        public Button loginButton;
         public Button createButton;
         public Button cancelButton;
         public Button exitButton;
@@ -26,18 +24,9 @@ namespace Assets.Scripts.Managers
 
         private void Start()
         {
-            loginButton.onClick.AddListener(OnLoginButtonClick);
             createButton.onClick.AddListener(OnCreateButtonClick);
             cancelButton.onClick.AddListener(OnCancelButtonClick);
             exitButton.onClick.AddListener(OnExitButtonClick);
-        }
-
-        private void OnLoginButtonClick()
-        {
-            int.TryParse(steamId.text, out var localSteamId);
-            // Calls networking logic here for authentication
-            LoginClient.Instance.SendLoginCredentials(localSteamId);
-            createButton.gameObject.SetActive(true);
         }
 
         private void OnCreateButtonClick()
@@ -45,16 +34,19 @@ namespace Assets.Scripts.Managers
             // Hide character selection
             characterSelectionUI.SetActive(false);
             characterSelectionPanel.SetActive(false);
-            loginButton.gameObject.SetActive(false);
-            steamId.gameObject.SetActive(false);
             cancelButton.gameObject.SetActive(true);
+            PopupManager.Instance.popupPanel.SetActive(false);
             // Show character creation
         }
 
         private void OnCancelButtonClick()
         {
-            characterSelectionUI.SetActive(true);
-            characterSelectionPanel.SetActive(true);
+            if (CharacterSelectionManager.Instance.cachedPlayers.Count >= 1)
+            {
+                characterSelectionUI.SetActive(true);
+                characterSelectionPanel.SetActive(true);
+            }
+
             cancelButton.gameObject.SetActive(false);
         }
 

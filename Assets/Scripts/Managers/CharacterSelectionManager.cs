@@ -23,6 +23,7 @@ namespace Assets.Scripts.Managers
         public Button createButton;
         public Button cancelButton;
 
+        public List<PlayerSelection> cachedPlayers = new();
         private PlayerSelection selectedPlayer;
 
         public static CharacterSelectionManager Instance;
@@ -38,6 +39,7 @@ namespace Assets.Scripts.Managers
 
         public void ShowCharacterSelection(List<PlayerSelection> players)
         {
+            cachedPlayers = players;
             characterSelectionUI.SetActive(true);
             PopulateCharacterSelection(players);
         }
