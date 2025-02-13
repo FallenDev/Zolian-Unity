@@ -1,4 +1,5 @@
 using Assets.Scripts.Managers;
+using Assets.Scripts.Network;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using UnityEngine;
 using TMPro;
@@ -28,6 +29,7 @@ public class CharacterSelection : MonoBehaviour
     private void OnCharacterSelected()
     {
         Debug.Log($"Character {player.Name} selected!");
+        Debug.Log($"{player.Serial} {LoginClient.Instance.SteamId}");
         CharacterSelectionManager.Instance.SelectCharacter(player);
     }
 }

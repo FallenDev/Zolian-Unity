@@ -44,6 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd3dac386825f4a40be3e804b61796d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  usernameInput: {fileID: 0}
-  passwordInput: {fileID: 0}
-  loginButton: {fileID: 0}
+  createButton: {fileID: 0}
+  cancelButton: {fileID: 0}
+  exitButton: {fileID: 0}
+  characterSelectionUI: {fileID: 0}
+  characterSelectionPanel: {fileID: 0}

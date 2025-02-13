@@ -10,6 +10,7 @@ namespace Assets.Scripts.Managers
         public Button createButton;
         public Button cancelButton;
         public Button exitButton;
+        public Button loginButton;
 
         // GameObjects attached so they can be hidden through this manager
         public GameObject characterSelectionUI;
@@ -27,6 +28,8 @@ namespace Assets.Scripts.Managers
             createButton.onClick.AddListener(OnCreateButtonClick);
             cancelButton.onClick.AddListener(OnCancelButtonClick);
             exitButton.onClick.AddListener(OnExitButtonClick);
+            loginButton.onClick.AddListener(OnLoginButtonClick);
+            loginButton.gameObject.SetActive(false);
         }
 
         private void OnCreateButtonClick()
@@ -41,13 +44,18 @@ namespace Assets.Scripts.Managers
 
         private void OnCancelButtonClick()
         {
-            if (CharacterSelectionManager.Instance.cachedPlayers.Count >= 1)
+            if (LoginClient.Instance.cachedPlayers.Count >= 1)
             {
                 characterSelectionUI.SetActive(true);
                 characterSelectionPanel.SetActive(true);
             }
 
             cancelButton.gameObject.SetActive(false);
+        }
+
+        private void OnLoginButtonClick()
+        {
+            Debug.Log($"Logging in {CharacterSelectionManager.Instance.selectedPlayer.Name}");
         }
 
         private void OnExitButtonClick() => MainThreadDispatcher.RunOnMainThread(Application.Quit);

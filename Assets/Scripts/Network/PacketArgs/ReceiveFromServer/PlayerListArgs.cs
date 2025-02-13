@@ -10,6 +10,7 @@ namespace Assets.Scripts.Network.PacketArgs.ReceiveFromServer
 
     public sealed record PlayerSelection
     {
+        public long Serial { get; set; }
         public string Name { get; set; }
         public int Level { get; set; }
         public BaseClass BaseClass { get; set; }

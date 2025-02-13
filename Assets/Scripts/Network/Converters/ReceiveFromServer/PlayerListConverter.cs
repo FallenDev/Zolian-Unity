@@ -18,6 +18,7 @@ namespace Assets.Scripts.Network.Converters.ReceiveFromServer
 
             for (var i = 0; i < numberOfCharacters; i++)
             {
+                var serial = reader.ReadInt64();
                 var name = reader.ReadString();
                 var level = reader.ReadInt32();
                 var baseClassString = reader.ReadString();
@@ -32,6 +33,7 @@ namespace Assets.Scripts.Network.Converters.ReceiveFromServer
 
                 var player = new PlayerSelection
                 {
+                    Serial = serial,
                     Name = name,
                     Level = level,
                     BaseClass = baseClass,

@@ -29,6 +29,8 @@ namespace Assets.Scripts.Network
         private StreamWriter writer;
         private readonly Dictionary<byte, IPacketConverter> ServerConverters = new();
         private readonly Dictionary<byte, IPacketConverter> ClientConverters = new();
+        public List<PlayerSelection> cachedPlayers = new();
+        public long SteamId;
 
         [SerializeField] private string _serverIp = "127.0.0.1";
         [SerializeField] private ushort _loginPort = 4201;
@@ -96,10 +98,9 @@ namespace Assets.Scripts.Network
         /// </summary>
         public void SendLoginCredentials(long steamId)
         {
-            // ToDo: Mock ID used for now 123456
             var args = new LoginArgs
             {
-                SteamId = 1
+                SteamId = steamId
             };
 
             SendPacket(args.OpCode, args);
@@ -213,7 +214,8 @@ namespace Assets.Scripts.Network
                         Debug.Log($"Accept connection message: {acceptArgs.Message}");
 
                         // ToDo: Obtain SteamID and send it here
-                        SendLoginCredentials(1);
+                        SteamId = 123456;
+                        SendLoginCredentials(SteamId);
                         break;
                     }
                 case (byte)ServerOpCode.LoginMessage: // Login message
@@ -234,6 +236,7 @@ namespace Assets.Scripts.Network
                 case (byte)ServerOpCode.PlayerList:
                     {
                         var playerListArgs = (PlayerListArgs)args;
+                        cachedPlayers = playerListArgs.Players;
 
                         MainThreadDispatcher.RunOnMainThread(() =>
                         {
