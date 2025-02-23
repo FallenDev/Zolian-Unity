@@ -240,13 +240,14 @@ namespace Assets.Scripts.Network
 
                         MainThreadDispatcher.RunOnMainThread(() =>
                         {
-                            if (playerListArgs.Players.Count != 0)
+                            if (cachedPlayers.Count == 0)
+                                PopupManager.Instance.ShowMessage("No characters found, create one below!");
+                            else
                             {
-                                CharacterSelectionManager.Instance.ShowCharacterSelection(playerListArgs.Players);
-                                return;
+                                CharacterSelectionUI.Instance.PopulateCharacterList();
+                                CharacterSelectionUI.Instance.SelectCharacter(0);
                             }
-
-                            PopupManager.Instance.ShowMessage("No characters found, create one below!");
+                            
                             CreationAndAuthManager.Instance.createButton.gameObject.SetActive(true);
                         });
                         break;

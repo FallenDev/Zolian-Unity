@@ -1,5 +1,4 @@
 using Assets.Scripts.Network;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,12 +7,9 @@ namespace Assets.Scripts.Managers
     public class CreationAndAuthManager : MonoBehaviour
     {
         public Button createButton;
+        public Button deleteButton;
         public Button cancelButton;
-        public Button exitButton;
         public Button loginButton;
-
-        // GameObjects attached so they can be hidden through this manager
-        public GameObject characterSelectionUI;
         public GameObject characterSelectionPanel;
 
         public static CreationAndAuthManager Instance;
@@ -21,43 +17,62 @@ namespace Assets.Scripts.Managers
         private void Awake()
         {
             Instance = this;
+            createButton.onClick.AddListener(OnCreateButtonClick);
+            deleteButton.onClick.AddListener(OnDeleteButtonClick);
+            cancelButton.onClick.AddListener(OnCancelButtonClick);
+            loginButton.onClick.AddListener(OnLoginButtonClick);
         }
 
         private void Start()
         {
-            createButton.onClick.AddListener(OnCreateButtonClick);
-            cancelButton.onClick.AddListener(OnCancelButtonClick);
-            exitButton.onClick.AddListener(OnExitButtonClick);
-            loginButton.onClick.AddListener(OnLoginButtonClick);
+            deleteButton.gameObject.SetActive(false);
+            cancelButton.gameObject.SetActive(false);
             loginButton.gameObject.SetActive(false);
         }
 
-        private void OnCreateButtonClick()
+        public void OnCreateButtonClick()
         {
-            // Hide character selection
-            characterSelectionUI.SetActive(false);
-            characterSelectionPanel.SetActive(false);
-            cancelButton.gameObject.SetActive(true);
+            // Hide popup if it exists
             PopupManager.Instance.popupPanel.SetActive(false);
-            // Show character creation
+
+            // Hide UI not needed for character creation
+            characterSelectionPanel.SetActive(false);
+            deleteButton.gameObject.SetActive(false);
+            loginButton.gameObject.SetActive(false);
+            createButton.gameObject.SetActive(false);
+            CharacterSelectionUI.Instance.leftArrowButton.gameObject.SetActive(false);
+            CharacterSelectionUI.Instance.rightArrowButton.gameObject.SetActive(false);
+
+            // Show UI needed for character creation
+            cancelButton.gameObject.SetActive(true);
+        }
+
+        private void OnDeleteButtonClick()
+        {
+            // Show character deletion
         }
 
         private void OnCancelButtonClick()
         {
+            // Hide UI not needed for character selection
+            cancelButton.gameObject.SetActive(false);
+
+            // Show UI needed for character selection
             if (LoginClient.Instance.cachedPlayers.Count >= 1)
             {
-                characterSelectionUI.SetActive(true);
                 characterSelectionPanel.SetActive(true);
             }
 
-            cancelButton.gameObject.SetActive(false);
+            deleteButton.gameObject.SetActive(true);
+            loginButton.gameObject.SetActive(true);
+            createButton.gameObject.SetActive(true);
+            CharacterSelectionUI.Instance.leftArrowButton.gameObject.SetActive(true);
+            CharacterSelectionUI.Instance.rightArrowButton.gameObject.SetActive(true);
         }
 
-        private void OnLoginButtonClick()
+        public void OnLoginButtonClick()
         {
-            Debug.Log($"Logging in {CharacterSelectionManager.Instance.selectedPlayer.Name}");
+            Debug.Log($"OnLoginButtonClick called");
         }
-
-        private void OnExitButtonClick() => MainThreadDispatcher.RunOnMainThread(Application.Quit);
     }
 }
