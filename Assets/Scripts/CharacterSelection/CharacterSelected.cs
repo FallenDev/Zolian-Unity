@@ -6,7 +6,6 @@ namespace Assets.Scripts.Managers
 {
     public class CharacterSelected : MonoBehaviour
     {
-        public TextMeshProUGUI characterNameText;
         public TextMeshProUGUI characterLevelText;
         public TextMeshProUGUI characterBaseClassText;
         public TextMeshProUGUI characterAdvClassText;
@@ -26,7 +25,6 @@ namespace Assets.Scripts.Managers
         public void SelectCharacter(PlayerSelection player)
         {
             selectedPlayer = player;
-            characterNameText.text = player.Name;
             characterLevelText.text = $"Level: {player.Level}";
             characterBaseClassText.text = $"Class: {player.BaseClass}";
             characterAdvClassText.text = $"Adv Class: {player.AdvClass}";

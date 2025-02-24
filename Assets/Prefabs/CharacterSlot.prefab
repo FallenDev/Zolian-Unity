@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 4199496528890426637}
   - component: {fileID: 3188153850280829368}
   - component: {fileID: 8144254022791453147}
-  - component: {fileID: 7185576228613969229}
   - component: {fileID: 5210868480917305458}
   - component: {fileID: 6440464978178518736}
   m_Layer: 5
@@ -94,18 +93,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &7185576228613969229
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 333253968087552150}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bba044c8bfc5a0e46ac197d98360efde, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &5210868480917305458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,12 +235,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
+  m_fontSize: 12
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMin: 12
+  m_fontSizeMax: 24
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -286,7 +273,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 60.10524, z: 0, w: 40.32956}
+  m_margin: {x: 12.376648, y: 53.382095, z: 12.053711, w: 34.434113}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -327,7 +314,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 19.500002, y: 4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8695177146997305242
 CanvasRenderer:
