@@ -11,7 +11,7 @@ public class CharacterSelectionUI : MonoBehaviour
     [Header("UI Elements")]
     public GameObject characterListPanel;
     public GameObject characterEntryPrefab;
-    public Transform characterListContainer;
+    public Transform contentListContainer;
     public RawImage characterPreview;
     public TextMeshProUGUI characterNameText;
     public Button leftArrowButton;
@@ -40,10 +40,26 @@ public class CharacterSelectionUI : MonoBehaviour
     {
         characters = LoginClient.Instance.cachedPlayers;
 
-        foreach (Transform child in characterListContainer)
+        List<Transform> childrenToDestroy = new List<Transform>();
+
+        // Collect only character slot entries, NOT the Content object itself
+        foreach (Transform child in contentListContainer)
         {
-            Destroy(child.gameObject);
+            if (child.CompareTag("CharacterSlot")) // Ensure only character slots are deleted
+            {
+                childrenToDestroy.Add(child);
+            }
         }
+
+        // Now, safely destroy only the character slots
+        foreach (Transform child in childrenToDestroy)
+        {
+            DestroyImmediate(child.gameObject);
+        }
+
+        // Force UI to update after clearing
+        LayoutRebuilder.ForceRebuildLayoutImmediate(contentListContainer.GetComponent<RectTransform>());
+
 
         if (LoginClient.Instance.cachedPlayers.Count >= 1)
         {
@@ -54,7 +70,8 @@ public class CharacterSelectionUI : MonoBehaviour
 
         for (var i = 0; i < characters.Count; i++)
         {
-            var entry = Instantiate(characterEntryPrefab, characterListContainer);
+            var entry = Instantiate(characterEntryPrefab, contentListContainer);
+            entry.transform.SetParent(contentListContainer, false);
             entry.GetComponentInChildren<TextMeshProUGUI>().text = $"{characters[i].Name} (Lvl {characters[i].Level} {characters[i].BaseClass})";
             var index = i;
             entry.GetComponent<Button>().onClick.AddListener(() =>
@@ -69,17 +86,16 @@ public class CharacterSelectionUI : MonoBehaviour
     {
         if (characters.Count == 0) return;
         selectedCharacterIndex = index;
-        CharacterSelected.Instance.SelectCharacter(characters[index]);
         UpdateCharacterDisplay();
     }
 
     private void UpdateCharacterDisplay()
     {
         if (characters.Count == 0) return;
-
+        CharacterSelected.Instance.SelectCharacter(characters[selectedCharacterIndex]);
         var character = characters[selectedCharacterIndex];
         characterNameText.text = $"{character.Name} - Lvl {character.Level} {character.BaseClass}";
-        
+
         // TODO: Update 3D character preview
     }
 
