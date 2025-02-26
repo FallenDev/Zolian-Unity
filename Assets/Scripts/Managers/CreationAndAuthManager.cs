@@ -11,6 +11,11 @@ namespace Assets.Scripts.Managers
         public Button cancelButton;
         public Button loginButton;
         public GameObject characterSelectionPanel;
+        public GameObject characterCreationPanel;
+
+        // These are the groups that will be shown/hidden
+        public GameObject characterSelectionGroup;
+        public GameObject characterCreationGroup;
 
         public static CreationAndAuthManager Instance;
 
@@ -23,28 +28,13 @@ namespace Assets.Scripts.Managers
             loginButton.onClick.AddListener(OnLoginButtonClick);
         }
 
-        private void Start()
-        {
-            deleteButton.gameObject.SetActive(false);
-            cancelButton.gameObject.SetActive(false);
-            loginButton.gameObject.SetActive(false);
-        }
+        private void Start() { }
 
         public void OnCreateButtonClick()
         {
-            // Hide popup if it exists
             PopupManager.Instance.popupPanel.SetActive(false);
-
-            // Hide UI not needed for character creation
-            characterSelectionPanel.SetActive(false);
-            deleteButton.gameObject.SetActive(false);
-            loginButton.gameObject.SetActive(false);
-            createButton.gameObject.SetActive(false);
-            CharacterSelectionUI.Instance.leftArrowButton.gameObject.SetActive(false);
-            CharacterSelectionUI.Instance.rightArrowButton.gameObject.SetActive(false);
-
-            // Show UI needed for character creation
-            cancelButton.gameObject.SetActive(true);
+            characterSelectionGroup.gameObject.SetActive(false);
+            characterCreationGroup.gameObject.SetActive(true);
         }
 
         private void OnDeleteButtonClick()
@@ -54,20 +44,10 @@ namespace Assets.Scripts.Managers
 
         private void OnCancelButtonClick()
         {
-            // Hide UI not needed for character selection
-            cancelButton.gameObject.SetActive(false);
-
-            // Show UI needed for character selection
-            if (LoginClient.Instance.cachedPlayers.Count >= 1)
-            {
-                characterSelectionPanel.SetActive(true);
-            }
-
-            deleteButton.gameObject.SetActive(true);
-            loginButton.gameObject.SetActive(true);
-            createButton.gameObject.SetActive(true);
-            CharacterSelectionUI.Instance.leftArrowButton.gameObject.SetActive(true);
-            CharacterSelectionUI.Instance.rightArrowButton.gameObject.SetActive(true);
+            characterCreationGroup.gameObject.SetActive(false);
+            // Only show SelectionPanel if characters exist to select from
+            characterSelectionPanel.SetActive(LoginClient.Instance.cachedPlayers.Count >= 1);
+            characterSelectionGroup.gameObject.SetActive(true);
         }
 
         public void OnLoginButtonClick()
