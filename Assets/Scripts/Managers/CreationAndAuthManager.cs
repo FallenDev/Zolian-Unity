@@ -1,7 +1,7 @@
 using Assets.Scripts.Network;
 
 using TMPro;
-
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,7 +18,7 @@ namespace Assets.Scripts.Managers
         [Header("Object References")] public GameObject CharacterListPanel;
         public TextMeshProUGUI RaceDescription;
         public TextMeshProUGUI ClassDescription;
-        public TextMeshProUGUI CharacterName;
+        public TMP_InputField CharacterName;
         public Toggle MaleToggle;
         public Toggle FemaleToggle;
         public Toggle BerserkerToggle;
@@ -73,13 +73,13 @@ namespace Assets.Scripts.Managers
                 OnCancelButtonClick();
             }
 
-            if (CharacterName.text != "")
+            if (CharacterName == null || string.IsNullOrEmpty(CharacterName.text))
             {
-                continueButton.interactable = true;
+                continueButton.gameObject.SetActive(false);
             }
             else
             {
-                continueButton.interactable = false;
+                continueButton.gameObject.SetActive(CharacterName.text.Length >= 3);
             }
         }
 
