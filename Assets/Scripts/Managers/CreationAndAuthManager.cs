@@ -13,6 +13,7 @@ namespace Assets.Scripts.Managers
         public Button deleteButton;
         public Button cancelButton;
         public Button loginButton;
+        public Button continueButton;
 
         [Header("Object References")] public GameObject CharacterListPanel;
         public TextMeshProUGUI RaceDescription;
@@ -47,6 +48,7 @@ namespace Assets.Scripts.Managers
             deleteButton.onClick.AddListener(OnDeleteButtonClick);
             cancelButton.onClick.AddListener(OnCancelButtonClick);
             loginButton.onClick.AddListener(OnLoginButtonClick);
+            continueButton.onClick.AddListener(OnContinueButtonClick);
             MaleToggle.onValueChanged.AddListener(OnGenderToggle);
             FemaleToggle.onValueChanged.AddListener(OnGenderToggle);
             BerserkerToggle.onValueChanged.AddListener(OnClassToggle);
@@ -62,6 +64,23 @@ namespace Assets.Scripts.Managers
         {
             OnClassToggle(false);
             OnRaceDropdownChange(RaceDropdown);
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                OnCancelButtonClick();
+            }
+
+            if (CharacterName.text != "")
+            {
+                continueButton.interactable = true;
+            }
+            else
+            {
+                continueButton.interactable = false;
+            }
         }
 
         public void OnCreateButtonClick()
@@ -99,6 +118,11 @@ namespace Assets.Scripts.Managers
             //{
 
             //}
+        }
+
+        private void OnContinueButtonClick()
+        {
+            // Send character creation packet
         }
 
         private void OnClassToggle(bool toggled)
