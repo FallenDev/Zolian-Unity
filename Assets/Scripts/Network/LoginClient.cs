@@ -9,6 +9,7 @@ using System.Security.Authentication;
 using System.Text;
 using System.Collections.Generic;
 using Assets.Scripts.Managers;
+using Assets.Scripts.Models;
 using Assets.Scripts.Network.Converters.SendToServer;
 using Assets.Scripts.Network.Converters.ReceiveFromServer;
 using Assets.Scripts.Network.OpCodes;
@@ -89,8 +90,19 @@ namespace Assets.Scripts.Network
 
         private void SendConnectionConfirmation()
         {
-            var args = new ConfirmConnectionArgs();
-            SendPacket(args.OpCode, args);
+            try
+            {
+                var args = new ConfirmConnectionArgs();
+                SendPacket(args.OpCode, args);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to send connection confirmation: {e.Message}");
+                MainThreadDispatcher.RunOnMainThread(() =>
+                {
+                    PopupManager.Instance.ShowMessage(e.Message);
+                });
+            }
         }
 
         /// <summary>
@@ -98,12 +110,74 @@ namespace Assets.Scripts.Network
         /// </summary>
         public void SendLoginCredentials(long steamId)
         {
-            var args = new LoginArgs
+            try
             {
-                SteamId = steamId
-            };
+                var args = new LoginArgs
+                {
+                    SteamId = steamId
+                };
 
-            SendPacket(args.OpCode, args);
+                SendPacket(args.OpCode, args);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to send login credentials: {e.Message}");
+                MainThreadDispatcher.RunOnMainThread(() =>
+                {
+                    PopupManager.Instance.ShowMessage(e.Message);
+                });
+            }
+        }
+
+        public void SendCharacterDelete(long steamId, string name)
+        {
+            try
+            {
+                var args = new DeleteCharacterArgs
+                {
+                    SteamId = steamId,
+                    Name = name
+                };
+
+                SendPacket(args.OpCode, args);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to delete character: {e.Message}");
+                MainThreadDispatcher.RunOnMainThread(() =>
+                {
+                    PopupManager.Instance.ShowMessage(e.Message);
+                });
+            }
+        }
+
+        public void SendCharacterCreation(long steamId, string name, string className, string race, string sex)
+        {
+            try
+            {
+                Enum.TryParse<BaseClass>(className, out var classEnum);
+                Enum.TryParse<Race>(race, out var raceEnum);
+                Enum.TryParse<Sex>(sex, out var sexEnum);
+
+                var args = new CreateCharacterArgs
+                {
+                    SteamId = steamId,
+                    Name = name,
+                    Class = classEnum,
+                    Race = raceEnum,
+                    Sex = sexEnum
+                };
+
+                SendPacket(args.OpCode, args);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to create character: {e.Message}");
+                MainThreadDispatcher.RunOnMainThread(() =>
+                {
+                    PopupManager.Instance.ShowMessage(e.Message);
+                });
+            }
         }
 
         #endregion

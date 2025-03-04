@@ -5,15 +5,12 @@ namespace Assets.Scripts.Models
     [Flags]
     public enum BaseClass : byte
     {
-        Peasant = 0,
         Berserker = 1,
         Defender = 2,
         Assassin = 3,
         Cleric = 4,
         Arcanus = 5,
         Monk = 6,
-        DualBash = 7,
-        DualCast = 8,
         Racial = 9,
         Monster = 10,
         Quest = 11
@@ -38,9 +35,35 @@ namespace Assets.Scripts.Models
         Dragoon = 1 << 12
     }
 
+    [Flags]
+    public enum Race
+    {
+        UnDecided = 0,
+        Human = 1,
+        HalfElf = 2,
+        HighElf = 3,
+        DarkElf = 4,
+        WoodElf = 5,
+        Orc = 6,
+        Dwarf = 7,
+        Halfling = 8,
+        Dragonkin = 9,
+        HalfBeast = 10,
+        Merfolk = 11
+    }
+
+    [Flags]
+    public enum Sex
+    {
+        Male = 0,
+        Female = 1
+    }
+
     public static class PlayerModels
     {
         public static bool BaseClassFlagIsSet(this BaseClass self, BaseClass flag) => (self & flag) == flag;
         public static bool JobClassFlagIsSet(this JobClass self, JobClass flag) => (self & flag) == flag;
+        public static bool RaceFlagIsSet(this Race self, Race flag) => (self & flag) == flag;
+        public static bool SexFlagIsSet(this Sex self, Sex flag) => (self & flag) == flag;
     }
 }

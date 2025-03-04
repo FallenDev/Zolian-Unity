@@ -16,5 +16,7 @@
         Login = 0x01,
         Version = 0x0A,
         ClientRedirected = 0x0B,
+        CreateCharacter = 0x0C,
+        DeleteCharacter = 0x0D,
     }
 }

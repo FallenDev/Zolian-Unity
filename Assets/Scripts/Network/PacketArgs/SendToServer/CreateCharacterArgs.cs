@@ -1,0 +1,15 @@
+using Assets.Scripts.Network.OpCodes;
+using Assets.Scripts.Models;
+
+namespace Assets.Scripts.Network.PacketArgs.SendToServer
+{
+    public sealed record CreateCharacterArgs : IPacketSerializable
+    {
+        public byte OpCode => (byte)ClientOpCode.DeleteCharacter;
+        public long SteamId;
+        public string Name;
+        public BaseClass Class;
+        public Race Race;
+        public Sex Sex;
+    }
+}
