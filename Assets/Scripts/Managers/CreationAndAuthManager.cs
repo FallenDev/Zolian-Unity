@@ -1,7 +1,7 @@
+using Assets.Scripts.Models;
 using Assets.Scripts.Network;
 
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,6 +34,9 @@ namespace Assets.Scripts.Managers
         public Image ArcanusImage;
         public Image MonkImage;
         public TMP_Dropdown RaceDropdown;
+        private BaseClass classChosen;
+        private Race raceChosen;
+        private Sex genderChosen;
 
         // These are the groups that will be shown/hidden
         [Header("Character Screens")] public GameObject CharacterSelectionGroup;
@@ -85,7 +88,7 @@ namespace Assets.Scripts.Managers
 
         public void OnCreateButtonClick()
         {
-            PopupManager.Instance.popupPanel.SetActive(false);
+            PopupManager.Instance.systemPopup.SetActive(false);
             CharacterSelectionGroup.gameObject.SetActive(false);
             CharacterCreationGroup.gameObject.SetActive(true);
         }
@@ -97,6 +100,10 @@ namespace Assets.Scripts.Managers
 
         private void OnCancelButtonClick()
         {
+            CharacterName.text = "";
+            BerserkerToggle.isOn = true;
+            MaleToggle.isOn = true;
+            RaceDropdown.value = 0;
             CharacterCreationGroup.gameObject.SetActive(false);
             // Only show SelectionPanel if characters exist to select from
             CharacterListPanel.SetActive(LoginClient.Instance.cachedPlayers.Count >= 1);
@@ -110,20 +117,19 @@ namespace Assets.Scripts.Managers
 
         private void OnGenderToggle(bool toggled)
         {
-            //if (MaleToggle.isOn)
-            //{
-
-            //}
-            //else
-            //{
-
-            //}
+            // ToDo: Switch model to show male or female based on which is chosen. 
+            if (FemaleToggle.isOn)
+            {
+                genderChosen = Sex.Female;
+            }
+            else if (MaleToggle.isOn)
+            {
+                genderChosen = Sex.Male;
+            }
         }
 
-        private void OnContinueButtonClick()
-        {
-            // Send character creation packet
-        }
+        private void OnContinueButtonClick() => LoginClient.Instance.SendCharacterCreation(LoginClient.Instance.SteamId, CharacterName.text, classChosen, raceChosen, genderChosen);
+        public void CharacterFinalized() => OnCancelButtonClick();
 
         private void OnClassToggle(bool toggled)
         {
@@ -136,6 +142,7 @@ namespace Assets.Scripts.Managers
                 ClericImage.gameObject.SetActive(false);
                 ArcanusImage.gameObject.SetActive(false);
                 MonkImage.gameObject.SetActive(false);
+                classChosen = BaseClass.Berserker;
             }
             else if (DefenderToggle.isOn)
             {
@@ -146,6 +153,7 @@ namespace Assets.Scripts.Managers
                 ClericImage.gameObject.SetActive(false);
                 ArcanusImage.gameObject.SetActive(false);
                 MonkImage.gameObject.SetActive(false);
+                classChosen = BaseClass.Defender;
             }
             else if (AssassinToggle.isOn)
             {
@@ -156,6 +164,7 @@ namespace Assets.Scripts.Managers
                 ClericImage.gameObject.SetActive(false);
                 ArcanusImage.gameObject.SetActive(false);
                 MonkImage.gameObject.SetActive(false);
+                classChosen = BaseClass.Assassin;
             }
             else if (ClericToggle.isOn)
             {
@@ -166,6 +175,7 @@ namespace Assets.Scripts.Managers
                 ClericImage.gameObject.SetActive(true);
                 ArcanusImage.gameObject.SetActive(false);
                 MonkImage.gameObject.SetActive(false);
+                classChosen = BaseClass.Cleric;
             }
             else if (ArcanusToggle.isOn)
             {
@@ -176,6 +186,7 @@ namespace Assets.Scripts.Managers
                 ClericImage.gameObject.SetActive(false);
                 ArcanusImage.gameObject.SetActive(true);
                 MonkImage.gameObject.SetActive(false);
+                classChosen = BaseClass.Arcanus;
             }
             else if (MonkToggle.isOn)
             {
@@ -186,6 +197,7 @@ namespace Assets.Scripts.Managers
                 ClericImage.gameObject.SetActive(false);
                 ArcanusImage.gameObject.SetActive(false);
                 MonkImage.gameObject.SetActive(true);
+                classChosen = BaseClass.Monk;
             }
         }
 
@@ -195,36 +207,47 @@ namespace Assets.Scripts.Managers
             {
                 case "Human":
                     RaceDescription.text = "Humans are well-rounded and can adapt to any class. They have no specific strengths or weaknesses.";
+                    raceChosen = Race.Human;
                     break;
                 case "Half-Elf":
                     RaceDescription.text = "Half-Elves are a mix of human and elf. They have a higher resistance to magic and can adapt to any class.";
+                    raceChosen = Race.HalfElf;
                     break;
                 case "High Elf":
                     RaceDescription.text = "High Elves are known for their high intelligence and magic resistance. They are best suited for magic classes.";
+                    raceChosen = Race.HighElf;
                     break;
                 case "Drow":
                     RaceDescription.text = "Drow are known for their high agility and dexterity. They are best suited for rogue classes.";
+                    raceChosen = Race.DarkElf;
                     break;
                 case "Wood Elf":
                     RaceDescription.text = "Wood Elves are known for their high agility and dexterity. They are best suited for rogue classes.";
+                    raceChosen = Race.WoodElf;
                     break;
                 case "Orc":
                     RaceDescription.text = "Orcs are known for their high strength and constitution. They are best suited for warrior classes.";
+                    raceChosen = Race.Orc;
                     break;
                 case "Dwarf":
                     RaceDescription.text = "Dwarves are known for their high constitution and strength. They are best suited for warrior classes.";
+                    raceChosen = Race.Dwarf;
                     break;
                 case "Halfling":
                     RaceDescription.text = "Halflings are known for their high agility and dexterity. They are best suited for rogue classes.";
+                    raceChosen = Race.Halfling;
                     break;
                 case "Dragonkin":
                     RaceDescription.text = "Dragonkin are known for their high strength and constitution. They are best suited for warrior classes.";
+                    raceChosen = Race.Dragonkin;
                     break;
                 case "Half-Beast":
                     RaceDescription.text = "Half-Beasts are known for their high strength and constitution. They are best suited for warrior classes.";
+                    raceChosen = Race.HalfBeast;
                     break;
                 case "Merfolk":
                     RaceDescription.text = "Merfolk are known for their high agility and dexterity. They are best suited for rogue classes.";
+                    raceChosen = Race.Merfolk;
                     break;
             }
         }

@@ -8,6 +8,7 @@ using UnityEngine;
 using System.Security.Authentication;
 using System.Text;
 using System.Collections.Generic;
+using Assets.Scripts.Managers;
 using Assets.Scripts.Network.Converters.SendToServer;
 using Assets.Scripts.Network.Converters.ReceiveFromServer;
 using Assets.Scripts.Network.OpCodes;

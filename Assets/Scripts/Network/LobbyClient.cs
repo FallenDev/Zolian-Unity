@@ -9,6 +9,7 @@ using System.Security.Authentication;
 using System.Collections.Generic;
 using System.Threading;
 using Assets.Scripts.Managers;
+using Assets.Scripts.Models;
 using Assets.Scripts.Network.Converters.SendToServer;
 using Assets.Scripts.Network.Converters.ReceiveFromServer;
 using Assets.Scripts.Network.OpCodes;
@@ -224,7 +225,7 @@ namespace Assets.Scripts.Network
                         var loginArgs = (LoginMessageArgs)args;
                         MainThreadDispatcher.RunOnMainThread(() =>
                         {
-                            PopupManager.Instance.ShowMessage(loginArgs.Message);
+                            PopupManager.Instance.ShowMessage(loginArgs.Message, loginArgs.LoginMessageType);
                         });
                         break;
                     }
@@ -238,7 +239,7 @@ namespace Assets.Scripts.Network
                 default:
                     MainThreadDispatcher.RunOnMainThread(() =>
                     {
-                        PopupManager.Instance.ShowMessage($"Unhandled OpCode: {opCode}");
+                        PopupManager.Instance.ShowMessage($"Unhandled OpCode: {opCode}", PopupMessageType.System);
                     });
                     break;
             }
@@ -286,7 +287,7 @@ namespace Assets.Scripts.Network
             {
                 MainThreadDispatcher.RunOnMainThread(() =>
                 {
-                    PopupManager.Instance.ShowMessage($"SSL Authentication failed: {ex.Message}");
+                    PopupManager.Instance.ShowMessage($"SSL Authentication failed: {ex.Message}", PopupMessageType.System);
                 });
                 Cleanup();
             }
@@ -294,7 +295,7 @@ namespace Assets.Scripts.Network
             {
                 MainThreadDispatcher.RunOnMainThread(() =>
                 {
-                    PopupManager.Instance.ShowMessage("Server Offline");
+                    PopupManager.Instance.ShowMessage("Server Offline", PopupMessageType.Screen);
                 });
                 Cleanup();
             }
@@ -302,7 +303,7 @@ namespace Assets.Scripts.Network
             {
                 MainThreadDispatcher.RunOnMainThread(() =>
                 {
-                    PopupManager.Instance.ShowMessage($"Connection error: {ex.Message}");
+                    PopupManager.Instance.ShowMessage($"Connection error: {ex.Message}", PopupMessageType.System);
                 });
                 Cleanup();
             }
@@ -331,11 +332,11 @@ namespace Assets.Scripts.Network
                 }
 #endif
 
-                PopupManager.Instance.ShowMessage($"Certificate validation failed: {sslPolicyErrors}");
+                PopupManager.Instance.ShowMessage($"Certificate validation failed: {sslPolicyErrors}", PopupMessageType.System);
                 return false;
             }
 
-            PopupManager.Instance.ShowMessage("The provided certificate is not an X509Certificate2.");
+            PopupManager.Instance.ShowMessage("The provided certificate is not an X509Certificate2.", PopupMessageType.System);
             return false;
         }
 

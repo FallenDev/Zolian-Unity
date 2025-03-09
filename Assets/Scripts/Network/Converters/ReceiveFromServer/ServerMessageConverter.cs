@@ -1,3 +1,4 @@
+using Assets.Scripts.Models;
 using Assets.Scripts.Network.OpCodes;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using Assets.Scripts.Network.Span;
@@ -15,7 +16,7 @@ namespace Assets.Scripts.Network.Converters.ReceiveFromServer
 
             return new ServerMessageArgs
             {
-                ServerMessageType = (ServerMessageType)messageType,
+                ServerMessageType = (PopupMessageType)messageType,
                 Message = message
             };
         }

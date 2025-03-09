@@ -5,7 +5,7 @@ namespace Assets.Scripts.Network.PacketArgs.SendToServer
 {
     public sealed record CreateCharacterArgs : IPacketSerializable
     {
-        public byte OpCode => (byte)ClientOpCode.DeleteCharacter;
+        public byte OpCode => (byte)ClientOpCode.CreateCharacter;
         public long SteamId;
         public string Name;
         public BaseClass Class;

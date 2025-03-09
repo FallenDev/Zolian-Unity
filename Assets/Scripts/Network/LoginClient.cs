@@ -8,6 +8,9 @@ using UnityEngine;
 using System.Security.Authentication;
 using System.Text;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using Assets.Scripts.Managers;
 using Assets.Scripts.Models;
 using Assets.Scripts.Network.Converters.SendToServer;
@@ -100,7 +103,7 @@ namespace Assets.Scripts.Network
                 Debug.LogError($"Failed to send connection confirmation: {e.Message}");
                 MainThreadDispatcher.RunOnMainThread(() =>
                 {
-                    PopupManager.Instance.ShowMessage(e.Message);
+                    PopupManager.Instance.ShowMessage(e.Message, PopupMessageType.System);
                 });
             }
         }
@@ -124,7 +127,7 @@ namespace Assets.Scripts.Network
                 Debug.LogError($"Failed to send login credentials: {e.Message}");
                 MainThreadDispatcher.RunOnMainThread(() =>
                 {
-                    PopupManager.Instance.ShowMessage(e.Message);
+                    PopupManager.Instance.ShowMessage(e.Message, PopupMessageType.System);
                 });
             }
         }
@@ -146,26 +149,22 @@ namespace Assets.Scripts.Network
                 Debug.LogError($"Failed to delete character: {e.Message}");
                 MainThreadDispatcher.RunOnMainThread(() =>
                 {
-                    PopupManager.Instance.ShowMessage(e.Message);
+                    PopupManager.Instance.ShowMessage(e.Message, PopupMessageType.System);
                 });
             }
         }
 
-        public void SendCharacterCreation(long steamId, string name, string className, string race, string sex)
+        public void SendCharacterCreation(long steamId, string name, BaseClass className, Race race, Sex sex)
         {
             try
             {
-                Enum.TryParse<BaseClass>(className, out var classEnum);
-                Enum.TryParse<Race>(race, out var raceEnum);
-                Enum.TryParse<Sex>(sex, out var sexEnum);
-
                 var args = new CreateCharacterArgs
                 {
                     SteamId = steamId,
                     Name = name,
-                    Class = classEnum,
-                    Race = raceEnum,
-                    Sex = sexEnum
+                    Class = className,
+                    Race = race,
+                    Sex = sex
                 };
 
                 SendPacket(args.OpCode, args);
@@ -175,7 +174,7 @@ namespace Assets.Scripts.Network
                 Debug.LogError($"Failed to create character: {e.Message}");
                 MainThreadDispatcher.RunOnMainThread(() =>
                 {
-                    PopupManager.Instance.ShowMessage(e.Message);
+                    PopupManager.Instance.ShowMessage(e.Message, PopupMessageType.System);
                 });
             }
         }
@@ -297,7 +296,7 @@ namespace Assets.Scripts.Network
                         var loginArgs = (LoginMessageArgs)args;
                         MainThreadDispatcher.RunOnMainThread(() =>
                         {
-                            PopupManager.Instance.ShowMessage(loginArgs.Message);
+                            PopupManager.Instance.ShowMessage(loginArgs.Message, PopupMessageType.System);
                         });
                         break;
                     }
@@ -307,21 +306,37 @@ namespace Assets.Scripts.Network
                         // Redirect to World Scene
                         break;
                     }
+                case (byte)ServerOpCode.CreateCharacterFinalized: // Character finalized
+                    {
+                        var characterFinalizedArgs = (CharacterFinalizedArgs)args;
+                        if (characterFinalizedArgs.Finalized)
+                        {
+                            MainThreadDispatcher.RunOnMainThread(() =>
+                            {
+                                PopupManager.Instance.ShowMessage("Character created successfully!", PopupMessageType.System);
+                                CreationAndAuthManager.Instance.CharacterFinalized();
+                                SendLoginCredentials(SteamId);
+                            });
+                        }
+                        break;
+                    }
                 case (byte)ServerOpCode.PlayerList:
                     {
                         var playerListArgs = (PlayerListArgs)args;
+                        cachedPlayers.Clear();
+                        cachedPlayers = new List<PlayerSelection>();
                         cachedPlayers = playerListArgs.Players;
 
                         MainThreadDispatcher.RunOnMainThread(() =>
                         {
                             if (cachedPlayers.Count == 0)
-                                PopupManager.Instance.ShowMessage("No characters found, create one below!");
+                                PopupManager.Instance.ShowMessage("No characters found, create one below!", PopupMessageType.System);
                             else
                             {
                                 CharacterSelectionUI.Instance.PopulateCharacterList();
                                 CharacterSelectionUI.Instance.SelectCharacter(0);
                             }
-                            
+
                             CreationAndAuthManager.Instance.createButton.gameObject.SetActive(true);
                         });
                         break;
@@ -329,7 +344,7 @@ namespace Assets.Scripts.Network
                 default:
                     MainThreadDispatcher.RunOnMainThread(() =>
                     {
-                        PopupManager.Instance.ShowMessage($"Unhandled OpCode: {opCode}");
+                        PopupManager.Instance.ShowMessage($"Unhandled OpCode: {opCode}", PopupMessageType.System);
                     });
                     break;
             }
@@ -344,6 +359,7 @@ namespace Assets.Scripts.Network
             ServerConverters.Add((byte)ServerOpCode.AcceptConnection, new AcceptConnectionConverter());
             ServerConverters.Add((byte)ServerOpCode.LoginMessage, new LoginMessageConverter());
             ServerConverters.Add((byte)ServerOpCode.ServerMessage, new ServerMessageConverter());
+            ServerConverters.Add((byte)ServerOpCode.CreateCharacterFinalized, new CharacterFinalizedConverter());
             ServerConverters.Add((byte)ServerOpCode.ConnectionInfo, new ConnectionInfoConverter());
             ServerConverters.Add((byte)ServerOpCode.PlayerList, new PlayerListConverter());
         }
@@ -352,6 +368,8 @@ namespace Assets.Scripts.Network
         {
             ClientConverters.Add((byte)ClientOpCode.ClientRedirected, new ConfirmConnectionConverter());
             ClientConverters.Add((byte)ClientOpCode.Login, new LoginConverter());
+            ClientConverters.Add((byte)ClientOpCode.CreateCharacter, new CreateCharacterConverter());
+            ClientConverters.Add((byte)ClientOpCode.DeleteCharacter, new DeleteCharacterConverter());
         }
 
         public void ConnectToServer(ushort port)
@@ -375,17 +393,17 @@ namespace Assets.Scripts.Network
             }
             catch (AuthenticationException ex)
             {
-                PopupManager.Instance.ShowMessage($"SSL Authentication failed: {ex.Message}");
+                PopupManager.Instance.ShowMessage($"SSL Authentication failed: {ex.Message}", PopupMessageType.System);
                 Cleanup();
             }
             catch (SocketException ex)
             {
-                PopupManager.Instance.ShowMessage("Server Offline");
+                PopupManager.Instance.ShowMessage("Server Offline", PopupMessageType.Screen);
                 Cleanup();
             }
             catch (Exception ex)
             {
-                PopupManager.Instance.ShowMessage($"Connection error: {ex.Message}");
+                PopupManager.Instance.ShowMessage($"Connection error: {ex.Message}", PopupMessageType.System);
                 Cleanup();
             }
             finally
@@ -413,11 +431,11 @@ namespace Assets.Scripts.Network
                 }
 #endif
 
-                PopupManager.Instance.ShowMessage($"Certificate validation failed: {sslPolicyErrors}");
+                PopupManager.Instance.ShowMessage($"Certificate validation failed: {sslPolicyErrors}", PopupMessageType.System);
                 return false;
             }
 
-            PopupManager.Instance.ShowMessage("The provided certificate is not an X509Certificate2.");
+            PopupManager.Instance.ShowMessage("The provided certificate is not an X509Certificate2.", PopupMessageType.System);
             return false;
         }
 

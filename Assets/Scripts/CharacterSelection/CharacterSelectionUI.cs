@@ -36,6 +36,12 @@ public class CharacterSelectionUI : MonoBehaviour
         rightArrowButton.gameObject.SetActive(false);
     }
 
+    private void Update()
+    {
+        if (characters.Equals(LoginClient.Instance.cachedPlayers)) return;
+        PopulateCharacterList();
+    }
+
     public void PopulateCharacterList()
     {
         characters = LoginClient.Instance.cachedPlayers;

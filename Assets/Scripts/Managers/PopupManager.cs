@@ -1,13 +1,19 @@
+using Assets.Scripts.Models;
 using TMPro;
 
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets.Scripts.Managers
 {
     public class PopupManager : MonoBehaviour
     {
-        public GameObject popupPanel;
-        [SerializeField] private TMP_Text messageText;
+        public GameObject screenPopup;
+        public GameObject systemPopup;
+        [SerializeField] private TMP_Text screenMessageText;
+        [SerializeField] private TMP_Text systemMessageText;
+        public Button screenAcceptButton;
+        public Button systemAcceptButton;
 
         private static PopupManager _instance;
 
@@ -39,21 +45,58 @@ namespace Assets.Scripts.Managers
             }
         }
 
-        private void Start() => popupPanel.SetActive(false);
-
-
-        public void ShowMessage(string message)
+        private void Start()
         {
-            if (popupPanel == null || messageText == null)
-            {
-                Debug.LogError("PopupManager is not set up correctly!");
-                return;
-            }
-
-            messageText.text = message;
-            popupPanel.SetActive(true);
+            screenAcceptButton.onClick.AddListener(ClosePopup);
+            systemAcceptButton.onClick.AddListener(ClosePopup);
+            screenPopup.SetActive(false);
+            systemPopup.SetActive(false);
         }
 
-        public void ClosePopup() => popupPanel.SetActive(false);
+
+        public void ShowMessage(string message, PopupMessageType type)
+        {
+            switch (type)
+            {
+                case PopupMessageType.Screen:
+                    {
+                        screenMessageText.text = message;
+
+                        if (screenPopup == null || screenMessageText == null)
+                        {
+                            Debug.LogError("PopupManager is not set up correctly!");
+                            return;
+                        }
+
+                        screenPopup.SetActive(true);
+                    }
+                    break;
+                case PopupMessageType.System:
+                    {
+                        systemMessageText.text = message;
+
+                        if (systemPopup == null || systemMessageText == null)
+                        {
+                            Debug.LogError("PopupManager is not set up correctly!");
+                            return;
+                        }
+
+                        systemPopup.SetActive(true);
+                    }
+                    break;
+                case PopupMessageType.Login:
+                case PopupMessageType.WoodenBoard:
+                case PopupMessageType.AdminMessage:
+                default:
+                    Debug.LogError($"PopupManager {type} type is not set up!");
+                    break;
+            }
+        }
+
+        public void ClosePopup()
+        {
+            screenPopup.SetActive(false);
+            systemPopup.SetActive(false);
+        }
     }
 }
