@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Assets.Scripts.Network.Span
@@ -305,9 +306,43 @@ namespace Assets.Scripts.Network.Span
         }
 
         /// <summary>
+        /// Writes a packed vector3 to the buffer.
+        /// </summary>
+        /// <param name="value"></param>
+        public void WritePackedVector3(Vector3 value)
+        {
+            EnsureCapacity(6);
+            WriteUInt16(HalfPrecisionHelper.FloatToHalf(value.X));
+            WriteUInt16(HalfPrecisionHelper.FloatToHalf(value.Y));
+            WriteUInt16(HalfPrecisionHelper.FloatToHalf(value.Z));
+        }
+
+        /// <summary>
         /// Trims the buffer to the written content and returns it as a span.
         /// </summary>
         /// <returns>A span containing the written content.</returns>
         public Span<byte> ToSpan() => _buffer[.._position];
+    }
+    
+    public static class HalfPrecisionHelper
+    {
+        [StructLayout(LayoutKind.Explicit)]
+        private struct FloatToShort
+        {
+            [FieldOffset(0)] public float FloatValue;
+            [FieldOffset(0)] public ushort ShortValue;
+        }
+
+        public static ushort FloatToHalf(float value)
+        {
+            var converter = new FloatToShort { FloatValue = value };
+            return converter.ShortValue;
+        }
+
+        public static float HalfToFloat(ushort value)
+        {
+            var converter = new FloatToShort { ShortValue = value };
+            return converter.FloatValue;
+        }
     }
 }
