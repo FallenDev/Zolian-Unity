@@ -18,9 +18,9 @@ namespace Assets.Scripts.Network.Converters.ReceiveFromServer
 
             for (var i = 0; i < numberOfCharacters; i++)
             {
-                var serial = reader.ReadInt64();
+                var serial = reader.ReadGuid();
                 var name = reader.ReadString();
-                var level = reader.ReadInt32();
+                var level = reader.ReadUInt32();
                 var baseClassString = reader.ReadString();
                 var advClassString = reader.ReadString();
                 var jobString = reader.ReadString();

@@ -293,6 +293,18 @@ namespace Assets.Scripts.Network.Span
         }
 
         /// <summary>
+        /// Writes a 128-bit GUID to the buffer.
+        /// </summary>
+        public void WriteGuid(Guid value)
+        {
+            EnsureCapacity(16);
+
+            // Write GUID as bytes directly
+            value.TryWriteBytes(_buffer[_position..(_position + 16)]);
+            _position += 16;
+        }
+
+        /// <summary>
         /// Trims the buffer to the written content and returns it as a span.
         /// </summary>
         /// <returns>A span containing the written content.</returns>

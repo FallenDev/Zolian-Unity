@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Assets.Scripts.Models;
 
 namespace Assets.Scripts.Network.PacketArgs.ReceiveFromServer
@@ -10,9 +11,9 @@ namespace Assets.Scripts.Network.PacketArgs.ReceiveFromServer
 
     public sealed record PlayerSelection
     {
-        public long Serial { get; set; }
+        public Guid Serial { get; set; }
         public string Name { get; set; }
-        public int Level { get; set; }
+        public uint Level { get; set; }
         public BaseClass BaseClass { get; set; }
         public BaseClass AdvClass { get; set; }
         public JobClass Job { get; set; }

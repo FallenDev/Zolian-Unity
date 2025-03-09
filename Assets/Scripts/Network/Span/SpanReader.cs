@@ -238,6 +238,16 @@ namespace Assets.Scripts.Network.Span
         }
 
         /// <summary>
+        /// Reads a 128-bit GUID from the buffer.
+        /// </summary>
+        public Guid ReadGuid()
+        {
+            var guidBytes = _buffer[_position..(_position + 16)];
+            _position += 16;
+            return new Guid(guidBytes);
+        }
+
+        /// <summary>
         /// Returns a span of the unread portion of the buffer.
         /// </summary>
         /// <returns>A span of the unread portion of the buffer.</returns>
