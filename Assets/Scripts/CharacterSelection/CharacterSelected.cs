@@ -1,8 +1,9 @@
-using UnityEngine;
+using Assets.Scripts.Managers;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using TMPro;
+using UnityEngine;
 
-namespace Assets.Scripts.Managers
+namespace Assets.Scripts.CharacterSelection
 {
     public class CharacterSelected : MonoBehaviour
     {

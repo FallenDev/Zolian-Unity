@@ -2,7 +2,7 @@
 {
     public enum PopupMessageType : byte
     {
-        Login = 0,
+        Confirmation = 0,
         System = 3,
         Screen = 5,
         WoodenBoard = 9,

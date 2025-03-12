@@ -6,11 +6,8 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using System.Security.Authentication;
-using System.Text;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
+using Assets.Scripts.CharacterSelection;
 using Assets.Scripts.Managers;
 using Assets.Scripts.Models;
 using Assets.Scripts.Network.Converters.SendToServer;
@@ -19,8 +16,6 @@ using Assets.Scripts.Network.OpCodes;
 using Assets.Scripts.Network.PacketArgs.SendToServer;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using Assets.Scripts.Network.Span;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 namespace Assets.Scripts.Network
 {
@@ -325,7 +320,7 @@ namespace Assets.Scripts.Network
                         var playerListArgs = (PlayerListArgs)args;
                         cachedPlayers.Clear();
                         cachedPlayers = new List<PlayerSelection>();
-                        cachedPlayers = playerListArgs.Players;
+                        cachedPlayers = playerListArgs.Players.Where(p => p.Disabled != true).ToList();
 
                         MainThreadDispatcher.RunOnMainThread(() =>
                         {

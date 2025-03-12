@@ -1,21 +1,25 @@
+using Assets.Scripts.CharacterSelection;
 using Assets.Scripts.Models;
 using Assets.Scripts.Network;
 
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Assets.Scripts.Managers
 {
     public class CreationAndAuthManager : MonoBehaviour
     {
-        [Header("Action Buttons")] public Button createButton;
+        [Header("Action Buttons")] 
+        public Button createButton;
         public Button deleteButton;
         public Button cancelButton;
         public Button loginButton;
         public Button continueButton;
 
-        [Header("Object References")] public GameObject CharacterListPanel;
+        [Header("Object References")] 
+        public GameObject CharacterListPanel;
         public TextMeshProUGUI RaceDescription;
         public TextMeshProUGUI ClassDescription;
         public TMP_InputField CharacterName;
@@ -34,13 +38,17 @@ namespace Assets.Scripts.Managers
         public Image ArcanusImage;
         public Image MonkImage;
         public TMP_Dropdown RaceDropdown;
+
+        // These are the groups that will be shown/hidden
+        [Header("Character Screens")] 
+        public GameObject CharacterSelectionGroup;
+        public GameObject CharacterCreationGroup;
+
         private BaseClass classChosen;
         private Race raceChosen;
         private Sex genderChosen;
-
-        // These are the groups that will be shown/hidden
-        [Header("Character Screens")] public GameObject CharacterSelectionGroup;
-        public GameObject CharacterCreationGroup;
+        private const string characterSceneName = "CharacterCreationDisplay";
+        private bool isSceneLoaded = false;
 
         public static CreationAndAuthManager Instance;
 
@@ -91,6 +99,7 @@ namespace Assets.Scripts.Managers
             PopupManager.Instance.systemPopup.SetActive(false);
             CharacterSelectionGroup.gameObject.SetActive(false);
             CharacterCreationGroup.gameObject.SetActive(true);
+            LoadCharacterScene();
         }
 
         private void OnDeleteButtonClick()
@@ -108,6 +117,7 @@ namespace Assets.Scripts.Managers
             // Only show SelectionPanel if characters exist to select from
             CharacterListPanel.SetActive(LoginClient.Instance.cachedPlayers.Count >= 1);
             CharacterSelectionGroup.gameObject.SetActive(true);
+            UnloadCharacterScene();
         }
 
         public void OnLoginButtonClick()
@@ -126,6 +136,8 @@ namespace Assets.Scripts.Managers
             {
                 genderChosen = Sex.Male;
             }
+
+            UpdateCharacterDisplay();
         }
 
         private void OnContinueButtonClick() => LoginClient.Instance.SendCharacterCreation(LoginClient.Instance.SteamId, CharacterName.text, classChosen, raceChosen, genderChosen);
@@ -250,6 +262,40 @@ namespace Assets.Scripts.Managers
                     raceChosen = Race.Merfolk;
                     break;
             }
+
+            UpdateCharacterDisplay();
+        }
+
+        private void LoadCharacterScene()
+        {
+            if (!isSceneLoaded)
+            {
+                SceneManager.LoadScene(characterSceneName, LoadSceneMode.Additive);
+                isSceneLoaded = true;
+                Invoke(nameof(FindCharacterDisplayManager), 0.5f);
+            }
+        }
+
+        private void UnloadCharacterScene()
+        {
+            if (isSceneLoaded)
+            {
+                SceneManager.UnloadSceneAsync(characterSceneName);
+                isSceneLoaded = false;
+            }
+        }
+
+        private void FindCharacterDisplayManager()
+        {
+            if (CharacterDisplayManager.Instance != null)
+                UpdateCharacterDisplay();
+        }
+
+        private void UpdateCharacterDisplay()
+        {
+            if (CharacterDisplayManager.Instance == null) return;
+            GameObject selectedPrefab = CharacterPrefabLoader.GetPrefab(raceChosen, genderChosen);
+            CharacterDisplayManager.Instance.LoadCharacter(selectedPrefab);
         }
     }
 }

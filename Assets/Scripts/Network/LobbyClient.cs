@@ -16,7 +16,9 @@ using Assets.Scripts.Network.OpCodes;
 using Assets.Scripts.Network.PacketArgs.SendToServer;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using Assets.Scripts.Network.Span;
+using TMPro;
 using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 
 namespace Assets.Scripts.Network
 {
@@ -36,6 +38,7 @@ namespace Assets.Scripts.Network
         [SerializeField] private ushort _lobbyPort = 4200;
         [SerializeField] private ushort _loginPort = 4201;
         [SerializeField] private ushort _worldPort = 4202;
+        [SerializeField] private TMP_Text _statusText;
 
         // Static instance of NetworkClient
         private static LobbyClient _instance;
@@ -233,7 +236,10 @@ namespace Assets.Scripts.Network
                     {
                         var connectionInfoArgs = (ConnectionInfoArgs)args;
                         if (connectionInfoArgs.PortNumber == _loginPort)
+                        {
                             sceneTransfer = true;
+                            Cleanup();
+                        }
                         break;
                     }
                 default:

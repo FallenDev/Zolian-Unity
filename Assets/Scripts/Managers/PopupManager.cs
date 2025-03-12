@@ -1,4 +1,6 @@
+using System;
 using Assets.Scripts.Models;
+
 using TMPro;
 
 using UnityEngine;
@@ -8,12 +10,23 @@ namespace Assets.Scripts.Managers
 {
     public class PopupManager : MonoBehaviour
     {
+        [Header("Screen Popups")]
         public GameObject screenPopup;
-        public GameObject systemPopup;
         [SerializeField] private TMP_Text screenMessageText;
-        [SerializeField] private TMP_Text systemMessageText;
         public Button screenAcceptButton;
+
+        [Header("System Popups")]
+        public GameObject systemPopup;
+        [SerializeField] private TMP_Text systemMessageText;
         public Button systemAcceptButton;
+
+        [Header("Confirmation Popups")]
+        public GameObject confirmPopup;
+        [SerializeField] private TMP_Text confirmMessageText;
+        public Button confirmAcceptButton;
+        [SerializeField] private TMP_Text confirmAcceptButtonText;
+        public Button confirmCancelButton;
+        public Action<int> onResult = (result) => { Debug.Log($"Result: {result}"); };
 
         private static PopupManager _instance;
 
@@ -49,15 +62,32 @@ namespace Assets.Scripts.Managers
         {
             screenAcceptButton.onClick.AddListener(ClosePopup);
             systemAcceptButton.onClick.AddListener(ClosePopup);
+            confirmAcceptButton.onClick.AddListener(ClosePopup);
+            confirmCancelButton.onClick.AddListener(ClosePopup);
             screenPopup.SetActive(false);
             systemPopup.SetActive(false);
+            confirmPopup.SetActive(false);
         }
 
 
-        public void ShowMessage(string message, PopupMessageType type)
+        public void ShowMessage(string message, PopupMessageType type, string buttonMessage = null)
         {
             switch (type)
             {
+                case PopupMessageType.Confirmation:
+                    {
+                        confirmMessageText.text = message;
+                        confirmAcceptButtonText.text = buttonMessage ?? "OK";
+
+                        if (confirmPopup == null || confirmMessageText == null)
+                        {
+                            Debug.LogError("PopupManager is not set up correctly!");
+                            return;
+                        }
+                        
+                        confirmPopup.SetActive(true);
+                    }
+                    break;
                 case PopupMessageType.Screen:
                     {
                         screenMessageText.text = message;
@@ -84,7 +114,6 @@ namespace Assets.Scripts.Managers
                         systemPopup.SetActive(true);
                     }
                     break;
-                case PopupMessageType.Login:
                 case PopupMessageType.WoodenBoard:
                 case PopupMessageType.AdminMessage:
                 default:
@@ -97,6 +126,13 @@ namespace Assets.Scripts.Managers
         {
             screenPopup.SetActive(false);
             systemPopup.SetActive(false);
+            confirmPopup.SetActive(false);
+        }
+
+        public void OnResult(int result)
+        {
+            confirmPopup.SetActive(false);
+            onResult(result);
         }
     }
 }

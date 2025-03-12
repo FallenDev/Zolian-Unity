@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Assets.Scripts
 {
-    public class MainThreadDispatcher : MonoBehaviour
+    public abstract class MainThreadDispatcher : MonoBehaviour
     {
         private static SynchronizationContext _mainThreadContext;
 
