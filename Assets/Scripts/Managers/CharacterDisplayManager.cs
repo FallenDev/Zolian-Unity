@@ -33,7 +33,7 @@ namespace Assets.Scripts.Managers
             currentCharacter.transform.SetParent(characterSpawnPoint);
 
             // Adjust scale
-            currentCharacter.transform.localScale = Vector3.one * 300f;
+            currentCharacter.transform.localScale = Vector3.one * 4f;
 
             Debug.Log($"Spawned character prefab: {characterPrefab.name}");
 

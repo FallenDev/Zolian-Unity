@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: e82cc13eaf5daaf4eb179d4899bcde4a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 294319
+  packageName: Modular Stylized Character 2 - Fantasy
+  packageVersion: 1.0
+  assetPath: Assets/Rukha93/ModularAnimeCharacter 2/Samples/Scripts/ColorCustomization.cs
+  uploadId: 697762
