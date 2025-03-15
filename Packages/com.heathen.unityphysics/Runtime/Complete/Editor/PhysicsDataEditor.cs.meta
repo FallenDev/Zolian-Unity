@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: acce8ecba5202cf4ca2e1cb1b0fa0d72
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Runtime/Complete/Editor/PhysicsDataEditor.cs
+  uploadId: 668420

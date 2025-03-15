@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: b41f97073bcbee147a325021ecc3fc76
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Runtime/Verlet Spring/Editor/VerletHierarchyDrawer.cs
+  uploadId: 668420

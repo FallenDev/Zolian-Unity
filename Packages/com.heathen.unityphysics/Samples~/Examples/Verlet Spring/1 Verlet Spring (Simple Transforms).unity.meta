@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: cc4cf5b6a87d62a4aacb5a3e573042a2
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Verlet Spring/1
+    Verlet Spring (Simple Transforms).unity
+  uploadId: 668420

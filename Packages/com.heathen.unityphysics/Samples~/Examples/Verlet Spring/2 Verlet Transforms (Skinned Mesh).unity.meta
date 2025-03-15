@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e4bcb317693b9884f8c15fbe2d0d8cb7
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Verlet Spring/2
+    Verlet Transforms (Skinned Mesh).unity
+  uploadId: 668420

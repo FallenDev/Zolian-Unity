@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 23cfc84d506a22640a6d2db5b3e919ea
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Runtime/Verlet Spring/VerletTransformTreeSettings.cs
+  uploadId: 668420

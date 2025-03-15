@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 77e374b5f6cbadc43866045ac3ee59ea
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Runtime/Ballistics/BallisticTargeting2D.cs
+  uploadId: 668420

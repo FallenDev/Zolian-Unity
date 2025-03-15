@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 37287b2c84b6a294d9cd46678ffc7818
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Ballisitics/Scripts/Sample3Peg.cs
+  uploadId: 668420

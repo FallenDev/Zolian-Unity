@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 763750ac9dd816445b0a7f41b8ffd948
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Runtime/Complete/ConvexHull/MIConvexHull.asmdef
+  uploadId: 668420

@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "com.coffee.ui-particle": "https://github.com/mob-sakai/ParticleEffectForUGUI.git#4.11.1",
+    "com.heathen.systemcore": "https://github.com/heathen-engineering/SystemCore.git?path=/com.heathen.systemcore",
+    "com.rlabrecque.steamworks.net": "https://github.com/rlabrecque/Steamworks.NET.git?path=/com.rlabrecque.steamworks.net",
     "com.soupday.cc3_unity_tools": "https://github.com/soupday/cc_unity_tools_URP.git",
     "com.unity.2d.pixel-perfect": "5.0.3",
     "com.unity.2d.sprite": "1.0.0",

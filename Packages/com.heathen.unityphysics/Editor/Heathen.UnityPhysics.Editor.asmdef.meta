@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b068135e421b4d74081be838049df10a
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Editor/Heathen.UnityPhysics.Editor.asmdef
+  uploadId: 668420

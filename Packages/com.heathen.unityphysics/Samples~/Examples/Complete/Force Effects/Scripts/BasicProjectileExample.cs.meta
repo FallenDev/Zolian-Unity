@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 132e9810d279b924eb5f7c274923b1fe
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Complete/Force Effects/Scripts/BasicProjectileExample.cs
+  uploadId: 668420

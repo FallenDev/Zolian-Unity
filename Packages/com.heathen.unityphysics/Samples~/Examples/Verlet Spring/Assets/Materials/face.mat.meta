@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 4d83bd267b90e934e88637afcd02cb8a
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Verlet Spring/Assets/Materials/face.mat
+  uploadId: 668420

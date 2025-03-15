@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: bf1a903eda864a744912224722529af4
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Runtime/Verlet Spring/Editor/VerletParticleDrawer.cs
+  uploadId: 668420

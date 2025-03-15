@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b2fb24391cb61ed4c9788be64066070b
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Complete/Force Effects/3
+    Multi-body Gravity.unity
+  uploadId: 668420

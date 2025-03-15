@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: aa84846e89bbcff4e9ee19ad437b123d
+AssetOrigin:
+  serializedVersion: 1
+  productId: 299310
+  packageName: Toolkit for Steamworks 2025
+  packageVersion: 4.0.6
+  assetPath: Packages/com.heathen.steamworks/Runtime/Events/LobbyResponceEvent.cs
+  uploadId: 733075

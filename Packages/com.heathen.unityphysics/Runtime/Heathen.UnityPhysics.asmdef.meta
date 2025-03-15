@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 5881b52d0691c6248ab32d2d6dbf5897
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Runtime/Heathen.UnityPhysics.asmdef
+  uploadId: 668420

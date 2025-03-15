@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 316742f11ebaccb49a9a47f1d8311711
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Runtime/Complete/ConstantLinearVelocity.cs
+  uploadId: 668420

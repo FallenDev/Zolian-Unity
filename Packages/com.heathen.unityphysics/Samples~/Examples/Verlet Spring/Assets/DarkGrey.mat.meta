@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a2c9b69f4cfd1f44d97c464eec3ec6d7
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Verlet Spring/Assets/DarkGrey.mat
+  uploadId: 668420

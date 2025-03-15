@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: d6d29e0b9eafcf44fa924809b2fbf9ca
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Runtime/Verlet Spring/ScaledAnimationCurve.cs
+  uploadId: 668420

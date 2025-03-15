@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 03cc3e831777c8648b33f3d128833bea
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Complete/Force Effects/2
+    Spherical Gravity.unity
+  uploadId: 668420

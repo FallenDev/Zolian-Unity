@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 4bed3a8fb4868d241a724096bd8b31eb
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Runtime/Complete/ForceEffectReceiver2D.cs
+  uploadId: 668420

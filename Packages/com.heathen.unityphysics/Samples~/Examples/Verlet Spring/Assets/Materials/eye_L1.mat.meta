@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 4987862c1c195e74c86994ba4bcbd812
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Verlet Spring/Assets/Materials/eye_L1.mat
+  uploadId: 668420

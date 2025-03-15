@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: ca131910d5c9a634dbdd38e77111033f
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Verlet Spring/Assets/Materials/skin1.mat
+  uploadId: 668420

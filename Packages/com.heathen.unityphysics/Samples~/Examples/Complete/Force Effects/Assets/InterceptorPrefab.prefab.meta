@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0259cd6e372547b4aa24646eafbb3014
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Complete/Force Effects/Assets/InterceptorPrefab.prefab
+  uploadId: 668420

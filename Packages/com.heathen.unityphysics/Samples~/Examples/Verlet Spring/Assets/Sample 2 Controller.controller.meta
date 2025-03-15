@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 826a1e4c1f7a43c43aa114dc8c42c871
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Verlet Spring/Assets/Sample
+    2 Controller.controller
+  uploadId: 668420

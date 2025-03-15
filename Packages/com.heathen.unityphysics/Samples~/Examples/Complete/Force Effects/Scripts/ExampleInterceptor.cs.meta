@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: ff796be794fc41c46bda6136aa508d27
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Complete/Force Effects/Scripts/ExampleInterceptor.cs
+  uploadId: 668420

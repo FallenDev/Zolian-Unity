@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 17f7ebcc20a32ab419abedc1e88d16be
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Ballisitics/Scripts/Sample3Projectile.cs
+  uploadId: 668420

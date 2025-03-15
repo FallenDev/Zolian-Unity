@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5cc33173d06be654b94ba5c27bb238ff
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Ballisitics/Fantasy
+    Style Ballistic Simulation.unity
+  uploadId: 668420

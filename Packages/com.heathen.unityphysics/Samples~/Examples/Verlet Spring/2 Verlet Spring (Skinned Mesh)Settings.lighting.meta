@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: bebd69c954662964da010619ee86911c
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Verlet Spring/2
+    Verlet Spring (Skinned Mesh)Settings.lighting
+  uploadId: 668420

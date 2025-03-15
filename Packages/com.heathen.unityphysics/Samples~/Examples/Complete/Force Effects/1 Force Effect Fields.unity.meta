@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 25e5a52de0ed0444dacd63457627edff
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Complete/Force Effects/1
+    Force Effect Fields.unity
+  uploadId: 668420

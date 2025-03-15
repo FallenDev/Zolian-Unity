@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: bb570020a8c3bad4bbf803af20e78937
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Verlet Spring/Assets/Materials/body.mat
+  uploadId: 668420

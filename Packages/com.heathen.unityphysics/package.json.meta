@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 55e5d459e0757ca48b23e9a8b594b3ca
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/package.json
+  uploadId: 668420

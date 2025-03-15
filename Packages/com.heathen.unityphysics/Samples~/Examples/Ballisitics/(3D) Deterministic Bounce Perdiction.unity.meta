@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 48af0286133b06443997cc0a5ce92442
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Ballisitics/(3D)
+    Deterministic Bounce Perdiction.unity
+  uploadId: 668420

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 29df0db9bd41e1c47ab49e545170b0b2
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Samples~/Examples/Complete/Force Effects/Assets/ProjetilePrefab.prefab
+  uploadId: 668420

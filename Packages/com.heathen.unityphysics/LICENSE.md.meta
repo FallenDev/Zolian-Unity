@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d6ae8914ef65e8242bf0844fa46def26
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/LICENSE.md
+  uploadId: 668420

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: a043c08218ad70e49ab48bfd509b0f8d
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics
+  packageVersion: 3.2.0
+  assetPath: Packages/com.heathen.unityphysics/Runtime/Complete/Shaders/ExampleWaveSurfaceShader.shader
+  uploadId: 668420
