@@ -4643,7 +4643,7 @@ GameObject:
   - component: {fileID: 691907918}
   - component: {fileID: 691907917}
   m_Layer: 5
-  m_Name: characterPreview
+  m_Name: CharacterDisplay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4666,7 +4666,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 150, y: 200}
+  m_SizeDelta: {x: 250, y: 230}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &691907917
 MonoBehaviour:
@@ -4688,7 +4688,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 24f0c3d0e27884c43bfb9ba8f0ab930d, type: 3}
+  m_Texture: {fileID: 8400000, guid: b02df157abd8ce543afa0b89ce09e13c, type: 2}
   m_UVRect:
     serializedVersion: 2
     x: 0

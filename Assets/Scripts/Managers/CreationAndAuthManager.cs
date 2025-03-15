@@ -50,6 +50,22 @@ namespace Assets.Scripts.Managers
         private const string characterSceneName = "CharacterCreationDisplay";
         private bool isSceneLoaded = false;
 
+        [Header("Character BodyParts")] 
+        public GameObject HumanBaseArmorMale;
+        public GameObject HumanBaseArmorFemale;
+        public GameObject HumanBerserkerArmorMale;
+        public GameObject HumanDefenderArmorMale;
+        public GameObject HumanAssassinArmorMale;
+        public GameObject HumanClericArmorMale;
+        public GameObject HumanArcanusArmorMale;
+        public GameObject HumanMonkArmorMale;
+        public GameObject HumanBerserkerArmorFemale;
+        public GameObject HumanDefenderArmorFemale;
+        public GameObject HumanAssassinArmorFemale;
+        public GameObject HumanClericArmorFemale;
+        public GameObject HumanArcanusArmorFemale;
+        public GameObject HumanMonkArmorFemale;
+
         public static CreationAndAuthManager Instance;
 
         private void Awake()
