@@ -59,7 +59,7 @@ namespace Assets.Scripts.Models
         Female = 1
     }
 
-    public static class PlayerModels
+    public static class PlayerEnums
     {
         public static bool BaseClassFlagIsSet(this BaseClass self, BaseClass flag) => (self & flag) == flag;
         public static bool JobClassFlagIsSet(this JobClass self, JobClass flag) => (self & flag) == flag;
