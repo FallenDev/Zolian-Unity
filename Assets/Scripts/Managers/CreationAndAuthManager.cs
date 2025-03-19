@@ -1,25 +1,26 @@
 using Assets.Scripts.CharacterSelection;
+using Assets.Scripts.Entity;
 using Assets.Scripts.Models;
 using Assets.Scripts.Network;
 
 using TMPro;
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
 namespace Assets.Scripts.Managers
 {
     public class CreationAndAuthManager : MonoBehaviour
     {
-        [Header("Action Buttons")] 
-        public Button createButton;
+        [Header("Action Buttons")] public Button createButton;
         public Button deleteButton;
         public Button cancelButton;
         public Button loginButton;
         public Button continueButton;
 
-        [Header("Object References")] 
-        public GameObject CharacterListPanel;
+        [Header("Object References")] public GameObject CharacterListPanel;
         public TextMeshProUGUI RaceDescription;
         public TextMeshProUGUI ClassDescription;
         public TMP_InputField CharacterName;
@@ -40,8 +41,7 @@ namespace Assets.Scripts.Managers
         public TMP_Dropdown RaceDropdown;
 
         // These are the groups that will be shown/hidden
-        [Header("Character Screens")] 
-        public GameObject CharacterSelectionGroup;
+        [Header("Character Screens")] public GameObject CharacterSelectionGroup;
         public GameObject CharacterCreationGroup;
 
         private BaseClass classChosen;
@@ -50,21 +50,20 @@ namespace Assets.Scripts.Managers
         private const string characterSceneName = "CharacterCreationDisplay";
         private bool isSceneLoaded = false;
 
-        [Header("Character BodyParts")] 
-        public GameObject HumanBaseArmorMale;
-        public GameObject HumanBaseArmorFemale;
-        public GameObject HumanBerserkerArmorMale;
-        public GameObject HumanDefenderArmorMale;
-        public GameObject HumanAssassinArmorMale;
-        public GameObject HumanClericArmorMale;
-        public GameObject HumanArcanusArmorMale;
-        public GameObject HumanMonkArmorMale;
-        public GameObject HumanBerserkerArmorFemale;
-        public GameObject HumanDefenderArmorFemale;
-        public GameObject HumanAssassinArmorFemale;
-        public GameObject HumanClericArmorFemale;
-        public GameObject HumanArcanusArmorFemale;
-        public GameObject HumanMonkArmorFemale;
+        [Header("Character BodyParts")] public GameObject BaseHead;
+        public GameObject ArmsLower;
+        public GameObject ArmsUpper;
+        public GameObject Feet;
+        public GameObject Hands;
+        public GameObject Hips;
+        public GameObject LegsLower;
+        public GameObject LegsUpper;
+        public GameObject LegsKnee;
+        public GameObject Shoulders;
+        public GameObject Neck;
+        public GameObject Chest;
+        public GameObject Abdomen;
+        public SkinnedMeshRenderer HeadBlendShapes;
 
         public static CreationAndAuthManager Instance;
 
@@ -227,6 +226,8 @@ namespace Assets.Scripts.Managers
                 MonkImage.gameObject.SetActive(true);
                 classChosen = BaseClass.Monk;
             }
+
+            UpdateCharacterDisplay();
         }
 
         private void OnRaceDropdownChange(TMP_Dropdown dropdown)
@@ -311,7 +312,132 @@ namespace Assets.Scripts.Managers
         {
             if (CharacterDisplayManager.Instance == null) return;
             GameObject selectedPrefab = CharacterPrefabLoader.GetPrefab(raceChosen, genderChosen);
-            CharacterDisplayManager.Instance.LoadCharacter(selectedPrefab);
+            GameObject instantiatedCharacter = CharacterDisplayManager.Instance.LoadCharacter(selectedPrefab);
+            AssignCharacterBodyParts(instantiatedCharacter);
+        }
+
+        private void AssignCharacterBodyParts(GameObject character)
+        {
+            if (character == null)
+            {
+                Debug.LogError("Character prefab not instantiated correctly.");
+                return;
+            }
+
+            var headTransform = character.transform.Find("Armature_M/RL_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head");
+            if (headTransform == null)
+            {
+                headTransform = character.transform.Find("Armature_F/RL_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head");
+                if (headTransform == null)
+                {
+                    Debug.LogError("Head transform not found!");
+                    return;
+                }
+            }
+
+            BaseHead = headTransform.gameObject;
+            ArmsLower = character.transform.Find("CC_body_arms_lower").gameObject;
+            ArmsUpper = character.transform.Find("CC_body_arms_upper").gameObject;
+            Feet = character.transform.Find("CC_body_feet").gameObject;
+            Hands = character.transform.Find("CC_body_hands").gameObject;
+            Hips = character.transform.Find("CC_body_hips").gameObject;
+            LegsLower = character.transform.Find("CC_body_legs_lower").gameObject;
+            LegsUpper = character.transform.Find("CC_body_legs_upper").gameObject;
+            LegsKnee = character.transform.Find("CC_body_legs_knee").gameObject;
+            Shoulders = character.transform.Find("CC_body_shoulders").gameObject;
+            Neck = character.transform.Find("CC_body_neck").gameObject;
+            Chest = character.transform.Find("CC_body_chest").gameObject;
+            Abdomen = character.transform.Find("CC_body_abdomen").gameObject;
+
+            var headObject = character.transform.Find("Head");
+            if (headObject != null)
+            {
+                HeadBlendShapes = headObject.GetComponent<SkinnedMeshRenderer>();
+            }
+            else
+            {
+                Debug.LogError("Head object with SkinnedMeshRenderer not found!");
+            }
+
+            AssignCharacterGearByClass(character);
+        }
+
+        private void AssignCharacterGearByClass(GameObject character)
+        {
+            UnEquip(character);
+
+            switch (classChosen)
+            {
+                case BaseClass.Berserker:
+                    {
+                        character.transform.Find("Equipment/top.04_knight").gameObject.SetActive(true);
+                        character.transform.Find("Equipment/bottoms.02").gameObject.SetActive(true);
+                    }
+                    break;
+                case BaseClass.Defender:
+                    {
+                        character.transform.Find("Equipment/top.05_knight_full").gameObject.SetActive(true);
+                        character.transform.Find("Equipment/bottoms.08_knight").gameObject.SetActive(true);
+                    }
+                    break;
+                case BaseClass.Assassin:
+                    {
+                        character.transform.Find("Equipment/top.08_ranger_coat").gameObject.SetActive(true);
+                        character.transform.Find("Equipment/bottoms.05").gameObject.SetActive(true);
+                    }
+                    break;
+                case BaseClass.Cleric:
+                    {
+                        character.transform.Find("Equipment/dress.05_cleric").gameObject.SetActive(true);
+                        character.transform.Find("Equipment/bottoms.01").gameObject.SetActive(true);
+                    }
+                    break;
+                case BaseClass.Arcanus:
+                    {
+                        character.transform.Find("Equipment/dress.04_witch").gameObject.SetActive(true);
+                        character.transform.Find("Equipment/bottoms.01").gameObject.SetActive(true);
+                    }
+                    break;
+                case BaseClass.Monk:
+                    {
+                        character.transform.Find("Equipment/top.06_warrior").gameObject.SetActive(true);
+                        character.transform.Find("Equipment/bottoms.06").gameObject.SetActive(true);
+                    }
+                    break;
+                default:
+                    {
+                        character.transform.Find("Equipment/top.03_sleeveless_shirt").gameObject.SetActive(true);
+                        character.transform.Find("Equipment/bottoms.02").gameObject.SetActive(true);
+                    }
+                    break;
+            }
+
+        }
+
+        private void UnEquip(GameObject character)
+        {
+            character.transform.Find("Equipment/top.01_long_sleeve_shirt").gameObject.SetActive(false);
+            character.transform.Find("Equipment/top.02_short_sleeve_shirt").gameObject.SetActive(false);
+            character.transform.Find("Equipment/top.03_sleeveless_shirt").gameObject.SetActive(false);
+            character.transform.Find("Equipment/top.04_knight").gameObject.SetActive(false);
+            character.transform.Find("Equipment/top.05_knight_full").gameObject.SetActive(false);
+            character.transform.Find("Equipment/top.06_warrior").gameObject.SetActive(false);
+            character.transform.Find("Equipment/top.07_rogue-coat").gameObject.SetActive(false);
+            character.transform.Find("Equipment/top.08_ranger_coat").gameObject.SetActive(false);
+            character.transform.Find("Equipment/bottoms.01").gameObject.SetActive(false);
+            character.transform.Find("Equipment/bottoms.02").gameObject.SetActive(false);
+            character.transform.Find("Equipment/bottoms.03").gameObject.SetActive(false);
+            character.transform.Find("Equipment/bottoms.04").gameObject.SetActive(false);
+            character.transform.Find("Equipment/bottoms.05").gameObject.SetActive(false);
+            character.transform.Find("Equipment/bottoms.06").gameObject.SetActive(false);
+            character.transform.Find("Equipment/bottoms.07").gameObject.SetActive(false);
+            character.transform.Find("Equipment/bottoms.08_knight").gameObject.SetActive(false);
+            character.transform.Find("Equipment/bottoms.09").gameObject.SetActive(false);
+            character.transform.Find("Equipment/dress.01").gameObject.SetActive(false);
+            character.transform.Find("Equipment/dress.02").gameObject.SetActive(false);
+            character.transform.Find("Equipment/dress.03").gameObject.SetActive(false);
+            character.transform.Find("Equipment/dress.04_witch").gameObject.SetActive(false);
+            character.transform.Find("Equipment/dress.05_cleric").gameObject.SetActive(false);
         }
     }
 }

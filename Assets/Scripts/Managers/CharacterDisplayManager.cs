@@ -17,7 +17,7 @@ namespace Assets.Scripts.Managers
         }
 
         // Call this method when Race/Sex selection changes
-        public void LoadCharacter(GameObject characterPrefab)
+        public GameObject LoadCharacter(GameObject characterPrefab)
         {
             // Destroy previous character
             if (currentCharacter != null)
@@ -26,7 +26,7 @@ namespace Assets.Scripts.Managers
             if (characterPrefab == null)
             {
                 Debug.LogError("Character prefab is NULL! Check if the correct race/sex prefab exists.");
-                return;
+                return null;
             }
 
             // Instantiate new character at the spawn point
@@ -43,6 +43,8 @@ namespace Assets.Scripts.Managers
                 animator.Play("Idle");
             else
                 Debug.LogWarning("Animator not found on character prefab.");
+
+            return currentCharacter;
         }
     }
 }

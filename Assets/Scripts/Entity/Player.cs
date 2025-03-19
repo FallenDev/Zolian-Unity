@@ -1,9 +1,10 @@
 ﻿using System;
 using Assets.Scripts.Models;
+using UnityEngine;
 
 namespace Assets.Scripts.Entity
 {
-    public class Player
+    public class Player : MonoBehaviour
     {
         // Character Selection Properties
         public Guid Serial { get; set; }
