@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+
 using UnityEngine;
 
-namespace Rukha93.ModularAnimeCharacter.Customization
+namespace Assets.Scripts.Managers
 {
     [ExecuteInEditMode]
     public class ColorCustomization : MonoBehaviour
@@ -14,23 +15,23 @@ namespace Rukha93.ModularAnimeCharacter.Customization
 
             [HideInInspector]
             public Material sharedMaterial;
-            
+
             public Color shadeColor_A, mainColor_A;
             public Color shadeColor_B, mainColor_B;
             public Color shadeColor_C, mainColor_C;
         }
 
         [SerializeField] private Renderer[] m_Renderers;
-        [SerializeField] private List<ColorData> m_Colors;
+        [SerializeField] public List<ColorData> m_Colors;
 
         private void OnEnable()
         {
             //initialize dependencies
-            m_Renderers = GetComponentsInChildren<Renderer>();                            
-            if (m_Colors == null)     
+            m_Renderers = GetComponentsInChildren<Renderer>();
+            if (m_Colors == null)
                 m_Colors = new List<ColorData>();
 
-            
+
             //initialize the colors or refresh them in case a mesh has been enabled or disabled
             GetColors();
             ApplyColors();
@@ -39,11 +40,11 @@ namespace Rukha93.ModularAnimeCharacter.Customization
         private void OnDisable()
         {
             //disable the colors override when the component is disabled
-            ResetColors();            
+            ResetColors();
         }
-        
+
         private void OnValidate()
-        {            
+        {
             //apply the new colors to the renderers propertyblocks 
             ApplyColors();
         }
@@ -51,7 +52,7 @@ namespace Rukha93.ModularAnimeCharacter.Customization
         private void GetColors()
         {
             //get the current material colors
-            for(int rendererIndex = 0; rendererIndex < m_Renderers.Length; rendererIndex++)
+            for (int rendererIndex = 0; rendererIndex < m_Renderers.Length; rendererIndex++)
             {
                 for (int materialIndex = 0; materialIndex < m_Renderers[rendererIndex].sharedMaterials.Length; materialIndex++)
                 {
@@ -64,13 +65,13 @@ namespace Rukha93.ModularAnimeCharacter.Customization
 
                     if (IsMaterialMapped(material))
                         continue;
-                    
+
                     ColorData colorData = GetColorData(material);
                     colorData.sharedMaterial = material;
                     colorData.name = material.name;
 
                     m_Colors.Add(colorData);
-                    
+
                     MaterialPropertyBlock propertyBlock = new MaterialPropertyBlock();
                     m_Renderers[rendererIndex].GetPropertyBlock(propertyBlock, materialIndex);
 
@@ -110,17 +111,17 @@ namespace Rukha93.ModularAnimeCharacter.Customization
             }
         }
 
-        private void ApplyColors()
+        public void ApplyColors()
         {
             //update material colors
-            for(int rendererIndex = 0; rendererIndex < m_Renderers.Length; rendererIndex++)
+            for (int rendererIndex = 0; rendererIndex < m_Renderers.Length; rendererIndex++)
             {
                 for (int materialIndex = 0; materialIndex < m_Renderers[rendererIndex].sharedMaterials.Length; materialIndex++)
                 {
                     Material material = m_Renderers[rendererIndex].sharedMaterials[materialIndex];
                     if (material == null)
                         continue;
-                    
+
                     ColorData colorData = GetColorData(material);
 
                     MaterialPropertyBlock propertyBlock = new MaterialPropertyBlock();
@@ -156,11 +157,11 @@ namespace Rukha93.ModularAnimeCharacter.Customization
         private void ResetColors()
         {
             //clear the property blocks for each material in the renderers
-            for(int rendererIndex = 0; rendererIndex < m_Renderers.Length; rendererIndex++)
+            for (int rendererIndex = 0; rendererIndex < m_Renderers.Length; rendererIndex++)
                 for (int materialIndex = 0; materialIndex < m_Renderers[rendererIndex].sharedMaterials.Length; materialIndex++)
                     m_Renderers[rendererIndex].SetPropertyBlock(new MaterialPropertyBlock(), materialIndex);
         }
-    
+
         private bool IsMaterialMapped(Material material)
         {
             for (int i = 0; i < m_Colors.Count; i++)

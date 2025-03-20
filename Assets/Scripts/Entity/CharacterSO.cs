@@ -2,7 +2,7 @@
 
 namespace Assets.Scripts.Entity
 {
-    [CreateAssetMenu(menuName = "Player Model Customizer")]
+    [CreateAssetMenu(menuName = "Character Customizer")]
     public class CharacterSO : ScriptableObject
     {
         // Body Colors
@@ -12,14 +12,9 @@ namespace Assets.Scripts.Entity
         public Color[] EyeColor;
 
         // Body Meshes
-        public Mesh[] Hair;
-        public Mesh[] HairBangs;
-        public Mesh[] HairFacial;
-
-        // Accessories
-        public Mesh[] UpperBody;
-        public Mesh[] LowerBody;
-        public Mesh[] Shoes;
-        public Mesh[] Helmets;
+        public GameObject[] Hair;
+        public GameObject[] HairBangs;
+        public GameObject[] HairBeard;
+        public GameObject[] HairMustache;
     }
 }

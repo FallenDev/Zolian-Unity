@@ -1,3 +1,5 @@
+using System;
+
 using Assets.Scripts.CharacterSelection;
 using Assets.Scripts.Entity;
 using Assets.Scripts.Models;
@@ -7,23 +9,29 @@ using TMPro;
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
 namespace Assets.Scripts.Managers
 {
     public class CreationAndAuthManager : MonoBehaviour
     {
-        [Header("Action Buttons")] public Button createButton;
+        [Header("Action Buttons")]
+        public Button createButton;
         public Button deleteButton;
         public Button cancelButton;
         public Button loginButton;
         public Button continueButton;
 
-        [Header("Object References")] public GameObject CharacterListPanel;
+        [Header("Object References")]
+        public GameObject CharacterListPanel;
         public TextMeshProUGUI RaceDescription;
         public TextMeshProUGUI ClassDescription;
         public TMP_InputField CharacterName;
+        public Toggle CustomizeToggle;
+        public GameObject CustomizePanel;
+        public Toggle ClassSelectionToggle;
+        public GameObject ClassSelectionPanel;
+        public Button RandomizeLooks;
         public Toggle MaleToggle;
         public Toggle FemaleToggle;
         public Toggle BerserkerToggle;
@@ -41,7 +49,8 @@ namespace Assets.Scripts.Managers
         public TMP_Dropdown RaceDropdown;
 
         // These are the groups that will be shown/hidden
-        [Header("Character Screens")] public GameObject CharacterSelectionGroup;
+        [Header("Character Screens")]
+        public GameObject CharacterSelectionGroup;
         public GameObject CharacterCreationGroup;
 
         private BaseClass classChosen;
@@ -50,7 +59,8 @@ namespace Assets.Scripts.Managers
         private const string characterSceneName = "CharacterCreationDisplay";
         private bool isSceneLoaded = false;
 
-        [Header("Character BodyParts")] public GameObject BaseHead;
+        [Header("Character BodyPart References")]
+        public GameObject BaseHead; // GameObject related to hair, hats, etc.
         public GameObject ArmsLower;
         public GameObject ArmsUpper;
         public GameObject Feet;
@@ -63,7 +73,31 @@ namespace Assets.Scripts.Managers
         public GameObject Neck;
         public GameObject Chest;
         public GameObject Abdomen;
+        public GameObject Head; // BlendShapes parent, used for colorization
         public SkinnedMeshRenderer HeadBlendShapes;
+
+        [Header("Character Customizable Options")]
+        public GameObject Hair;
+        public GameObject HairBangs;
+        public GameObject HairBeard;
+        public GameObject HairMustache;
+        public Color HairColor;
+        public Color HairHighlightColor;
+        public Color EyeColor;
+        public Color SkinColor;
+
+        [Header("Character Scriptable Object Data")]
+        public CharacterSO HumanCharacterSO;
+        public CharacterSO HalfElfCharacterSO;
+        public CharacterSO HighElfCharacterSO;
+        public CharacterSO DrowCharacterSO;
+        public CharacterSO WoodElfCharacterSO;
+        public CharacterSO OrcCharacterSO;
+        public CharacterSO DwarfCharacterSO;
+        public CharacterSO HalflingCharacterSO;
+        public CharacterSO DragonkinCharacterSO;
+        public CharacterSO HalfBeastCharacterSO;
+        public CharacterSO MerfolkCharacterSO;
 
         public static CreationAndAuthManager Instance;
 
@@ -75,6 +109,9 @@ namespace Assets.Scripts.Managers
             cancelButton.onClick.AddListener(OnCancelButtonClick);
             loginButton.onClick.AddListener(OnLoginButtonClick);
             continueButton.onClick.AddListener(OnContinueButtonClick);
+            RandomizeLooks.onClick.AddListener(OnRandomLookClick);
+            CustomizeToggle.onValueChanged.AddListener(OnCustomizeToggle);
+            ClassSelectionToggle.onValueChanged.AddListener(OnClassSelectionToggle);
             MaleToggle.onValueChanged.AddListener(OnGenderToggle);
             FemaleToggle.onValueChanged.AddListener(OnGenderToggle);
             BerserkerToggle.onValueChanged.AddListener(OnClassToggle);
@@ -88,6 +125,7 @@ namespace Assets.Scripts.Managers
 
         private void Start()
         {
+            OnClassSelectionToggle(false);
             OnClassToggle(false);
             OnRaceDropdownChange(RaceDropdown);
         }
@@ -140,9 +178,11 @@ namespace Assets.Scripts.Managers
             Debug.Log($"OnLoginButtonClick called");
         }
 
+        /// <summary>
+        /// Toggles Character's Gender
+        /// </summary>
         private void OnGenderToggle(bool toggled)
         {
-            // ToDo: Switch model to show male or female based on which is chosen. 
             if (FemaleToggle.isOn)
             {
                 genderChosen = Sex.Female;
@@ -152,12 +192,82 @@ namespace Assets.Scripts.Managers
                 genderChosen = Sex.Male;
             }
 
-            UpdateCharacterDisplay();
+            UpdateCharacterDisplay(false);
         }
 
         private void OnContinueButtonClick() => LoginClient.Instance.SendCharacterCreation(LoginClient.Instance.SteamId, CharacterName.text, classChosen, raceChosen, genderChosen);
         public void CharacterFinalized() => OnCancelButtonClick();
 
+        /// <summary>
+        /// Toggles Character Visual Customizations Pane
+        /// </summary>
+        private void OnCustomizeToggle(bool toggled)
+        {
+            ClassSelectionPanel.SetActive(false);
+            CustomizePanel.SetActive(true);
+        }
+
+        /// <summary>
+        /// Randomizes a character's hair, facial hair, and other customizable options
+        /// </summary>
+        private void OnRandomLookClick()
+        {
+
+            // Based on Race, randomize with Scriptable Objects Data
+            switch (raceChosen)
+            {
+                case Race.UnDecided:
+                case Race.Human:
+                    {
+                        Hair = HumanCharacterSO.Hair[UnityEngine.Random.Range(0, HumanCharacterSO.Hair.Length)];
+                        HairBangs = HumanCharacterSO.HairBangs[UnityEngine.Random.Range(0, HumanCharacterSO.HairBangs.Length)];
+                        HairBeard = HumanCharacterSO.HairBeard[UnityEngine.Random.Range(0, HumanCharacterSO.HairBeard.Length)];
+                        HairMustache = HumanCharacterSO.HairMustache[UnityEngine.Random.Range(0, HumanCharacterSO.HairMustache.Length)];
+                        HairColor = HumanCharacterSO.HairColor[UnityEngine.Random.Range(0, HumanCharacterSO.HairColor.Length)];
+                        HairHighlightColor = HumanCharacterSO.HairHighlightColor[UnityEngine.Random.Range(0, HumanCharacterSO.HairHighlightColor.Length)];
+                        EyeColor = HumanCharacterSO.EyeColor[UnityEngine.Random.Range(0, HumanCharacterSO.EyeColor.Length)];
+                        SkinColor = HumanCharacterSO.SkinColor[UnityEngine.Random.Range(0, HumanCharacterSO.SkinColor.Length)];
+                    }
+                    break;
+                case Race.HalfElf:
+                    break;
+                case Race.HighElf:
+                    break;
+                case Race.DarkElf:
+                    break;
+                case Race.WoodElf:
+                    break;
+                case Race.Orc:
+                    break;
+                case Race.Dwarf:
+                    break;
+                case Race.Halfling:
+                    break;
+                case Race.Dragonkin:
+                    break;
+                case Race.HalfBeast:
+                    break;
+                case Race.Merfolk:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            
+            UpdateCharacterDisplay(true);
+        }
+
+        /// <summary>
+        /// Toggles Class Selection Pane
+        /// </summary>
+        private void OnClassSelectionToggle(bool toggled)
+        {
+            CustomizePanel.SetActive(false);
+            ClassSelectionPanel.SetActive(true);
+        }
+
+        /// <summary>
+        /// Toggles Character's Class Selection
+        /// </summary>
         private void OnClassToggle(bool toggled)
         {
             if (BerserkerToggle.isOn)
@@ -227,9 +337,12 @@ namespace Assets.Scripts.Managers
                 classChosen = BaseClass.Monk;
             }
 
-            UpdateCharacterDisplay();
+            UpdateCharacterDisplay(false);
         }
 
+        /// <summary>
+        /// Sets Character's Race Selection
+        /// </summary>
         private void OnRaceDropdownChange(TMP_Dropdown dropdown)
         {
             switch (dropdown.options[dropdown.value].text)
@@ -280,19 +393,25 @@ namespace Assets.Scripts.Managers
                     break;
             }
 
-            UpdateCharacterDisplay();
+            UpdateCharacterDisplay(false);
         }
 
+        /// <summary>
+        /// Loads CharacterCreationDisplay Scene for visually seeing character during character creation
+        /// </summary>
         private void LoadCharacterScene()
         {
             if (!isSceneLoaded)
             {
                 SceneManager.LoadScene(characterSceneName, LoadSceneMode.Additive);
                 isSceneLoaded = true;
-                Invoke(nameof(FindCharacterDisplayManager), 0.5f);
+                Invoke(nameof(FindCharacterDisplayManager), 0.15f);
             }
         }
 
+        /// <summary>
+        /// Unloads CharacterCreationDisplay Scene during character selection
+        /// </summary>
         private void UnloadCharacterScene()
         {
             if (isSceneLoaded)
@@ -302,21 +421,31 @@ namespace Assets.Scripts.Managers
             }
         }
 
+
+        /// <summary>
+        /// Updates Character Display if CharacterDisplayManager is available
+        /// </summary>
         private void FindCharacterDisplayManager()
         {
             if (CharacterDisplayManager.Instance != null)
-                UpdateCharacterDisplay();
+                UpdateCharacterDisplay(false);
         }
 
-        private void UpdateCharacterDisplay()
+        /// <summary>
+        /// Updates Character Prefab based on current selected values 
+        /// </summary>
+        private void UpdateCharacterDisplay(bool customized)
         {
             if (CharacterDisplayManager.Instance == null) return;
             GameObject selectedPrefab = CharacterPrefabLoader.GetPrefab(raceChosen, genderChosen);
             GameObject instantiatedCharacter = CharacterDisplayManager.Instance.LoadCharacter(selectedPrefab);
-            AssignCharacterBodyParts(instantiatedCharacter);
+            AssignCharacterBodyParts(instantiatedCharacter, customized);
         }
 
-        private void AssignCharacterBodyParts(GameObject character)
+        /// <summary>
+        /// Assigns body parts to script's variables for easy access
+        /// </summary>
+        private void AssignCharacterBodyParts(GameObject character, bool customized)
         {
             if (character == null)
             {
@@ -349,19 +478,181 @@ namespace Assets.Scripts.Managers
             Chest = character.transform.Find("CC_body_chest").gameObject;
             Abdomen = character.transform.Find("CC_body_abdomen").gameObject;
 
-            var headObject = character.transform.Find("Head");
-            if (headObject != null)
+            Head = character.transform.Find("Head").gameObject;
+            if (Head != null)
             {
-                HeadBlendShapes = headObject.GetComponent<SkinnedMeshRenderer>();
+                HeadBlendShapes = Head.GetComponent<SkinnedMeshRenderer>();
             }
             else
             {
                 Debug.LogError("Head object with SkinnedMeshRenderer not found!");
             }
 
+            if (customized)
+                AssignCharacterCustomizations();
             AssignCharacterGearByClass(character);
         }
 
+        /// <summary>
+        /// Assigns character customizations like hair, beard, etc.
+        /// </summary>
+        private void AssignCharacterCustomizations()
+        {
+            if (BaseHead == null)
+            {
+                Debug.LogError("BaseHead reference not set!");
+                return;
+            }
+
+            // Clear existing child objects from BaseHead
+            foreach (Transform child in BaseHead.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            // Instantiate and parent the new customizable hair parts
+            InstantiateHairPart(Hair, BaseHead.transform);
+            InstantiateHairPart(HairBangs, BaseHead.transform);
+            InstantiateHairPart(HairBeard, BaseHead.transform);
+            InstantiateHairPart(HairMustache, BaseHead.transform);
+            ConfigureSkinColor();
+            ConfigureHeadColor();
+        }
+
+        /// <summary>
+        /// Instantiates a hair part and sets its color
+        /// </summary>
+        private void InstantiateHairPart(GameObject hairPrefab, Transform parent)
+        {
+            if (hairPrefab != null)
+            {
+                GameObject hairPart = Instantiate(hairPrefab, parent);
+                SetLayerRecursively(hairPart, LayerMask.NameToLayer("Player"));
+                var colorCustomization = hairPart.GetComponent<ColorCustomization>();
+                if (colorCustomization == null)
+                {
+                    colorCustomization = hairPart.AddComponent<ColorCustomization>();
+                }
+
+                ConfigureHairColors(colorCustomization);
+            }
+            else
+            {
+                Debug.LogError("Hair part is null!");
+            }
+        }
+
+        /// <summary>
+        /// Sets the layer recursively for all child objects
+        /// </summary>
+        private void SetLayerRecursively(GameObject obj, int newLayer)
+        {
+            if (null == obj)
+                return;
+
+            obj.layer = newLayer;
+
+            foreach (Transform child in obj.transform)
+            {
+                if (null == child)
+                    continue;
+                SetLayerRecursively(child.gameObject, newLayer);
+            }
+        }
+
+        /// <summary>
+        /// Configures hair colors for the character
+        /// </summary>
+        private void ConfigureHairColors(ColorCustomization customization)
+        {
+            if (customization == null) return;
+
+            foreach (var colorData in customization.m_Colors)
+            {
+                if (colorData.mainColor_A == colorData.mainColor_B)
+                {
+                    if (colorData.mainColor_A == colorData.mainColor_C)
+                        colorData.mainColor_C = HairColor;
+                    colorData.mainColor_B = HairColor;
+                }
+                else
+                {
+                    if (colorData.mainColor_A != colorData.mainColor_C)
+                        colorData.mainColor_C = HairHighlightColor;
+                    colorData.mainColor_B = HairHighlightColor;
+                }
+
+                colorData.mainColor_A = HairColor;
+            }
+
+            customization.ApplyColors();
+        }
+
+        private void ConfigureSkinColor()
+        {
+            SetSkinColor(ArmsLower);
+            SetSkinColor(Hands);
+            SetSkinColor(Feet);
+            SetSkinColor(LegsLower);
+            SetSkinColor(LegsUpper);
+            SetSkinColor(LegsKnee);
+            SetSkinColor(Hips);
+            SetSkinColor(Chest);
+            SetSkinColor(Abdomen);
+            SetSkinColor(Shoulders);
+            SetSkinColor(Neck);
+            SetSkinColor(ArmsUpper);
+        }
+
+        private void SetSkinColor(GameObject bodyPart)
+        {
+            if (bodyPart == null || !bodyPart.gameObject.activeSelf)
+                return;
+            
+            var colorCustomization = bodyPart.GetComponent<ColorCustomization>();
+            if (colorCustomization == null)
+                colorCustomization = bodyPart.AddComponent<ColorCustomization>();
+
+            foreach (var colorData in colorCustomization.m_Colors)
+            {
+                colorData.mainColor_A = SkinColor;
+            }
+
+            colorCustomization.ApplyColors();
+        }
+
+        private void ConfigureHeadColor()
+        {
+            if (Head == null)
+                return;
+
+            var colorCustomization = Head.GetComponent<ColorCustomization>();
+            if (colorCustomization == null)
+            {
+                colorCustomization = Head.AddComponent<ColorCustomization>();
+            }
+    
+            foreach (var colorData in colorCustomization.m_Colors)
+            {
+                if (colorData.sharedMaterial == null)
+                    continue;
+
+                if (colorData.sharedMaterial.name.Contains("mat_face"))
+                {
+                    colorData.mainColor_A = SkinColor;
+                }
+                else if (colorData.sharedMaterial.name.Contains("mat_eye.002"))
+                {
+                    colorData.mainColor_B = EyeColor;
+                }
+            }
+
+            colorCustomization.ApplyColors();
+        }
+
+        /// <summary>
+        /// Assigns character gear based on the selected class
+        /// </summary>
         private void AssignCharacterGearByClass(GameObject character)
         {
             UnEquip(character);
@@ -414,6 +705,9 @@ namespace Assets.Scripts.Managers
 
         }
 
+        /// <summary>
+        /// UnEquips all character gear
+        /// </summary>
         private void UnEquip(GameObject character)
         {
             character.transform.Find("Equipment/top.01_long_sleeve_shirt").gameObject.SetActive(false);
