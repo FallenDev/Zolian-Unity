@@ -11,10 +11,10 @@ namespace Assets.Scripts.Entity
         public Color[] HairHighlightColor;
         public Color[] EyeColor;
 
-        // Body Meshes
-        public GameObject[] Hair;
-        public GameObject[] HairBangs;
-        public GameObject[] HairBeard;
-        public GameObject[] HairMustache;
+        // Body Meshes GameObject[1] allows null values for the first entry
+        public GameObject[] Hair = new GameObject[1];
+        public GameObject[] HairBangs = new GameObject[1];
+        public GameObject[] HairBeard = new GameObject[1];
+        public GameObject[] HairMustache = new GameObject[1];
     }
 }

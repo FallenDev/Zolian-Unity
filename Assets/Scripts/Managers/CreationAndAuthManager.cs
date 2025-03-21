@@ -47,6 +47,22 @@ namespace Assets.Scripts.Managers
         public Image ArcanusImage;
         public Image MonkImage;
         public TMP_Dropdown RaceDropdown;
+        public Slider HairSlider;
+        public Slider HairBangsSlider;
+        public Slider HairBeardSlider;
+        public Slider HairMustacheSlider;
+        public Slider HairColorSlider;
+        public Slider HairHighlightSlider;
+        public Slider EyeColorSlider;
+        public Slider SkinToneSlider;
+        private int lastHairIndex = -1;
+        private int lastBangsIndex = -1;
+        private int lastBeardIndex = -1;
+        private int lastMustacheIndex = -1;
+        private int lastHairColorIndex = -1;
+        private int lastHairHighlightColorIndex = -1;
+        private int lastEyeColorIndex = -1;
+        private int lastSkinToneIndex = -1;
 
         // These are the groups that will be shown/hidden
         [Header("Character Screens")]
@@ -56,35 +72,38 @@ namespace Assets.Scripts.Managers
         private BaseClass classChosen;
         private Race raceChosen;
         private Sex genderChosen;
+        private Race lastRaceChosen;
+        private Sex lastSexChosen;
+        private GameObject instantiatedCharacter;
         private const string characterSceneName = "CharacterCreationDisplay";
         private bool isSceneLoaded = false;
 
         [Header("Character BodyPart References")]
-        public GameObject BaseHead; // GameObject related to hair, hats, etc.
-        public GameObject ArmsLower;
-        public GameObject ArmsUpper;
-        public GameObject Feet;
-        public GameObject Hands;
-        public GameObject Hips;
-        public GameObject LegsLower;
-        public GameObject LegsUpper;
-        public GameObject LegsKnee;
-        public GameObject Shoulders;
-        public GameObject Neck;
-        public GameObject Chest;
-        public GameObject Abdomen;
-        public GameObject Head; // BlendShapes parent, used for colorization
-        public SkinnedMeshRenderer HeadBlendShapes;
+        private GameObject BaseHead; // GameObject related to hair, hats, etc.
+        private GameObject ArmsLower;
+        private GameObject ArmsUpper;
+        private GameObject Feet;
+        private GameObject Hands;
+        private GameObject Hips;
+        private GameObject LegsLower;
+        private GameObject LegsUpper;
+        private GameObject LegsKnee;
+        private GameObject Shoulders;
+        private GameObject Neck;
+        private GameObject Chest;
+        private GameObject Abdomen;
+        private GameObject Head; // BlendShapes parent, used for colorization
+        private SkinnedMeshRenderer _headBlendShapes;
 
         [Header("Character Customizable Options")]
-        public GameObject Hair;
-        public GameObject HairBangs;
-        public GameObject HairBeard;
-        public GameObject HairMustache;
-        public Color HairColor;
-        public Color HairHighlightColor;
-        public Color EyeColor;
-        public Color SkinColor;
+        private GameObject Hair;
+        private GameObject HairBangs;
+        private GameObject HairBeard;
+        private GameObject HairMustache;
+        private Color HairColor;
+        private Color HairHighlightColor;
+        private Color EyeColor;
+        private Color SkinColor;
 
         [Header("Character Scriptable Object Data")]
         public CharacterSO HumanCharacterSO;
@@ -121,6 +140,14 @@ namespace Assets.Scripts.Managers
             ArcanusToggle.onValueChanged.AddListener(OnClassToggle);
             MonkToggle.onValueChanged.AddListener(OnClassToggle);
             RaceDropdown.onValueChanged.AddListener(delegate { OnRaceDropdownChange(RaceDropdown); });
+            HairSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged();});
+            HairBangsSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged();});
+            HairBeardSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged();});
+            HairMustacheSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged();});
+            HairColorSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged();});
+            HairHighlightSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged();});
+            EyeColorSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged();});
+            SkinToneSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged();});
         }
 
         private void Start()
@@ -212,48 +239,105 @@ namespace Assets.Scripts.Managers
         /// </summary>
         private void OnRandomLookClick()
         {
+            var characterSO = GetCurrentCharacterSO();
+            if (characterSO == null) return;
+            ConfigureSliders(characterSO);
 
-            // Based on Race, randomize with Scriptable Objects Data
-            switch (raceChosen)
-            {
-                case Race.UnDecided:
-                case Race.Human:
-                    {
-                        Hair = HumanCharacterSO.Hair[UnityEngine.Random.Range(0, HumanCharacterSO.Hair.Length)];
-                        HairBangs = HumanCharacterSO.HairBangs[UnityEngine.Random.Range(0, HumanCharacterSO.HairBangs.Length)];
-                        HairBeard = HumanCharacterSO.HairBeard[UnityEngine.Random.Range(0, HumanCharacterSO.HairBeard.Length)];
-                        HairMustache = HumanCharacterSO.HairMustache[UnityEngine.Random.Range(0, HumanCharacterSO.HairMustache.Length)];
-                        HairColor = HumanCharacterSO.HairColor[UnityEngine.Random.Range(0, HumanCharacterSO.HairColor.Length)];
-                        HairHighlightColor = HumanCharacterSO.HairHighlightColor[UnityEngine.Random.Range(0, HumanCharacterSO.HairHighlightColor.Length)];
-                        EyeColor = HumanCharacterSO.EyeColor[UnityEngine.Random.Range(0, HumanCharacterSO.EyeColor.Length)];
-                        SkinColor = HumanCharacterSO.SkinColor[UnityEngine.Random.Range(0, HumanCharacterSO.SkinColor.Length)];
-                    }
-                    break;
-                case Race.HalfElf:
-                    break;
-                case Race.HighElf:
-                    break;
-                case Race.DarkElf:
-                    break;
-                case Race.WoodElf:
-                    break;
-                case Race.Orc:
-                    break;
-                case Race.Dwarf:
-                    break;
-                case Race.Halfling:
-                    break;
-                case Race.Dragonkin:
-                    break;
-                case Race.HalfBeast:
-                    break;
-                case Race.Merfolk:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            
+            Hair = characterSO.Hair[UnityEngine.Random.Range(0, characterSO.Hair.Length)];
+            HairBangs = characterSO.HairBangs[UnityEngine.Random.Range(0, characterSO.HairBangs.Length)];
+            HairBeard = characterSO.HairBeard[UnityEngine.Random.Range(0, characterSO.HairBeard.Length)];
+            HairMustache = characterSO.HairMustache[UnityEngine.Random.Range(0, characterSO.HairMustache.Length)];
+
+            HairColor = characterSO.HairColor[UnityEngine.Random.Range(0, characterSO.HairColor.Length)];
+            HairHighlightColor = characterSO.HairHighlightColor[UnityEngine.Random.Range(0, characterSO.HairHighlightColor.Length)];
+            EyeColor = characterSO.EyeColor[UnityEngine.Random.Range(0, characterSO.EyeColor.Length)];
+            SkinColor = characterSO.SkinColor[UnityEngine.Random.Range(0, characterSO.SkinColor.Length)];
             UpdateCharacterDisplay(true);
+        }
+
+        /// <summary>
+        /// Updates character's customizations based on slider values
+        /// </summary>
+        public void OnCustomizationSliderChanged()
+        {
+            var characterSO = GetCurrentCharacterSO();
+            if (characterSO == null) return;
+            ConfigureSliders(characterSO);
+
+            var hairIndex = Mathf.Clamp((int)HairSlider.value, 0, characterSO.Hair.Length - 1);
+            var bangsIndex = Mathf.Clamp((int)HairBangsSlider.value, 0, characterSO.HairBangs.Length - 1);
+            var beardIndex = Mathf.Clamp((int)HairBeardSlider.value, 0, characterSO.HairBeard.Length - 1);
+            var mustacheIndex = Mathf.Clamp((int)HairMustacheSlider.value, 0, characterSO.HairMustache.Length - 1);
+            var hairColorIndex = Mathf.Clamp((int)HairColorSlider.value, 0, characterSO.HairColor.Length - 1);
+            var hairHighlightIndex = Mathf.Clamp((int)HairHighlightSlider.value, 0, characterSO.HairHighlightColor.Length - 1);
+            var eyeColorIndex = Mathf.Clamp((int)EyeColorSlider.value, 0, characterSO.EyeColor.Length - 1);
+            var skinToneIndex = Mathf.Clamp((int)SkinToneSlider.value, 0, characterSO.SkinColor.Length - 1);
+
+            if (hairIndex != lastHairIndex)
+            {
+                Hair = characterSO.Hair[hairIndex];
+                lastHairIndex = hairIndex;
+            }
+
+            if (bangsIndex != lastBangsIndex)
+            {
+                HairBangs = characterSO.HairBangs[bangsIndex];
+                lastBangsIndex = bangsIndex;
+            }
+
+            if (beardIndex != lastBeardIndex)
+            {
+                HairBeard = characterSO.HairBeard[beardIndex];
+                lastBeardIndex = beardIndex;
+            }
+
+            if (mustacheIndex != lastMustacheIndex)
+            {
+                HairMustache = characterSO.HairMustache[mustacheIndex];
+                lastMustacheIndex = mustacheIndex;
+            }
+
+            if (hairColorIndex != lastHairColorIndex)
+            {
+                HairColor = characterSO.HairColor[hairColorIndex];
+                lastHairColorIndex = hairColorIndex;
+            }
+
+            if (hairHighlightIndex != lastHairHighlightColorIndex)
+            {
+                HairHighlightColor = characterSO.HairHighlightColor[hairHighlightIndex];
+                lastHairHighlightColorIndex = hairHighlightIndex;
+            }
+
+            if (eyeColorIndex != lastEyeColorIndex)
+            {
+                EyeColor = characterSO.EyeColor[eyeColorIndex];
+                lastEyeColorIndex = eyeColorIndex;
+            }
+
+            if (skinToneIndex != lastSkinToneIndex)
+            {
+                SkinColor = characterSO.SkinColor[skinToneIndex];
+                lastSkinToneIndex = skinToneIndex;
+            }
+
+            UpdateCharacterDisplay(true);
+        }
+
+        /// <summary>
+        /// Set's slider's max values on CharacterSO change
+        /// </summary>
+        private void ConfigureSliders(CharacterSO characterSO)
+        {
+            HairSlider.maxValue = characterSO.Hair.Length - 1;
+            HairBangsSlider.maxValue = characterSO.HairBangs.Length - 1;
+            HairBeardSlider.maxValue = characterSO.HairBeard.Length - 1;
+            HairMustacheSlider.maxValue = characterSO.HairMustache.Length - 1;
+
+            HairColorSlider.maxValue = characterSO.HairColor.Length - 1;
+            HairHighlightSlider.maxValue = characterSO.HairHighlightColor.Length - 1;
+            EyeColorSlider.maxValue = characterSO.EyeColor.Length - 1;
+            SkinToneSlider.maxValue = characterSO.SkinColor.Length - 1;
         }
 
         /// <summary>
@@ -263,6 +347,28 @@ namespace Assets.Scripts.Managers
         {
             CustomizePanel.SetActive(false);
             ClassSelectionPanel.SetActive(true);
+        }
+
+        /// <summary>
+        /// Sets the current Scriptable Object based on race
+        /// </summary>
+        private CharacterSO GetCurrentCharacterSO()
+        {
+            return raceChosen switch
+            {
+                Race.Human => HumanCharacterSO,
+                Race.HalfElf => HalfElfCharacterSO,
+                Race.HighElf => HighElfCharacterSO,
+                Race.DarkElf => DrowCharacterSO,
+                Race.WoodElf => WoodElfCharacterSO,
+                Race.Orc => OrcCharacterSO,
+                Race.Dwarf => DwarfCharacterSO,
+                Race.Halfling => HalflingCharacterSO,
+                Race.Dragonkin => DragonkinCharacterSO,
+                Race.HalfBeast => HalfBeastCharacterSO,
+                Race.Merfolk => MerfolkCharacterSO,
+                _ => HumanCharacterSO
+            };
         }
 
         /// <summary>
@@ -437,8 +543,15 @@ namespace Assets.Scripts.Managers
         private void UpdateCharacterDisplay(bool customized)
         {
             if (CharacterDisplayManager.Instance == null) return;
-            GameObject selectedPrefab = CharacterPrefabLoader.GetPrefab(raceChosen, genderChosen);
-            GameObject instantiatedCharacter = CharacterDisplayManager.Instance.LoadCharacter(selectedPrefab);
+
+            if (lastSexChosen != genderChosen || lastRaceChosen != raceChosen)
+            {
+                var selectedPrefab = CharacterPrefabLoader.GetPrefab(raceChosen, genderChosen);
+                instantiatedCharacter = CharacterDisplayManager.Instance.LoadCharacter(selectedPrefab);
+                lastSexChosen = genderChosen;
+                lastRaceChosen = raceChosen;
+            }
+
             AssignCharacterBodyParts(instantiatedCharacter, customized);
         }
 
@@ -481,7 +594,7 @@ namespace Assets.Scripts.Managers
             Head = character.transform.Find("Head").gameObject;
             if (Head != null)
             {
-                HeadBlendShapes = Head.GetComponent<SkinnedMeshRenderer>();
+                _headBlendShapes = Head.GetComponent<SkinnedMeshRenderer>();
             }
             else
             {
@@ -511,10 +624,14 @@ namespace Assets.Scripts.Managers
             }
 
             // Instantiate and parent the new customizable hair parts
-            InstantiateHairPart(Hair, BaseHead.transform);
-            InstantiateHairPart(HairBangs, BaseHead.transform);
-            InstantiateHairPart(HairBeard, BaseHead.transform);
-            InstantiateHairPart(HairMustache, BaseHead.transform);
+            if (Hair != null)
+                InstantiateHairPart(Hair, BaseHead.transform);
+            if (HairBangs != null)
+                InstantiateHairPart(HairBangs, BaseHead.transform);
+            if (HairBeard != null)
+                InstantiateHairPart(HairBeard, BaseHead.transform);
+            if (HairMustache != null)
+                InstantiateHairPart(HairMustache, BaseHead.transform);
             ConfigureSkinColor();
             ConfigureHeadColor();
         }
@@ -524,22 +641,16 @@ namespace Assets.Scripts.Managers
         /// </summary>
         private void InstantiateHairPart(GameObject hairPrefab, Transform parent)
         {
-            if (hairPrefab != null)
+            if (hairPrefab == null) return;
+            var hairPart = Instantiate(hairPrefab, parent);
+            SetLayerRecursively(hairPart, LayerMask.NameToLayer("Player"));
+            var colorCustomization = hairPart.GetComponent<ColorCustomization>();
+            if (colorCustomization == null)
             {
-                GameObject hairPart = Instantiate(hairPrefab, parent);
-                SetLayerRecursively(hairPart, LayerMask.NameToLayer("Player"));
-                var colorCustomization = hairPart.GetComponent<ColorCustomization>();
-                if (colorCustomization == null)
-                {
-                    colorCustomization = hairPart.AddComponent<ColorCustomization>();
-                }
+                colorCustomization = hairPart.AddComponent<ColorCustomization>();
+            }
 
-                ConfigureHairColors(colorCustomization);
-            }
-            else
-            {
-                Debug.LogError("Hair part is null!");
-            }
+            ConfigureHairColors(colorCustomization);
         }
 
         /// <summary>
