@@ -1,6 +1,10 @@
 Code Monkey Toolkit - Version 1.0.2
 =============================
 
+   * -- IMPORTANT --
+   * -- Open the main window through the Menu bar: Tools -> Code Monkey Toolkit --
+   * -- And make sure you import TextMeshPro Essentials: Window -> TextMeshPro -> Import TMP Essential Resources --
+   *
    * Hi there!
    * Welcome to my Code Monkey Toolkit!
    *
