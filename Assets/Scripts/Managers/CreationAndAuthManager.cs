@@ -63,6 +63,14 @@ namespace Assets.Scripts.Managers
         private int lastHairHighlightColorIndex = -1;
         private int lastEyeColorIndex = -1;
         private int lastSkinToneIndex = -1;
+        private int randHairIndex;
+        private int randBangsIndex;
+        private int randBeardIndex;
+        private int randMustacheIndex;
+        private int randHairColorIndex;
+        private int randHairHighlightColorIndex;
+        private int randEyeColorIndex;
+        private int randSkinToneIndex;
 
         // These are the groups that will be shown/hidden
         [Header("Character Screens")]
@@ -140,14 +148,14 @@ namespace Assets.Scripts.Managers
             ArcanusToggle.onValueChanged.AddListener(OnClassToggle);
             MonkToggle.onValueChanged.AddListener(OnClassToggle);
             RaceDropdown.onValueChanged.AddListener(delegate { OnRaceDropdownChange(RaceDropdown); });
-            HairSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged();});
-            HairBangsSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged();});
-            HairBeardSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged();});
-            HairMustacheSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged();});
-            HairColorSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged();});
-            HairHighlightSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged();});
-            EyeColorSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged();});
-            SkinToneSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged();});
+            HairSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged(); });
+            HairBangsSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged(); });
+            HairBeardSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged(); });
+            HairMustacheSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged(); });
+            HairColorSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged(); });
+            HairHighlightSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged(); });
+            EyeColorSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged(); });
+            SkinToneSlider.onValueChanged.AddListener(delegate { OnCustomizationSliderChanged(); });
         }
 
         private void Start()
@@ -225,6 +233,8 @@ namespace Assets.Scripts.Managers
         private void OnContinueButtonClick() => LoginClient.Instance.SendCharacterCreation(LoginClient.Instance.SteamId, CharacterName.text, classChosen, raceChosen, genderChosen);
         public void CharacterFinalized() => OnCancelButtonClick();
 
+        #region Customizations
+
         /// <summary>
         /// Toggles Character Visual Customizations Pane
         /// </summary>
@@ -243,22 +253,31 @@ namespace Assets.Scripts.Managers
             if (characterSO == null) return;
             ConfigureSliders(characterSO);
 
-            Hair = characterSO.Hair[UnityEngine.Random.Range(0, characterSO.Hair.Length)];
-            HairBangs = characterSO.HairBangs[UnityEngine.Random.Range(0, characterSO.HairBangs.Length)];
-            HairBeard = characterSO.HairBeard[UnityEngine.Random.Range(0, characterSO.HairBeard.Length)];
-            HairMustache = characterSO.HairMustache[UnityEngine.Random.Range(0, characterSO.HairMustache.Length)];
+            randHairIndex = UnityEngine.Random.Range(0, characterSO.Hair.Length);
+            randBangsIndex = UnityEngine.Random.Range(0, characterSO.HairBangs.Length);
+            randBeardIndex = UnityEngine.Random.Range(0, characterSO.HairBeard.Length);
+            randMustacheIndex = UnityEngine.Random.Range(0, characterSO.HairMustache.Length);
+            randHairColorIndex = UnityEngine.Random.Range(0, characterSO.HairColor.Length);
+            randHairHighlightColorIndex = UnityEngine.Random.Range(0, characterSO.HairHighlightColor.Length);
+            randEyeColorIndex = UnityEngine.Random.Range(0, characterSO.EyeColor.Length);
+            randSkinToneIndex = UnityEngine.Random.Range(0, characterSO.SkinColor.Length);
+            Hair = characterSO.Hair[randHairIndex];
+            HairBangs = characterSO.HairBangs[randBangsIndex];
+            HairBeard = characterSO.HairBeard[randBeardIndex];
+            HairMustache = characterSO.HairMustache[randMustacheIndex];
+            HairColor = characterSO.HairColor[randHairColorIndex];
+            HairHighlightColor = characterSO.HairHighlightColor[randHairHighlightColorIndex];
+            EyeColor = characterSO.EyeColor[randEyeColorIndex];
+            SkinColor = characterSO.SkinColor[randSkinToneIndex];
 
-            HairColor = characterSO.HairColor[UnityEngine.Random.Range(0, characterSO.HairColor.Length)];
-            HairHighlightColor = characterSO.HairHighlightColor[UnityEngine.Random.Range(0, characterSO.HairHighlightColor.Length)];
-            EyeColor = characterSO.EyeColor[UnityEngine.Random.Range(0, characterSO.EyeColor.Length)];
-            SkinColor = characterSO.SkinColor[UnityEngine.Random.Range(0, characterSO.SkinColor.Length)];
+            SetSlidersAfterRandom();
             UpdateCharacterDisplay(true);
         }
 
         /// <summary>
         /// Updates character's customizations based on slider values
         /// </summary>
-        public void OnCustomizationSliderChanged()
+        private void OnCustomizationSliderChanged()
         {
             var characterSO = GetCurrentCharacterSO();
             if (characterSO == null) return;
@@ -325,7 +344,7 @@ namespace Assets.Scripts.Managers
         }
 
         /// <summary>
-        /// Set's slider's max values on CharacterSO change
+        /// Sets slider's max values on CharacterSO change
         /// </summary>
         private void ConfigureSliders(CharacterSO characterSO)
         {
@@ -339,6 +358,23 @@ namespace Assets.Scripts.Managers
             EyeColorSlider.maxValue = characterSO.EyeColor.Length - 1;
             SkinToneSlider.maxValue = characterSO.SkinColor.Length - 1;
         }
+
+        /// <summary>
+        /// Set slider's current values on RandomButton()
+        /// </summary>
+        private void SetSlidersAfterRandom()
+        {
+            HairSlider.value = randHairIndex;
+            HairBangsSlider.value = randBangsIndex;
+            HairBeardSlider.value = randBeardIndex;
+            HairMustacheSlider.value = randMustacheIndex;
+            HairColorSlider.value = randHairColorIndex;
+            HairHighlightSlider.value = randHairHighlightColorIndex;
+            EyeColorSlider.value = randEyeColorIndex;
+            SkinToneSlider.value = randSkinToneIndex;
+        }
+
+        #endregion
 
         /// <summary>
         /// Toggles Class Selection Pane
@@ -544,12 +580,14 @@ namespace Assets.Scripts.Managers
         {
             if (CharacterDisplayManager.Instance == null) return;
 
-            if (lastSexChosen != genderChosen || lastRaceChosen != raceChosen)
+            if (lastSexChosen != genderChosen || lastRaceChosen != raceChosen || instantiatedCharacter == null)
             {
-                var selectedPrefab = CharacterPrefabLoader.GetPrefab(raceChosen, genderChosen);
+                var selectedPrefab = CharacterPrefabLoader.GetPrefab(genderChosen);
                 instantiatedCharacter = CharacterDisplayManager.Instance.LoadCharacter(selectedPrefab);
                 lastSexChosen = genderChosen;
                 lastRaceChosen = raceChosen;
+                OnRandomLookClick();
+                return;
             }
 
             AssignCharacterBodyParts(instantiatedCharacter, customized);
@@ -719,7 +757,7 @@ namespace Assets.Scripts.Managers
         {
             if (bodyPart == null || !bodyPart.gameObject.activeSelf)
                 return;
-            
+
             var colorCustomization = bodyPart.GetComponent<ColorCustomization>();
             if (colorCustomization == null)
                 colorCustomization = bodyPart.AddComponent<ColorCustomization>();
@@ -742,7 +780,7 @@ namespace Assets.Scripts.Managers
             {
                 colorCustomization = Head.AddComponent<ColorCustomization>();
             }
-    
+
             foreach (var colorData in colorCustomization.m_Colors)
             {
                 if (colorData.sharedMaterial == null)

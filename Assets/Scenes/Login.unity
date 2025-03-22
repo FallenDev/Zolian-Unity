@@ -22128,6 +22128,12 @@ PrefabInstance:
       objectReference: {fileID: 30149057}
     - target: {fileID: 8117494265951467738, guid: 90b535f950aea104a900545eb1d06d42,
         type: 3}
+      propertyPath: OrcCharacterSO
+      value: 
+      objectReference: {fileID: 11400000, guid: e783381a96b47e340972cda082c10c61,
+        type: 2}
+    - target: {fileID: 8117494265951467738, guid: 90b535f950aea104a900545eb1d06d42,
+        type: 3}
       propertyPath: RandomizeLooks
       value: 
       objectReference: {fileID: 1480735588}
@@ -22156,6 +22162,12 @@ PrefabInstance:
       propertyPath: CustomizeToggle
       value: 
       objectReference: {fileID: 1315984606}
+    - target: {fileID: 8117494265951467738, guid: 90b535f950aea104a900545eb1d06d42,
+        type: 3}
+      propertyPath: DrowCharacterSO
+      value: 
+      objectReference: {fileID: 11400000, guid: f3277568d9d15eb47a47dd1bac5d657e,
+        type: 2}
     - target: {fileID: 8117494265951467738, guid: 90b535f950aea104a900545eb1d06d42,
         type: 3}
       propertyPath: HairBangsSlider
@@ -22193,6 +22205,12 @@ PrefabInstance:
       objectReference: {fileID: 29406315}
     - target: {fileID: 8117494265951467738, guid: 90b535f950aea104a900545eb1d06d42,
         type: 3}
+      propertyPath: DwarfCharacterSO
+      value: 
+      objectReference: {fileID: 11400000, guid: a865d7fd6e1c0f84abf108dec4e828c6,
+        type: 2}
+    - target: {fileID: 8117494265951467738, guid: 90b535f950aea104a900545eb1d06d42,
+        type: 3}
       propertyPath: HumanCharacterSO
       value: 
       objectReference: {fileID: 11400000, guid: 7b5230ef7c49944429eacc4d3c9fbc0a,
@@ -22216,7 +22234,25 @@ PrefabInstance:
         type: 3}
       propertyPath: HalfElfCharacterSO
       value: 
-      objectReference: {fileID: 11400000, guid: eea141b04733b4049aa48a9539fafdf3,
+      objectReference: {fileID: 11400000, guid: 7b5230ef7c49944429eacc4d3c9fbc0a,
+        type: 2}
+    - target: {fileID: 8117494265951467738, guid: 90b535f950aea104a900545eb1d06d42,
+        type: 3}
+      propertyPath: HighElfCharacterSO
+      value: 
+      objectReference: {fileID: 11400000, guid: 2fdc9e5c602ee7242b61ba47225bde82,
+        type: 2}
+    - target: {fileID: 8117494265951467738, guid: 90b535f950aea104a900545eb1d06d42,
+        type: 3}
+      propertyPath: MerfolkCharacterSO
+      value: 
+      objectReference: {fileID: 11400000, guid: bbbb9ddd86bf80b408241d3473a89c94,
+        type: 2}
+    - target: {fileID: 8117494265951467738, guid: 90b535f950aea104a900545eb1d06d42,
+        type: 3}
+      propertyPath: WoodElfCharacterSO
+      value: 
+      objectReference: {fileID: 11400000, guid: 2fdc9e5c602ee7242b61ba47225bde82,
         type: 2}
     - target: {fileID: 8117494265951467738, guid: 90b535f950aea104a900545eb1d06d42,
         type: 3}
@@ -22233,6 +22269,12 @@ PrefabInstance:
       propertyPath: HairHighlightSlider
       value: 
       objectReference: {fileID: 1770674764}
+    - target: {fileID: 8117494265951467738, guid: 90b535f950aea104a900545eb1d06d42,
+        type: 3}
+      propertyPath: HalflingCharacterSO
+      value: 
+      objectReference: {fileID: 11400000, guid: 7b5230ef7c49944429eacc4d3c9fbc0a,
+        type: 2}
     - target: {fileID: 8117494265951467738, guid: 90b535f950aea104a900545eb1d06d42,
         type: 3}
       propertyPath: ClassSelectionToggle
