@@ -22252,7 +22252,7 @@ PrefabInstance:
         type: 3}
       propertyPath: WoodElfCharacterSO
       value: 
-      objectReference: {fileID: 11400000, guid: 2fdc9e5c602ee7242b61ba47225bde82,
+      objectReference: {fileID: 11400000, guid: 8f4c3c501df70d24f855204d966a7849,
         type: 2}
     - target: {fileID: 8117494265951467738, guid: 90b535f950aea104a900545eb1d06d42,
         type: 3}
@@ -22273,7 +22273,7 @@ PrefabInstance:
         type: 3}
       propertyPath: HalflingCharacterSO
       value: 
-      objectReference: {fileID: 11400000, guid: 7b5230ef7c49944429eacc4d3c9fbc0a,
+      objectReference: {fileID: 11400000, guid: 2dd5cb72ba402914d963f6afbd1f4904,
         type: 2}
     - target: {fileID: 8117494265951467738, guid: 90b535f950aea104a900545eb1d06d42,
         type: 3}

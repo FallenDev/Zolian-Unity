@@ -586,11 +586,36 @@ namespace Assets.Scripts.Managers
                 instantiatedCharacter = CharacterDisplayManager.Instance.LoadCharacter(selectedPrefab);
                 lastSexChosen = genderChosen;
                 lastRaceChosen = raceChosen;
-                OnRandomLookClick();
+                OnPrefabSetup();
                 return;
             }
 
             AssignCharacterBodyParts(instantiatedCharacter, customized);
+        }
+
+        private void OnPrefabSetup()
+        {
+            var characterSO = GetCurrentCharacterSO();
+            if (characterSO == null) return;
+            ConfigureSliders(characterSO);
+
+            randHairIndex = UnityEngine.Random.Range(1, characterSO.Hair.Length);
+            randBangsIndex = UnityEngine.Random.Range(0, characterSO.HairBangs.Length);
+            randHairColorIndex = UnityEngine.Random.Range(0, characterSO.HairColor.Length);
+            randHairHighlightColorIndex = UnityEngine.Random.Range(0, characterSO.HairHighlightColor.Length);
+            randEyeColorIndex = UnityEngine.Random.Range(0, characterSO.EyeColor.Length);
+            randSkinToneIndex = UnityEngine.Random.Range(0, characterSO.SkinColor.Length);
+            Hair = characterSO.Hair[randHairIndex];
+            HairBangs = characterSO.HairBangs[randBangsIndex];
+            HairBeard = characterSO.HairBeard[0];
+            HairMustache = characterSO.HairMustache[0];
+            HairColor = characterSO.HairColor[randHairColorIndex];
+            HairHighlightColor = characterSO.HairHighlightColor[randHairHighlightColorIndex];
+            EyeColor = characterSO.EyeColor[randEyeColorIndex];
+            SkinColor = characterSO.SkinColor[randSkinToneIndex];
+
+            SetSlidersAfterRandom();
+            UpdateCharacterDisplay(true);
         }
 
         /// <summary>
@@ -672,6 +697,7 @@ namespace Assets.Scripts.Managers
                 InstantiateHairPart(HairMustache, BaseHead.transform);
             ConfigureSkinColor();
             ConfigureHeadColor();
+            ConfigureFacialBlendShapes();
         }
 
         /// <summary>
@@ -797,6 +823,163 @@ namespace Assets.Scripts.Managers
             }
 
             colorCustomization.ApplyColors();
+        }
+
+        private void ConfigureFacialBlendShapes()
+        {
+            var tuckedEars = _headBlendShapes.sharedMesh.GetBlendShapeIndex("tuck_ears");
+            var halfElfEars = _headBlendShapes.sharedMesh.GetBlendShapeIndex("half_elf_ears");
+            var elvenEars = _headBlendShapes.sharedMesh.GetBlendShapeIndex("elf_ears");
+            var merfolkEars = _headBlendShapes.sharedMesh.GetBlendShapeIndex("merfolk_ears");
+            var scales = _headBlendShapes.sharedMesh.GetBlendShapeIndex("scales");
+            var elvenFace = _headBlendShapes.sharedMesh.GetBlendShapeIndex("elf_eyes");
+
+            switch (raceChosen)
+            {
+                case Race.UnDecided:
+                case Race.Human:
+                    if (tuckedEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(tuckedEars, 0);
+                    if (halfElfEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(halfElfEars, 0);
+                    if (elvenEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenEars, 0);
+                    if (merfolkEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(merfolkEars, 0);
+                    if (scales != -1)
+                        _headBlendShapes.SetBlendShapeWeight(scales, 0);
+                    if (elvenFace != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenFace, 0);
+                    break;
+                case Race.HalfElf:
+                    if (tuckedEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(tuckedEars, 0);
+                    if (halfElfEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(halfElfEars, 100);
+                    if (elvenEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenEars, 0);
+                    if (merfolkEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(merfolkEars, 0);
+                    if (scales != -1)
+                        _headBlendShapes.SetBlendShapeWeight(scales, 0);
+                    if (elvenFace != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenFace, 50);
+                    break;
+                case Race.HighElf:
+                case Race.DarkElf:
+                case Race.WoodElf:
+                    if (tuckedEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(tuckedEars, 0);
+                    if (halfElfEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(halfElfEars, 0);
+                    if (elvenEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenEars, 100);
+                    if (merfolkEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(merfolkEars, 0);
+                    if (scales != -1)
+                        _headBlendShapes.SetBlendShapeWeight(scales, 0);
+                    if (elvenFace != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenFace, 100);
+                    break;
+                case Race.Orc:
+                    if (tuckedEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(tuckedEars, 100);
+                    if (halfElfEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(halfElfEars, 25);
+                    if (elvenEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenEars, 25);
+                    if (merfolkEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(merfolkEars, 0);
+                    if (scales != -1)
+                        _headBlendShapes.SetBlendShapeWeight(scales, 0);
+                    if (elvenFace != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenFace, 0);
+                    break;
+                case Race.Dwarf:
+                    if (tuckedEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(tuckedEars, 75);
+                    if (halfElfEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(halfElfEars, 0);
+                    if (elvenEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenEars, 0);
+                    if (merfolkEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(merfolkEars, 0);
+                    if (scales != -1)
+                        _headBlendShapes.SetBlendShapeWeight(scales, 0);
+                    if (elvenFace != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenFace, 0);
+                    break;
+                case Race.Halfling:
+                    if (tuckedEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(tuckedEars, 100);
+                    if (halfElfEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(halfElfEars, 0);
+                    if (elvenEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenEars, 0);
+                    if (merfolkEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(merfolkEars, 0);
+                    if (scales != -1)
+                        _headBlendShapes.SetBlendShapeWeight(scales, 0);
+                    if (elvenFace != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenFace, 40);
+                    break;
+                case Race.Dragonkin:
+                    if (tuckedEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(tuckedEars, 0);
+                    if (halfElfEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(halfElfEars, 0);
+                    if (elvenEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenEars, 0);
+                    if (merfolkEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(merfolkEars, 0);
+                    if (scales != -1)
+                        _headBlendShapes.SetBlendShapeWeight(scales, 100);
+                    if (elvenFace != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenFace, 0);
+                    break;
+                case Race.HalfBeast:
+                    if (tuckedEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(tuckedEars, 0);
+                    if (halfElfEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(halfElfEars, 0);
+                    if (elvenEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenEars, 0);
+                    if (merfolkEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(merfolkEars, 0);
+                    if (scales != -1)
+                        _headBlendShapes.SetBlendShapeWeight(scales, 0);
+                    if (elvenFace != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenFace, 0);
+                    break;
+                case Race.Merfolk:
+                    if (tuckedEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(tuckedEars, 0);
+                    if (halfElfEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(halfElfEars, 0);
+                    if (elvenEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenEars, 0);
+                    if (merfolkEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(merfolkEars, 0);
+                    if (scales != -1)
+                        _headBlendShapes.SetBlendShapeWeight(scales, 0);
+                    if (elvenFace != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenFace, 0);
+                    break;
+                default:
+                    if (tuckedEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(tuckedEars, 0);
+                    if (halfElfEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(halfElfEars, 0);
+                    if (elvenEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenEars, 0);
+                    if (merfolkEars != -1)
+                        _headBlendShapes.SetBlendShapeWeight(merfolkEars, 0);
+                    if (scales != -1)
+                        _headBlendShapes.SetBlendShapeWeight(scales, 0);
+                    if (elvenFace != -1)
+                        _headBlendShapes.SetBlendShapeWeight(elvenFace, 0);
+                    break;
+            }
         }
 
         /// <summary>
