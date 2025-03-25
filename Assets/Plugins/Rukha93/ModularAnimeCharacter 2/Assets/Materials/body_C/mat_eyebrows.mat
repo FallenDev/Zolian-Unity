@@ -121,7 +121,7 @@ Material:
     - _GlossinessSource: 0
     - _GlossyReflections: 0
     - _Mask_Factor: 0.45
-    - _Metallic: 0
+    - _Metallic: 0.2
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
@@ -132,7 +132,7 @@ Material:
     - _Smoothness: 0.087
     - _SmoothnessMultiplier: 0.402
     - _SmoothnessSource: 0
-    - _SmoothnessTextureChannel: 0
+    - _SmoothnessTextureChannel: 0.2
     - _SpecSource: 0
     - _SpecularHighlights: 0
     - _SrcBlend: 1

@@ -15,7 +15,14 @@ namespace Assets.Scripts.Network.Converters.SendToServer
             writer.WriteByte((byte)args.Class);
             writer.WriteByte((byte)args.Race);
             writer.WriteByte((byte)args.Sex);
-            // ToDo: Create character visuals
+            writer.WriteInt16(args.Hair);
+            writer.WriteInt16(args.HairColor);
+            writer.WriteInt16(args.HairHighlightColor);
+            writer.WriteInt16(args.SkinColor);
+            writer.WriteInt16(args.EyeColor);
+            writer.WriteInt16(args.Beard);
+            writer.WriteInt16(args.Mustache);
+            writer.WriteInt16(args.Bangs);
         }
     }
 }

@@ -21998,6 +21998,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8117494265951467738, guid: 90b535f950aea104a900545eb1d06d42,
         type: 3}
+      propertyPath: ScalesSO
+      value: 
+      objectReference: {fileID: 11400000, guid: b39f4d568da2eb34f9355bf8cc81f740,
+        type: 2}
+    - target: {fileID: 8117494265951467738, guid: 90b535f950aea104a900545eb1d06d42,
+        type: 3}
       propertyPath: MonkImage
       value: 
       objectReference: {fileID: 388826177}

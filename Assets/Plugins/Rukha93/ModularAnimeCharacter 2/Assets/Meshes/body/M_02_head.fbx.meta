@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 94376c38a104e394abf131eb303e0667
+guid: 9b9b3c1b9abcb1048811d7d576a51ca9
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -27,8 +27,8 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: mat_face_F.02
-    second: {fileID: 2100000, guid: 9a49872644c9e4f438a17809b416841f, type: 2}
+      name: mat_face_M.02
+    second: {fileID: 2100000, guid: e2f46dce64a981f49879832a75b3315f, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -38,7 +38,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: mat_scales
-    second: {fileID: 2100000, guid: 808d4bb23eb58e6488d57d94543948ef, type: 2}
+    second: {fileID: 2100000, guid: 5b540cab236d6754bbcbc72b6b775013, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

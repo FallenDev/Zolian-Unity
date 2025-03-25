@@ -55,22 +55,22 @@ namespace Assets.Scripts.Managers
         public Slider HairHighlightSlider;
         public Slider EyeColorSlider;
         public Slider SkinToneSlider;
-        private int lastHairIndex = -1;
-        private int lastBangsIndex = -1;
-        private int lastBeardIndex = -1;
-        private int lastMustacheIndex = -1;
-        private int lastHairColorIndex = -1;
-        private int lastHairHighlightColorIndex = -1;
-        private int lastEyeColorIndex = -1;
-        private int lastSkinToneIndex = -1;
-        private int randHairIndex;
-        private int randBangsIndex;
-        private int randBeardIndex;
-        private int randMustacheIndex;
-        private int randHairColorIndex;
-        private int randHairHighlightColorIndex;
-        private int randEyeColorIndex;
-        private int randSkinToneIndex;
+        private short lastHairIndex = -1;
+        private short lastBangsIndex = -1;
+        private short lastBeardIndex = -1;
+        private short lastMustacheIndex = -1;
+        private short lastHairColorIndex = -1;
+        private short lastHairHighlightColorIndex = -1;
+        private short lastEyeColorIndex = -1;
+        private short lastSkinToneIndex = -1;
+        private short randHairIndex;
+        private short randBangsIndex;
+        private short randBeardIndex;
+        private short randMustacheIndex;
+        private short randHairColorIndex;
+        private short randHairHighlightColorIndex;
+        private short randEyeColorIndex;
+        private short randSkinToneIndex;
 
         // These are the groups that will be shown/hidden
         [Header("Character Screens")]
@@ -125,6 +125,7 @@ namespace Assets.Scripts.Managers
         public CharacterSO DragonkinCharacterSO;
         public CharacterSO HalfBeastCharacterSO;
         public CharacterSO MerfolkCharacterSO;
+        public ScalesSO ScalesSO;
 
         public static CreationAndAuthManager Instance;
 
@@ -230,7 +231,8 @@ namespace Assets.Scripts.Managers
             UpdateCharacterDisplay(false);
         }
 
-        private void OnContinueButtonClick() => LoginClient.Instance.SendCharacterCreation(LoginClient.Instance.SteamId, CharacterName.text, classChosen, raceChosen, genderChosen);
+        private void OnContinueButtonClick() => LoginClient.Instance.SendCharacterCreation(LoginClient.Instance.SteamId, CharacterName.text, classChosen, raceChosen, 
+            genderChosen, lastHairIndex, lastBangsIndex, lastBeardIndex, lastMustacheIndex, lastHairColorIndex, lastHairHighlightColorIndex, lastEyeColorIndex, lastSkinToneIndex);
         public void CharacterFinalized() => OnCancelButtonClick();
 
         #region Customizations
@@ -253,14 +255,14 @@ namespace Assets.Scripts.Managers
             if (characterSO == null) return;
             ConfigureSliders(characterSO);
 
-            randHairIndex = UnityEngine.Random.Range(0, characterSO.Hair.Length);
-            randBangsIndex = UnityEngine.Random.Range(0, characterSO.HairBangs.Length);
-            randBeardIndex = UnityEngine.Random.Range(0, characterSO.HairBeard.Length);
-            randMustacheIndex = UnityEngine.Random.Range(0, characterSO.HairMustache.Length);
-            randHairColorIndex = UnityEngine.Random.Range(0, characterSO.HairColor.Length);
-            randHairHighlightColorIndex = UnityEngine.Random.Range(0, characterSO.HairHighlightColor.Length);
-            randEyeColorIndex = UnityEngine.Random.Range(0, characterSO.EyeColor.Length);
-            randSkinToneIndex = UnityEngine.Random.Range(0, characterSO.SkinColor.Length);
+            randHairIndex = (short)UnityEngine.Random.Range(0, characterSO.Hair.Length);
+            randBangsIndex = (short)UnityEngine.Random.Range(0, characterSO.HairBangs.Length);
+            randBeardIndex = (short)UnityEngine.Random.Range(0, characterSO.HairBeard.Length);
+            randMustacheIndex = (short)UnityEngine.Random.Range(0, characterSO.HairMustache.Length);
+            randHairColorIndex = (short)UnityEngine.Random.Range(0, characterSO.HairColor.Length);
+            randHairHighlightColorIndex = (short)UnityEngine.Random.Range(0, characterSO.HairHighlightColor.Length);
+            randEyeColorIndex = (short)UnityEngine.Random.Range(0, characterSO.EyeColor.Length);
+            randSkinToneIndex = (short)UnityEngine.Random.Range(0, characterSO.SkinColor.Length);
             Hair = characterSO.Hair[randHairIndex];
             HairBangs = characterSO.HairBangs[randBangsIndex];
             HairBeard = characterSO.HairBeard[randBeardIndex];
@@ -283,14 +285,14 @@ namespace Assets.Scripts.Managers
             if (characterSO == null) return;
             ConfigureSliders(characterSO);
 
-            var hairIndex = Mathf.Clamp((int)HairSlider.value, 0, characterSO.Hair.Length - 1);
-            var bangsIndex = Mathf.Clamp((int)HairBangsSlider.value, 0, characterSO.HairBangs.Length - 1);
-            var beardIndex = Mathf.Clamp((int)HairBeardSlider.value, 0, characterSO.HairBeard.Length - 1);
-            var mustacheIndex = Mathf.Clamp((int)HairMustacheSlider.value, 0, characterSO.HairMustache.Length - 1);
-            var hairColorIndex = Mathf.Clamp((int)HairColorSlider.value, 0, characterSO.HairColor.Length - 1);
-            var hairHighlightIndex = Mathf.Clamp((int)HairHighlightSlider.value, 0, characterSO.HairHighlightColor.Length - 1);
-            var eyeColorIndex = Mathf.Clamp((int)EyeColorSlider.value, 0, characterSO.EyeColor.Length - 1);
-            var skinToneIndex = Mathf.Clamp((int)SkinToneSlider.value, 0, characterSO.SkinColor.Length - 1);
+            var hairIndex = (short)Mathf.Clamp(HairSlider.value, 0, characterSO.Hair.Length - 1);
+            var bangsIndex = (short)Mathf.Clamp(HairBangsSlider.value, 0, characterSO.HairBangs.Length - 1);
+            var beardIndex = (short)Mathf.Clamp(HairBeardSlider.value, 0, characterSO.HairBeard.Length - 1);
+            var mustacheIndex = (short)Mathf.Clamp(HairMustacheSlider.value, 0, characterSO.HairMustache.Length - 1);
+            var hairColorIndex = (short)Mathf.Clamp(HairColorSlider.value, 0, characterSO.HairColor.Length - 1);
+            var hairHighlightIndex = (short)Mathf.Clamp(HairHighlightSlider.value, 0, characterSO.HairHighlightColor.Length - 1);
+            var eyeColorIndex = (short)Mathf.Clamp(EyeColorSlider.value, 0, characterSO.EyeColor.Length - 1);
+            var skinToneIndex = (short)Mathf.Clamp(SkinToneSlider.value, 0, characterSO.SkinColor.Length - 1);
 
             if (hairIndex != lastHairIndex)
             {
@@ -599,12 +601,12 @@ namespace Assets.Scripts.Managers
             if (characterSO == null) return;
             ConfigureSliders(characterSO);
 
-            randHairIndex = UnityEngine.Random.Range(1, characterSO.Hair.Length);
-            randBangsIndex = UnityEngine.Random.Range(0, characterSO.HairBangs.Length);
-            randHairColorIndex = UnityEngine.Random.Range(0, characterSO.HairColor.Length);
-            randHairHighlightColorIndex = UnityEngine.Random.Range(0, characterSO.HairHighlightColor.Length);
-            randEyeColorIndex = UnityEngine.Random.Range(0, characterSO.EyeColor.Length);
-            randSkinToneIndex = UnityEngine.Random.Range(0, characterSO.SkinColor.Length);
+            randHairIndex = (short)UnityEngine.Random.Range(1, characterSO.Hair.Length);
+            randBangsIndex = (short)UnityEngine.Random.Range(0, characterSO.HairBangs.Length);
+            randHairColorIndex = (short)UnityEngine.Random.Range(0, characterSO.HairColor.Length);
+            randHairHighlightColorIndex = (short)UnityEngine.Random.Range(0, characterSO.HairHighlightColor.Length);
+            randEyeColorIndex = (short)UnityEngine.Random.Range(0, characterSO.EyeColor.Length);
+            randSkinToneIndex = (short)UnityEngine.Random.Range(0, characterSO.SkinColor.Length);
             Hair = characterSO.Hair[randHairIndex];
             HairBangs = characterSO.HairBangs[randBangsIndex];
             HairBeard = characterSO.HairBeard[0];
@@ -820,6 +822,19 @@ namespace Assets.Scripts.Managers
                 {
                     colorData.mainColor_B = EyeColor;
                 }
+
+                if (raceChosen is Race.Merfolk && colorData.sharedMaterial.name.Contains("mat_scales"))
+                {
+                    colorData.mainColor_A = ScalesSO.ScalesColor[0];;
+                    colorData.metallic = 0.8f;
+                    colorData.smoothness = 0.5f;
+                }
+                else
+                {
+                    colorData.mainColor_A = SkinColor;
+                    colorData.metallic = 0.2f;
+                    colorData.smoothness = 0.2f;
+                }
             }
 
             colorCustomization.ApplyColors();
@@ -961,7 +976,7 @@ namespace Assets.Scripts.Managers
                     if (merfolkEars != -1)
                         _headBlendShapes.SetBlendShapeWeight(merfolkEars, 0);
                     if (scales != -1)
-                        _headBlendShapes.SetBlendShapeWeight(scales, 0);
+                        _headBlendShapes.SetBlendShapeWeight(scales, 25);
                     if (elvenFace != -1)
                         _headBlendShapes.SetBlendShapeWeight(elvenFace, 0);
                     break;

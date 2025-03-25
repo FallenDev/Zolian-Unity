@@ -11,5 +11,13 @@ namespace Assets.Scripts.Network.PacketArgs.SendToServer
         public BaseClass Class;
         public Race Race;
         public Sex Sex;
+        public short Hair;
+        public short HairColor;
+        public short HairHighlightColor;
+        public short SkinColor;
+        public short EyeColor;
+        public short Beard;
+        public short Mustache;
+        public short Bangs;
     }
 }

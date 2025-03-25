@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -19,6 +20,8 @@ namespace Assets.Scripts.Managers
             public Color shadeColor_A, mainColor_A;
             public Color shadeColor_B, mainColor_B;
             public Color shadeColor_C, mainColor_C;
+            public float metallic = 0.2f;
+            public float smoothness = 0.2f;
         }
 
         [SerializeField] private Renderer[] m_Renderers;
@@ -30,8 +33,7 @@ namespace Assets.Scripts.Managers
             m_Renderers = GetComponentsInChildren<Renderer>();
             if (m_Colors == null)
                 m_Colors = new List<ColorData>();
-
-
+            
             //initialize the colors or refresh them in case a mesh has been enabled or disabled
             GetColors();
             ApplyColors();
@@ -85,6 +87,8 @@ namespace Assets.Scripts.Managers
                         colorData.mainColor_B = GetColor("_Color_B_2", material, propertyBlock);
                         colorData.shadeColor_C = GetColor("_Color_C_1", material, propertyBlock);
                         colorData.mainColor_C = GetColor("_Color_C_2", material, propertyBlock);
+                        colorData.metallic = Math.Clamp(GetFloat("_Metallic", material, propertyBlock), 0f, 1f);
+                        colorData.smoothness = Math.Clamp(GetFloat("_SmoothnessMultiplier", material, propertyBlock), 0f, 1f);
 
                         continue;
                     }
@@ -135,6 +139,8 @@ namespace Assets.Scripts.Managers
                         propertyBlock.SetColor("_Color_B_2", colorData.mainColor_B);
                         propertyBlock.SetColor("_Color_C_1", colorData.shadeColor_C);
                         propertyBlock.SetColor("_Color_C_2", colorData.mainColor_C);
+                        propertyBlock.SetFloat("_Metallic", Math.Clamp(colorData.metallic, 0f, 1f));
+                        propertyBlock.SetFloat("_SmoothnessMultiplier", Math.Clamp(colorData.smoothness, 0f, 1f));
                     }
                     else if (material.HasColor("_Color"))
                     {
@@ -186,6 +192,8 @@ namespace Assets.Scripts.Managers
                 mainColor_B = Color.grey,
                 shadeColor_C = Color.black,
                 mainColor_C = Color.grey,
+                metallic = 0.2f,
+                smoothness = 0.2f
             };
         }
 
@@ -193,6 +201,12 @@ namespace Assets.Scripts.Managers
         {
             return propertyBlock.HasColor(id) ?
                 propertyBlock.GetColor(id) : material.GetColor(id);
+        }
+
+        private float GetFloat(string id, Material material, MaterialPropertyBlock propertyBlock)
+        {
+            return propertyBlock.HasFloat(id) ?
+                propertyBlock.GetFloat(id) : material.GetFloat(id);
         }
     }
 }

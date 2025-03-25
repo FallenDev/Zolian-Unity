@@ -149,7 +149,9 @@ namespace Assets.Scripts.Network
             }
         }
 
-        public void SendCharacterCreation(long steamId, string name, BaseClass className, Race race, Sex sex)
+        public void SendCharacterCreation(long steamId, string name, BaseClass className, Race race, Sex sex, 
+            short hairIndex, short bangsIndex, short beardIndex, short mustacheIndex, short hairColorIndex,
+            short hairHighlightIndex, short eyeColorIndex, short skinToneIndex)
         {
             try
             {
@@ -159,7 +161,15 @@ namespace Assets.Scripts.Network
                     Name = name,
                     Class = className,
                     Race = race,
-                    Sex = sex
+                    Sex = sex,
+                    Hair = hairIndex,
+                    Bangs = bangsIndex,
+                    Beard = beardIndex,
+                    Mustache = mustacheIndex,
+                    HairColor = hairColorIndex,
+                    HairHighlightColor = hairHighlightIndex,
+                    EyeColor = eyeColorIndex,
+                    SkinColor = skinToneIndex
                 };
 
                 SendPacket(args.OpCode, args);
