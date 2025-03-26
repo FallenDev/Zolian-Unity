@@ -27,10 +27,22 @@ namespace Assets.Scripts.Network.Converters.ReceiveFromServer
                 var jobString = reader.ReadString();
                 var health = reader.ReadInt64();
                 var mana = reader.ReadInt64();
+                var raceString = reader.ReadString();
+                var genderString = reader.ReadString();
+                var hair = reader.ReadInt16();
+                var hairColor = reader.ReadInt16();
+                var hairHighlightColor = reader.ReadInt16();
+                var skinColor = reader.ReadInt16();
+                var eyeColor = reader.ReadInt16();
+                var beard = reader.ReadInt16();
+                var mustache = reader.ReadInt16();
+                var bangs = reader.ReadInt16();
 
                 Enum.TryParse(baseClassString, out BaseClass baseClass);
                 Enum.TryParse(advClassString, out BaseClass advClass);
                 Enum.TryParse(jobString, out JobClass jobClass);
+                Enum.TryParse(raceString, out Race race);
+                Enum.TryParse(genderString, out Sex sex);
 
                 var player = new PlayerSelection
                 {
@@ -42,7 +54,17 @@ namespace Assets.Scripts.Network.Converters.ReceiveFromServer
                     AdvClass = advClass,
                     Job = jobClass,
                     Health = health,
-                    Mana = mana
+                    Mana = mana,
+                    Race = race,
+                    Sex = sex,
+                    Hair = hair,
+                    HairColor = hairColor,
+                    HairHighlightColor = hairHighlightColor,
+                    SkinColor = skinColor,
+                    EyeColor = eyeColor,
+                    Beard = beard,
+                    Mustache = mustache,
+                    Bangs = bangs
                 };
 
                 playerList.Add(player);
