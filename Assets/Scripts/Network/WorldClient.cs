@@ -26,6 +26,7 @@ namespace Assets.Scripts.Network
         private StreamWriter writer;
         private readonly Dictionary<byte, IPacketConverter> ServerConverters = new();
         private readonly Dictionary<byte, IPacketConverter> ClientConverters = new();
+        private readonly object _sendLock = new();
 
         public string serverIp = "127.0.0.1"; // Server IP address
         public ushort serverPort = 4202; // Server port
@@ -156,7 +157,10 @@ namespace Assets.Scripts.Network
                 // Create and send the packet
                 var packet = new Packet(opCode, payload);
                 var data = packet.ToArray();
-                sslStream.Write(data, 0, data.Length);
+                lock (_sendLock)
+                {
+                    sslStream.Write(data, 0, data.Length);
+                }
                 Debug.Log($"Packet with OpCode {opCode} sent successfully.");
             }
             catch (Exception ex)

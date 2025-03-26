@@ -33,6 +33,7 @@ namespace Assets.Scripts.Network
         private readonly Dictionary<byte, IPacketConverter> ServerConverters = new();
         private readonly Dictionary<byte, IPacketConverter> ClientConverters = new();
         private static SynchronizationContext _mainThreadContext;
+        private readonly object _sendLock = new();
 
         [SerializeField] private string _serverIp = "127.0.0.1";
         [SerializeField] private ushort _lobbyPort = 4200;
@@ -149,7 +150,10 @@ namespace Assets.Scripts.Network
                 // Create and send the packet
                 var packet = new Packet(opCode, payload);
                 var data = packet.ToArray();
-                sslStream.Write(data, 0, data.Length);
+                lock (_sendLock)
+                {
+                    sslStream.Write(data, 0, data.Length);
+                }
                 Debug.Log($"Packet with OpCode {opCode} sent successfully.");
             }
             catch (Exception ex)
