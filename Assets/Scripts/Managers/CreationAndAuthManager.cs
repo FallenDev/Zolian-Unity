@@ -188,6 +188,7 @@ namespace Assets.Scripts.Managers
             PopupManager.Instance.systemPopup.SetActive(false);
             CharacterSelectionGroup.gameObject.SetActive(false);
             CharacterCreationGroup.gameObject.SetActive(true);
+            CharacterSelected.Instance.UnloadCharacterScene();
             LoadCharacterScene();
         }
 
@@ -560,11 +561,16 @@ namespace Assets.Scripts.Managers
         {
             if (isSceneLoaded)
             {
+                // Destroy the instantiated character to free up resources
+                if (instantiatedCharacter != null)
+                {
+                    Destroy(instantiatedCharacter);
+                    instantiatedCharacter = null;
+                }
                 SceneManager.UnloadSceneAsync(characterSceneName);
                 isSceneLoaded = false;
             }
         }
-
 
         /// <summary>
         /// Updates Character Display if CharacterDisplayManager is available
@@ -584,7 +590,7 @@ namespace Assets.Scripts.Managers
 
             if (lastSexChosen != genderChosen || lastRaceChosen != raceChosen || instantiatedCharacter == null)
             {
-                var selectedPrefab = CharacterPrefabLoader.GetPrefab(genderChosen);
+                var selectedPrefab = CharacterPrefabLoader.GetPrefabForCreation(genderChosen);
                 instantiatedCharacter = CharacterDisplayManager.Instance.LoadCharacter(selectedPrefab);
                 lastSexChosen = genderChosen;
                 lastRaceChosen = raceChosen;

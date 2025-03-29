@@ -5,7 +5,6 @@ namespace Assets.Scripts.Managers
     public class CharacterDisplayManager : MonoBehaviour
     {
         public Transform characterSpawnPoint; // Empty GameObject in the scene
-        public GameObject defaultCharacterPrefab; // Default character if no selection
         [Header("This remains empty and is dynamically filled")]
         private GameObject currentCharacter; // Active character prefab
 

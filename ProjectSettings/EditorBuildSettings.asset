@@ -1,21 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!1045 &1
-EditorBuildSettings:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Scenes:
-  - enabled: 1
-    path: Assets/Scenes/Lobby.unity
-    guid: e3da09dcbd74bf04e96f9ada65d061c2
-  - enabled: 1
-    path: Assets/Scenes/Login.unity
-    guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
-    path: Assets/Scenes/CharacterCreationDisplay.unity
-    guid: 1077b06946f046a4d9130d3077fc1aa3
-  - enabled: 1
-    path: Assets/Scenes/World.unity
-    guid: 1d70f2a77f9ed0c4b8c565c572676b3a
-  m_configObjects: {}
-  m_UseUCBPForAssetBundles: 0
+version https://git-lfs.github.com/spec/v1
+oid sha256:41461bcde7ea2e986573e8e4bedf4b4647d6e4be6ce165f62c84eb37138c2e32
+size 696
