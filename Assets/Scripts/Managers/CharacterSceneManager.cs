@@ -1,22 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Assets.Scripts.Entity;
-
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Assets.Scripts.Managers
 {
+    /// <summary>
+    /// Manages the loading and unloading of character-related scenes
+    /// </summary>
     public class CharacterSceneManager : MonoBehaviour
     {
-        protected const string CharacterSceneName = "CharacterCreationDisplay";
-        protected const string SelectionSceneName = "CharacterSelectionDisplay";
-        public bool IsCreationSceneLoaded;
-        public bool IsSelectionSceneLoaded;
-
         public static CharacterSceneManager Instance;
 
         private void Awake()
@@ -37,13 +28,9 @@ namespace Assets.Scripts.Managers
         /// </summary>
         protected virtual bool LoadCharacterScene(string characterSceneName, bool isSceneLoaded)
         {
-            if (!isSceneLoaded)
-            {
-                SceneManager.LoadScene(characterSceneName, LoadSceneMode.Additive);
-                return true;
-            }
-
-            return false;
+            if (isSceneLoaded) return false;
+            SceneManager.LoadScene(characterSceneName, LoadSceneMode.Additive);
+            return true;
         }
 
         /// <summary>
@@ -51,13 +38,9 @@ namespace Assets.Scripts.Managers
         /// </summary>
         protected virtual bool UnloadCharacterScene(string characterSceneName, bool isSceneLoaded)
         {
-            if (isSceneLoaded)
-            {
-                SceneManager.UnloadSceneAsync(characterSceneName);
-                return false;
-            }
-
-            return true;
+            if (!isSceneLoaded) return true;
+            SceneManager.UnloadSceneAsync(characterSceneName);
+            return false;
         }
     }
 }
