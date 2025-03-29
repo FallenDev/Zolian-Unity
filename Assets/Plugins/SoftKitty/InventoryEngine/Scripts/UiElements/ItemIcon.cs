@@ -250,6 +250,18 @@ namespace SoftKitty.InventoryEngine
         }
 
         /// <summary>
+        /// Returns the item category id. Returns -1 if the slot is empty.
+        /// </summary>
+        /// <returns></returns>
+        public int GetCategory()
+        {
+            if (ItemManager.TryGetItem(itemId) != null)
+                return ItemManager.TryGetItem(itemId).type;
+            else
+                return -1;
+        }
+
+        /// <summary>
         /// Returns whether this item slot is hovered over by the mouse.
         /// </summary>
         /// <returns></returns>

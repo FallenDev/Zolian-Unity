@@ -149,6 +149,6 @@ AssetOrigin:
   serializedVersion: 1
   productId: 295131
   packageName: Master Inventory Engine - Crafting/Loot/Trade/Skills/HotBar
-  packageVersion: 1.81
-  assetPath: Assets/SoftKitty/InventoryEngine/Textures/ItemIcons/item (50).png
-  uploadId: 739184
+  packageVersion: 1.9
+  assetPath: Assets/Plugins/SoftKitty/InventoryEngine/Textures/ItemIcons/item (50).png
+  uploadId: 744238

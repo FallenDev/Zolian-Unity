@@ -126,7 +126,7 @@ namespace SoftKitty.InventoryEngine
             else
             {
                 if (waittingForDrop && ItemDragManager.DraggingSource.Type == IconType.Item && ItemDragManager.DraggingSource.Icon != Icon
-                    && isHover)
+                    && isHover && isVisible)
                 {
                     waittingForDrop = false;
                     if (Vector3.Distance(ItemDragManager.DropPos, transform.position) < Mathf.Min(Rect.sizeDelta.x * 0.48F, Rect.sizeDelta.y * 0.48F)* Rect.lossyScale.x)
@@ -179,7 +179,7 @@ namespace SoftKitty.InventoryEngine
 
         IEnumerator EndDragCo(int _add)
         {
-            yield return 1;
+            yield return 2;
             if (!ItemDragManager.DropReceived)
             {
                 int _id = StackData.GetItemId();
@@ -246,7 +246,7 @@ namespace SoftKitty.InventoryEngine
             {
                 if (InputProxy.GetMouseButton(0))
                 {
-                    if (mouseDownTime > 0.5F || Vector3.Distance(InputProxy.mousePosition, mouseDownPos) > 40F)
+                    if (isVisible && (mouseDownTime > 0.5F || Vector3.Distance(InputProxy.mousePosition, mouseDownPos) > 40F))
                     {
                         isDragging = false;
                         ItemDragManager.StartDragging(this, GetComponent<RectTransform>());
@@ -300,7 +300,7 @@ namespace SoftKitty.InventoryEngine
         /// </summary>
         public void Split()
         {
-            if (StackData.isEmpty() || StackData.Number <= 1 || !Splittable) return;
+            if (StackData.isEmpty() || StackData.Number <= 1 || !Splittable || !isVisible) return;
             NumberInput.GetNumber(StackData.Number, StackData.Number, Rect, Split);
         }
 

@@ -190,41 +190,94 @@ namespace SoftKitty.InventoryEngine
                 MerchantTradeItems[i].Fav.GetComponent<Image>().color = InventorySkin.instance.FavoriteColor;
             }
         }
-
+        private bool isKeyMatch(AlterKeys _key)
+        {
+            switch (_key)
+            {
+                case AlterKeys.None:
+                    return true;
+                case AlterKeys.LeftCtrl:
+                    return InputProxy.GetKey(KeyCode.LeftControl);
+                case AlterKeys.LeftAlt:
+                    return InputProxy.GetKey(KeyCode.LeftAlt);
+                case AlterKeys.LeftShift:
+                    return InputProxy.GetKey(KeyCode.LeftShift);
+            }
+            return false;
+        }
 
         public void OnPlayerTradeItemClick(int _index, int _button)//Callback for when player click an item in player's trading area.
         {
-            if (_button == 1 && PlayerTradeItems[_index].isTradeable() && !PlayerTradeItems[_index].isEmpty())
-            {
-                PlayerTradeHolder.RemoveItem(PlayerTradeItems[_index].GetItemId(), 1 - playerHolder.AddItem(PlayerTradeItems[_index].GetItem(), 1).Number, _index);
-                SoundManager.Play2D("ItemDrop");
+            if (PlayerTradeItems[_index].isTradeable() && !PlayerTradeItems[_index].isEmpty()) {
+                foreach (var setting in ItemManager.instance.clickSettings)
+                {
+                    if (_button == (int)setting.mouseButton && isKeyMatch(setting.key))
+                    {
+                        if (setting.function == ClickFunctions.Use)
+                        {
+                            PlayerTradeHolder.RemoveItem(PlayerTradeItems[_index].GetItemId(), 1 - playerHolder.AddItem(PlayerTradeItems[_index].GetItem(), 1).Number, _index);
+                            SoundManager.Play2D("ItemDrop");
+                        }
+                    }
+                }
             }
         }
 
         public void OnMerchantTradeItemClick(int _index, int _button)//Callback for when player click an item in merchant's trading area.
         {
-            if (_button == 1 && MerchantTradeItems[_index].isTradeable() && !MerchantTradeItems[_index].isEmpty())
+            if (MerchantTradeItems[_index].isTradeable() && !MerchantTradeItems[_index].isEmpty())
             {
-                NpcTradeHolder.RemoveItem(MerchantTradeItems[_index].GetItemId(), 1 - merchantHolder.AddItem(MerchantTradeItems[_index].GetItem(), 1).Number, _index);
-                SoundManager.Play2D("ItemDrop");
+                foreach (var setting in ItemManager.instance.clickSettings)
+                {
+                    if (_button == (int)setting.mouseButton && isKeyMatch(setting.key))
+                    {
+                        if (setting.function == ClickFunctions.Use)
+                        {
+                            NpcTradeHolder.RemoveItem(MerchantTradeItems[_index].GetItemId(), 1 - merchantHolder.AddItem(MerchantTradeItems[_index].GetItem(), 1).Number, _index);
+                            SoundManager.Play2D("ItemDrop");
+                        }
+                    }
+                }
             }
         }
 
         public void OnPlayerItemClick(int _index, int _button)//Callback for when player click an item in player's inventory.
         {
-            if (_button == 1 && playerItems[_index].isTradeable() && !playerItems[_index].isEmpty())
-            {
-                playerHolder.RemoveItem(playerItems[_index].GetItemId(), 1 - PlayerTradeHolder.AddItem(playerItems[_index].GetItem(), 1).Number, _index);
-                SoundManager.Play2D("ItemDrop");
+            if (playerItems[_index].isTradeable() && !playerItems[_index].isEmpty()
+                 && (merchantHolder.TradeAllItems || merchantHolder.TradeList.Contains(playerItems[_index].GetItemId()) || merchantHolder.TradeCategoryList.Contains(playerItems[_index].GetCategory()))) {
+                foreach (var setting in ItemManager.instance.clickSettings)
+                {
+                    if (_button == (int)setting.mouseButton && isKeyMatch(setting.key))
+                    {
+                        if (setting.function == ClickFunctions.Use)
+                        {
+                            playerHolder.RemoveItem(playerItems[_index].GetItemId(), 1 - PlayerTradeHolder.AddItem(playerItems[_index].GetItem(), 1).Number, _index);
+                            SoundManager.Play2D("ItemDrop");
+                        }
+                        else if (setting.function == ClickFunctions.MarkFavorite)
+                        {
+                            playerItems[_index].MarkFav();
+                        }
+                    }
+                }
             }
         }
 
         public void OnMerchantItemClick(int _index, int _button)//Callback for when player click an item in merchant's inventory.
         {
-            if (_button == 1 && merchantItems[_index].isTradeable() && !merchantItems[_index].isEmpty())
+            if (merchantItems[_index].isTradeable() && !merchantItems[_index].isEmpty())
             {
-                merchantHolder.RemoveItem(merchantItems[_index].GetItemId(), 1 - NpcTradeHolder.AddItem(merchantItems[_index].GetItem(), 1).Number, _index);
-                SoundManager.Play2D("ItemDrop");
+                foreach (var setting in ItemManager.instance.clickSettings)
+                {
+                    if (_button == (int)setting.mouseButton && isKeyMatch(setting.key))
+                    {
+                        if (setting.function == ClickFunctions.Use)
+                        {
+                            merchantHolder.RemoveItem(merchantItems[_index].GetItemId(), 1 - NpcTradeHolder.AddItem(merchantItems[_index].GetItem(), 1).Number, _index);
+                            SoundManager.Play2D("ItemDrop");
+                        }
+                    }
+                }
             }
         }
 
@@ -371,7 +424,8 @@ namespace SoftKitty.InventoryEngine
         {
             for (int i = 0; i < playerItems.Length; i++)
             {
-                playerItems[i].SetVisible(playerItems[i].isNameMatch(SearchInput.text) && (!filterFav || playerItems[i].Fav.activeSelf) && playerItems[i].isTradeable(true));
+                playerItems[i].SetVisible(playerItems[i].isNameMatch(SearchInput.text) && (!filterFav || playerItems[i].Fav.activeSelf) && playerItems[i].isTradeable(true)
+                    && (merchantHolder.TradeAllItems || merchantHolder.TradeList.Contains(playerItems[i].GetItemId()) || merchantHolder.TradeCategoryList.Contains(playerItems[i].GetCategory())));
             }
             for (int i = 0; i < merchantItems.Length; i++)
             {

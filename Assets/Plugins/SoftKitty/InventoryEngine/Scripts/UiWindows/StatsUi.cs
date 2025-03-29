@@ -94,7 +94,16 @@ namespace SoftKitty.InventoryEngine
             {
                 foreach (Attribute att in _baseAttributes)
                 {
-                    BaseDic.Add(att.key, att);
+                    if (ItemManager.instance.GetAtttibute(att.key) != null)
+                    {
+                        if (!ItemManager.instance.GetAtttibute(att.key).stringValue)
+                        {
+                            float _value = att.GetFloat();
+                            Attribute _newAtt = ItemManager.instance.GetAtttibute(att.key).Copy();
+                            _newAtt.UpdateValue(_value);
+                            BaseDic.Add(att.key, _newAtt);
+                        }
+                    }
                 }
             }
             for(int i=0;i<ItemManager.instance.itemAttributes.Count;i++) {

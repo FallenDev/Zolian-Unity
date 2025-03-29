@@ -1,6 +1,5 @@
 ﻿#if !DISABLESTEAMWORKS  && STEAMWORKSNET
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 namespace Heathen.SteamworksIntegration
@@ -56,16 +55,15 @@ namespace Heathen.SteamworksIntegration
 
             public override void OnInspectorGUI()
             {
-                EditorGUILayout.BeginHorizontal();
+                UnityEditor.EditorGUILayout.BeginHorizontal();
                 if(UnityEditor.EditorGUILayout.LinkButton("Settings"))
                     UnityEditor.SettingsService.OpenProjectSettings("Project/Player/Steamworks");
                 if (UnityEditor.EditorGUILayout.LinkButton("Inspector"))
-                    EditorApplication.ExecuteMenuItem("Window/Steamworks/Inspector");
-                EditorGUILayout.EndHorizontal();
+                    UnityEditor.EditorApplication.ExecuteMenuItem("Window/Steamworks/Inspector");
+                UnityEditor.EditorGUILayout.EndHorizontal();
 
 
                 parent = target as InitializeSteamworks;
-                parent.RefreshSettings();
 
                 if (parent.targetSettings == null)
                     parent.targetSettings = parent.mainSettings;
@@ -83,16 +81,27 @@ namespace Heathen.SteamworksIntegration
                 var currentLength = names.Count;
                 if(parent.playtestSettings != null)
                 {
-                    foreach(var setting in  parent.playtestSettings)
+                    parent.playtestSettings.RemoveAll(s => s == null);
+
+                    foreach (var setting in  parent.playtestSettings)
                     {
                         if (parent.targetSettings == setting)
-                            index = 1 + names.Count - currentLength;
+                            index = 1 + (parent.demoSettings != null ? 1 : 0) + names.Count - currentLength;
 
                         names.Add(setting.name);
                     }
                 }
 
-                var newIndex = UnityEditor.EditorGUILayout.Popup(index, names.ToArray());
+                var newIndex = index;
+
+                UnityEditor.EditorGUILayout.BeginHorizontal();
+                newIndex = UnityEditor.EditorGUILayout.Popup(index, names.ToArray());
+                if (GUILayout.Button("Refresh", GUILayout.Width(60)))
+                {
+                    parent.RefreshSettings();
+                }
+                UnityEditor.EditorGUILayout.EndHorizontal();
+
                 if(newIndex != index)
                 {
                     UnityEditor.Undo.RecordObject(target, "Active Settings");

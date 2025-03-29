@@ -58,13 +58,22 @@ namespace SoftKitty.InventoryEngine
 
             if (Manager == null)
             {
-                GUILayout.BeginHorizontal();
-                GUILayout.Space(20);
-                GUILayout.Box(warningIcon, GUIStyle.none, GUILayout.Width(20));
-                GUI.color = Color.red;
-                GUILayout.Label("You must have ItemManager prefab in the scene to modify this script.");
-                GUI.color = Color.white;
-                GUILayout.EndHorizontal();
+                GameObject _managerObj = AssetDatabase.LoadAssetAtPath<GameObject>(_thePath.Replace("Editor/", "Prefabs/System/InventoryEngine.prefab"));
+                if (_managerObj != null)
+                {
+                    Manager = _managerObj.GetComponent<ItemManager>();
+                }
+                else
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(20);
+                    GUILayout.Box(warningIcon, GUIStyle.none, GUILayout.Width(20));
+                    GUI.color = Color.red;
+                    GUILayout.Label("You must have ItemManager prefab in the scene to modify this script.");
+                    GUI.color = Color.white;
+                    GUILayout.EndHorizontal();
+                    return;
+                }
                 return;
             }
 

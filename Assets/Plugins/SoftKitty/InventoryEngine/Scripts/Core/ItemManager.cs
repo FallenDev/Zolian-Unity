@@ -146,7 +146,36 @@ namespace SoftKitty.InventoryEngine
         /// </summary>
         public static InventoryHolder PlayerInventoryHolder;
 
-
+        /// <summary>
+        /// Try get the item data by uid.
+        /// </summary>
+        /// <param name="_id"></param>
+        /// <returns></returns>
+        public static Item TryGetItem(int _id)
+        {
+            if (instance == null) return null;
+            if (_id < instance.items.Count && _id >= 0)
+            {
+                return instance.items[_id];
+            }
+            else
+            {
+                return null;
+            }
+        }
+        /// <summary>
+        /// Get the Attribute setting by its script key.
+        /// </summary>
+        /// <param name="_attributeKey"></param>
+        /// <returns></returns>
+        public  Attribute GetAtttibute(string _attributeKey)
+        {
+            foreach (var obj in itemAttributes)
+            {
+                if (obj.key == _attributeKey) return obj;
+            }
+            return null;
+        }
   
         /// <summary>
         /// The InventoryHolder of player will auto call this method on Awake(), but if you can call this if you want to manual set this.

@@ -12,6 +12,15 @@ namespace SoftKitty.InventoryEngine
         bool _hiddenExpand = false;
         bool _currencyExpand = false;
         bool _callbackExpand = false;
+        bool _merchantExpand = false;
+        bool _statsExpand = false;
+        bool _tradeListExpand = false;
+        bool _tradeCategoryListExpand = false;
+        int _tradeItemId = 0;
+        int _tradeType = 0;
+        int _tradeCategoryType = 0;
+        int _attIndex = 0;
+        float _attValue = 0F;
         Color _activeColor = new Color(0.1F, 0.3F, 0.5F);
         Color _disableColor = new Color(0F, 0.1F, 0.3F);
         Color _actionColor = new Color(0F, 1F, 0.4F);
@@ -62,14 +71,22 @@ namespace SoftKitty.InventoryEngine
 
             if (Manager == null)
             {
-                GUILayout.BeginHorizontal();
-                GUILayout.Space(20);
-                GUILayout.Box(warningIcon, GUIStyle.none, GUILayout.Width(20));
-                GUI.color = Color.red;
-                GUILayout.Label("You must have ItemManager prefab in the scene to modify this script.");
-                GUI.color = Color.white;
-                GUILayout.EndHorizontal();
-                return;
+                GameObject _managerObj= AssetDatabase.LoadAssetAtPath<GameObject>(_thePath.Replace("Editor/", "Prefabs/System/InventoryEngine.prefab"));
+                if (_managerObj != null)
+                {
+                    Manager = _managerObj.GetComponent<ItemManager>();
+                }
+                else
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(20);
+                    GUILayout.Box(warningIcon, GUIStyle.none, GUILayout.Width(20));
+                    GUI.color = Color.red;
+                    GUILayout.Label("You must have ItemManager prefab in the scene to modify this script.");
+                    GUI.color = Color.white;
+                    GUILayout.EndHorizontal();
+                    return;
+                }
             }
 
             GUILayout.BeginHorizontal();
@@ -92,22 +109,14 @@ namespace SoftKitty.InventoryEngine
             myTarget.SavePath = GUILayout.TextField(myTarget.SavePath);
             GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(new GUIContent("Sell Price Multiplier:", "This multiplier is applied when selling items. For example, a merchant NPC with a SellPriceMultiplier of 1.2 will sell an item priced at 1000 for 1200"), GUILayout.Width(150));
-            myTarget.SellPriceMultiplier = EditorGUILayout.Slider(myTarget.SellPriceMultiplier,0F,2F);
-            GUILayout.Label("x", GUILayout.Width(15));
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(new GUIContent("Buy Price Multiplier:", "This multiplier is applied when buying items. For example, a merchant NPC with a BuyPriceMultiplier of 0.8 will buy an item priced at 1000 for 800"), GUILayout.Width(150));
-            myTarget.BuyPriceMultiplier = EditorGUILayout.Slider(myTarget.BuyPriceMultiplier, 0F, 2F);
-            GUILayout.Label("x", GUILayout.Width(15));
-            GUILayout.EndHorizontal();
+           
 
             GUILayout.BeginHorizontal();
             GUILayout.Box(warningIcon, GUIStyle.none, GUILayout.Width(20));
             GUILayout.Label("Click this if you have changed the item settings in DataBase:", GUILayout.Width(400));
             GUILayout.EndHorizontal();
+
+           
 
             GUILayout.BeginHorizontal();
             GUI.backgroundColor = _buttonColor;
@@ -134,6 +143,310 @@ namespace SoftKitty.InventoryEngine
             }
             GUI.backgroundColor = _backgroundColor;
             GUILayout.EndHorizontal();
+
+            if (myTarget.Type== InventoryHolder.HolderType.PlayerEquipment || myTarget.Type== InventoryHolder.HolderType.NpcEquipment) {
+
+                for (int i=0;i< myTarget.BaseStats.Count;i++) {
+                    Attribute _att = Manager.GetAtttibute(myTarget.BaseStats[i].key);
+                    if (_att==null) {
+                        myTarget.BaseStats.RemoveAt(i);
+                    }
+                    else if (_att.stringValue)
+                    {
+                        myTarget.BaseStats.RemoveAt(i);
+                    }
+                    else if (_att.name != myTarget.BaseStats[i].name || _att.upgradeIncrement != myTarget.BaseStats[i].upgradeIncrement || _att.visible != myTarget.BaseStats[i].visible)
+                    {
+                        myTarget.BaseStats[i].name= _att.name;
+                        myTarget.BaseStats[i].upgradeIncrement= _att.upgradeIncrement;
+                        myTarget.BaseStats[i].visible=_att.visible;
+                    }
+                }
+
+                GUILayout.BeginHorizontal();
+                GUI.backgroundColor = _statsExpand ? _activeColor : _disableColor;
+                _titleButtonStyle.normal.textColor = _statsExpand ? Color.white : new Color(0.65F, 0.65F, 0.65F);
+                GUILayout.Label(_statsExpand ? "[-]" : "[+]", GUILayout.Width(20));
+                if (GUILayout.Button(new GUIContent(" Base Stats", "The base stats of this character without any equipment."), _titleButtonStyle))
+                {
+                    _statsExpand = !_statsExpand;
+                    EditorGUI.FocusTextInControl(null);
+                }
+                GUI.color = Color.white;
+                GUI.backgroundColor = _backgroundColor;
+                GUILayout.EndHorizontal();
+
+                if (_statsExpand) {
+                    if (Manager.itemAttributes.Count <= 0)
+                    {
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Space(50);
+                        GUILayout.Box(warningIcon, GUIStyle.none, GUILayout.Width(20));
+                        GUI.color = Color.red;
+                        GUILayout.Label("You must have at least one attribute setup in ItemManager prefab.");
+                        GUI.color = Color.white;
+                        GUILayout.EndHorizontal();
+                    }
+                    else{
+                        string[] _attributeOptions = new string[Manager.itemAttributes.Count];
+                        for (int i = 0; i < _attributeOptions.Length; i++) _attributeOptions[i] = Manager.itemAttributes[i].name;
+
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Space(40);
+                        GUILayout.Label("New:", GUILayout.Width(50));
+                        _attIndex = Mathf.Clamp(_attIndex, 0, Manager.itemAttributes.Count - 1);
+                        GUI.backgroundColor = _titleColor;
+                        _attIndex = EditorGUILayout.Popup("", _attIndex, _attributeOptions, GUILayout.Width(150));
+                        GUI.backgroundColor = Color.white;
+                        _attValue = EditorGUILayout.FloatField(_attValue, GUILayout.Width(50));
+                        GUI.backgroundColor = _buttonColor;
+                        if (Manager.itemAttributes[_attIndex].stringValue)
+                        {
+                            GUI.color = Color.red;
+                            GUILayout.Label("String Value", GUILayout.Width(70));
+                            GUI.color = Color.white;
+                        }
+                        else
+                        {
+                            if (GUILayout.Button("Add", GUILayout.Width(70)))
+                            {
+                                Attribute _newAtt = Manager.itemAttributes[_attIndex].Copy();
+                                bool _found = false;
+                                foreach (var obj in myTarget.BaseStats) {
+                                    if (obj.key==_newAtt.key) {
+                                        obj.UpdateValue(_attValue);
+                                        _found = true;
+                                    }
+                                }
+                                if (!_found)
+                                {
+                                    _newAtt.UpdateValue(_attValue);
+                                    myTarget.BaseStats.Add(_newAtt);
+                                }
+                                _valueChanged = true;
+                            }
+                        }
+                        GUI.backgroundColor = Color.white;
+                        GUILayout.EndHorizontal();
+
+                        EditorGUILayout.Separator();
+
+                        for (int i=0;i< myTarget.BaseStats.Count;i++) {
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Space(40);
+                            GUI.backgroundColor = _titleColor;
+                            GUILayout.Button(myTarget.BaseStats[i].name, _titleButtonStyle,GUILayout.Width(100));
+                            GUI.backgroundColor = Color.white;
+                            myTarget.BaseStats[i].value = EditorGUILayout.FloatField(float.Parse(myTarget.BaseStats[i].value), GUILayout.Width(50)).ToString();
+                            GUI.color = _buttonColor;
+                            GUILayout.Label("(Key: " +myTarget.BaseStats[i].key+")", GUILayout.Width(70));
+                            GUI.color = Color.white;
+                            GUI.backgroundColor = Color.red;
+                            if (GUILayout.Button("X", GUILayout.Width(30)))
+                            {
+                                myTarget.BaseStats.RemoveAt(i);
+                                _valueChanged = true;
+                            }
+                            GUI.backgroundColor = Color.white;
+                            GUILayout.EndHorizontal();
+                        }
+                    }
+                }
+            }
+
+            if (myTarget.Type == InventoryHolder.HolderType.Merchant)
+            {
+                GUILayout.BeginHorizontal();
+                GUI.backgroundColor = _merchantExpand ? _activeColor : _disableColor;
+                _titleButtonStyle.normal.textColor = _merchantExpand ? Color.white : new Color(0.65F, 0.65F, 0.65F);
+                GUILayout.Label(_merchantExpand ? "[-]" : "[+]", GUILayout.Width(20));
+                if (GUILayout.Button(new GUIContent(" Merchant Settings", "The settings of merchant."), _titleButtonStyle))
+                {
+                    _merchantExpand = !_merchantExpand;
+                    EditorGUI.FocusTextInControl(null);
+                }
+                GUI.color = Color.white;
+                GUI.backgroundColor = _backgroundColor;
+                GUILayout.EndHorizontal();
+
+                if (_merchantExpand)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    GUILayout.Label(new GUIContent("Sell Price Multiplier:", "This multiplier is applied when selling items. For example, a merchant NPC with a SellPriceMultiplier of 1.2 will sell an item priced at 1000 for 1200"), GUILayout.Width(150));
+                    myTarget.SellPriceMultiplier = EditorGUILayout.Slider(myTarget.SellPriceMultiplier, 0F, 2F);
+                    GUILayout.Label("x", GUILayout.Width(15));
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    GUILayout.Label(new GUIContent("Buy Price Multiplier:", "This multiplier is applied when buying items. For example, a merchant NPC with a BuyPriceMultiplier of 0.8 will buy an item priced at 1000 for 800"), GUILayout.Width(150));
+                    myTarget.BuyPriceMultiplier = EditorGUILayout.Slider(myTarget.BuyPriceMultiplier, 0F, 2F);
+                    GUILayout.Label("x", GUILayout.Width(15));
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    myTarget.TradeAllItems = GUILayout.Toggle(myTarget.TradeAllItems, new GUIContent("Accept all tradeable items.", "When unchecked, this merchant will only accept tradeable items within a list."),GUILayout.Width(200));
+                    GUILayout.EndHorizontal();
+
+                    if (!myTarget.TradeAllItems)
+                    {
+                        string[] _typeOption = new string[Manager.itemTypes.Count];
+                        for (int i = 0; i < _typeOption.Length; i++) _typeOption[i] = Manager.itemTypes[i].name;
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Space(30);
+                        GUI.color = _buttonColor;
+                        _tradeCategoryListExpand = EditorGUILayout.Foldout(_tradeCategoryListExpand, "Accept items of these categories:");
+                        GUI.color = Color.white;
+                        GUILayout.EndHorizontal();
+
+                        if (_tradeCategoryListExpand)
+                        {
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Space(40);
+                            GUILayout.Label("Category:", GUILayout.Width(60));
+                            _tradeCategoryType = Mathf.Clamp(_tradeCategoryType, 0, Manager.itemTypes.Count - 1);
+                            GUI.backgroundColor = Manager.itemTypes[_tradeCategoryType].color;
+                            _tradeCategoryType = EditorGUILayout.Popup("", _tradeCategoryType, _typeOption, GUILayout.Width(150));
+
+                            GUI.backgroundColor = _buttonColor;
+                            if (GUILayout.Button("Add", GUILayout.Width(70)))
+                            {
+                                myTarget.TradeCategoryList.Add(_tradeCategoryType);
+                                _valueChanged = true;
+                            }
+                            GUI.backgroundColor = Color.white;
+                            GUILayout.EndHorizontal();
+
+                            for (int i = 0; i < myTarget.TradeCategoryList.Count; i++)
+                            {
+                                if (myTarget.TradeCategoryList[i] >= 0 && myTarget.TradeCategoryList[i] < Manager.itemTypes.Count)
+                                {
+                                    GUILayout.BeginHorizontal();
+                                    GUILayout.Space(50);
+                                    GUI.backgroundColor = Manager.itemTypes[myTarget.TradeCategoryList[i]].color; ;
+                                    GUILayout.Button(Manager.itemTypes[myTarget.TradeCategoryList[i]].name, _titleButtonStyle,GUILayout.Width(150));
+                                    GUI.backgroundColor = Color.red;
+                                    if (GUILayout.Button("X", GUILayout.Width(30)))
+                                    {
+                                        myTarget.TradeCategoryList.RemoveAt(i);
+                                        _valueChanged = true;
+                                    }
+                                    GUI.backgroundColor = Color.white;
+                                    GUILayout.EndHorizontal();
+                                }
+                                else
+                                {
+                                    myTarget.TradeCategoryList.RemoveAt(i);
+                                }
+                            }
+                        }
+
+
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Space(30);
+                        GUI.color = _buttonColor;
+                        _tradeListExpand=EditorGUILayout.Foldout(_tradeListExpand,"Accept items within this list:");
+                        GUI.color = Color.white;
+                        GUILayout.EndHorizontal();
+                        if (_tradeListExpand)
+                        {
+                            if (Manager.items.Count <= 0)
+                            {
+                                GUILayout.BeginHorizontal();
+                                GUILayout.Space(50);
+                                GUILayout.Box(warningIcon, GUIStyle.none, GUILayout.Width(20));
+                                GUI.color = Color.red;
+                                GUILayout.Label("You must have at least one item setup in ItemManager prefab.");
+                                GUI.color = Color.white;
+                                GUILayout.EndHorizontal();
+                            }
+                            else
+                            {
+                                string[] _itemOption = new string[Manager.items.Count];
+                                for (int i = 0; i < _itemOption.Length; i++) _itemOption[i] = Manager.items[i].name;
+                                
+
+                                GUILayout.BeginHorizontal();
+                                GUILayout.Space(40);
+                                Color _color = Manager.itemTypes[Manager.items[_tradeItemId].type].color;
+                                GUILayout.Box(Manager.items[_tradeItemId].icon, GUILayout.Width(20), GUILayout.Height(20));
+                                GUI.backgroundColor = _color;
+                                _tradeItemId = EditorGUILayout.Popup("", _tradeItemId, _itemOption, GUILayout.Width(190));
+
+                                GUI.backgroundColor = _buttonColor;
+                                if (GUILayout.Button("Add", GUILayout.Width(70)))
+                                {
+                                    if(!myTarget.TradeList.Contains(_tradeItemId))myTarget.TradeList.Add(_tradeItemId);
+                                    _valueChanged = true;
+                                }
+                                GUI.backgroundColor = Color.white;
+                                GUILayout.EndHorizontal();
+
+                                GUILayout.BeginHorizontal();
+                                GUILayout.Space(40);
+                                GUILayout.Label("Category:",GUILayout.Width(60));
+                                _tradeType = Mathf.Clamp(_tradeType,0, Manager.itemTypes.Count-1);
+                                GUI.backgroundColor = Manager.itemTypes[_tradeType].color;
+                                _tradeType = EditorGUILayout.Popup("", _tradeType, _typeOption, GUILayout.Width(150));
+
+                                GUI.backgroundColor = _buttonColor;
+                                if (GUILayout.Button("Add All", GUILayout.Width(70)))
+                                {
+                                    for (int i=0;i<Manager.items.Count;i++) {
+                                        if (Manager.items[i].type== _tradeType && !myTarget.TradeList.Contains(i)) myTarget.TradeList.Add(i);
+                                    }
+                                    _valueChanged = true;
+                                }
+                                GUI.backgroundColor = Color.red;
+                                if (GUILayout.Button("Remove All", GUILayout.Width(85)))
+                                {
+                                    for (int i = myTarget.TradeList.Count-1; i>=0 ; i--)
+                                    {
+                                        if (Manager.items[myTarget.TradeList[i]].type == _tradeType) myTarget.TradeList.RemoveAt(i);
+                                    }
+                                    _valueChanged = true;
+                                }
+                                GUI.backgroundColor = Color.white;
+                                GUILayout.EndHorizontal();
+
+                                for (int i=0;i < myTarget.TradeList.Count;i++) {
+                                    if (myTarget.TradeList[i] >= 0 && myTarget.TradeList[i] < Manager.items.Count)
+                                    {
+                                        GUILayout.BeginHorizontal();
+                                        GUILayout.Space(50);
+                                        Color _itemColor = Manager.itemTypes[Manager.items[myTarget.TradeList[i]].type].color;
+                                        GUILayout.Box(Manager.items[myTarget.TradeList[i]].icon, GUILayout.Width(20), GUILayout.Height(20));
+                                        GUI.backgroundColor = _itemColor;
+                                        GUILayout.Button(Manager.items[myTarget.TradeList[i]].name, _titleButtonStyle, GUILayout.Width(190));
+                                        if (!Manager.items[myTarget.TradeList[i]].tradeable)
+                                        {
+                                            GUILayout.Box(warningIcon, GUIStyle.none, GUILayout.Width(20));
+                                            GUI.color = Color.red;
+                                            GUILayout.Label("NOT tradeable", GUILayout.Width(100));
+                                            GUI.color = Color.white;
+                                        }
+                                        GUI.backgroundColor = Color.red;
+                                        if (GUILayout.Button("X",GUILayout.Width(30))) {
+                                            myTarget.TradeList.RemoveAt(i);
+                                            _valueChanged = true;
+                                        }
+                                        GUI.backgroundColor = Color.white;
+                                        GUILayout.EndHorizontal();
+                                    }
+                                    else
+                                    {
+                                        myTarget.TradeList.RemoveAt(i);
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+
 
             GUILayout.BeginHorizontal();
             GUI.backgroundColor = _currencyExpand ? _activeColor : _disableColor;
@@ -183,7 +496,7 @@ namespace SoftKitty.InventoryEngine
                    
                     
                     GUILayout.Label("(ID:" + i.ToString() + ")", GUILayout.Width(40), GUILayout.Height(20));
-                    GUILayout.Box(Manager.currencies[i].icon.texture, GUILayout.Width(20), GUILayout.Height(20));
+                    if(Manager.currencies[i].icon!=null) GUILayout.Box(Manager.currencies[i].icon.texture, GUILayout.Width(20), GUILayout.Height(20));
                     GUI.color = Manager.currencies[i].color;
                     GUILayout.Label(Manager.currencies[i].name+" :", GUILayout.Width(100), GUILayout.Height(20));
                     GUI.color = Color.white;
@@ -217,13 +530,7 @@ namespace SoftKitty.InventoryEngine
             GUILayout.EndHorizontal();
 
             
-            string[] _itemOption = new string[Manager.items.Count + 1];
-            if (_itemExpand || _hiddenExpand) {
-                _itemOption[0] = "Empty";
-                for (int i = 1; i < _itemOption.Length; i++) _itemOption[i] = Manager.items[i - 1].name;
-            }
-            string[] _enchantOptions = new string[Manager.itemEnchantments.Count];
-            for (int i = 0; i < Manager.itemEnchantments.Count; i++) _enchantOptions[i] = Manager.itemEnchantments[i].name;
+           
 
             if (_itemExpand)
             {
@@ -239,6 +546,15 @@ namespace SoftKitty.InventoryEngine
                 }
                 else
                 {
+                    string[] _itemOption = new string[Manager.items.Count + 1];
+                    if (_itemExpand || _hiddenExpand)
+                    {
+                        _itemOption[0] = "Empty";
+                        for (int i = 1; i < _itemOption.Length; i++) _itemOption[i] = Manager.items[i - 1].name;
+                    }
+                    string[] _enchantOptions = new string[Manager.itemEnchantments.Count];
+                    for (int i = 0; i < Manager.itemEnchantments.Count; i++) _enchantOptions[i] = Manager.itemEnchantments[i].name;
+
                     float _weight = 0F;
 
                     for (int i = 0; i < myTarget.Stacks.Count; i++) _weight += myTarget.Stacks[i].GetWeight();
@@ -257,6 +573,20 @@ namespace SoftKitty.InventoryEngine
                     GUILayout.Space(30);
                     GUILayout.Label(new GUIContent("Inventory Size:","This will be the total count of the slots in the bag."),GUILayout.Width(130));
                     myTarget.InventorySize = EditorGUILayout.IntSlider(myTarget.InventorySize,1,200,GUILayout.Width(300));
+                    GUILayout.EndHorizontal();
+                    GUI.backgroundColor = _backgroundColor;
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    GUI.backgroundColor = _titleColor;
+                    if (GUILayout.Button("Expand All", GUILayout.Width(100)))
+                    {
+                        for (int i = 0; i < myTarget.Stacks.Count; i++) myTarget.Stacks[i].Fold = false;
+                    }
+                    if (GUILayout.Button("Shrink All", GUILayout.Width(100)))
+                    {
+                        for (int i = 0; i < myTarget.Stacks.Count; i++) myTarget.Stacks[i].Fold = true;
+                    }
                     GUILayout.EndHorizontal();
                     GUI.backgroundColor = _backgroundColor;
 
@@ -284,9 +614,17 @@ namespace SoftKitty.InventoryEngine
                         }
                         if (myTarget.Stacks[i].Item != null && !myTarget.Stacks[i].Empty)
                         {
-                            _item = myTarget.Stacks[i].Item.uid+1;
-                            _color = Manager.itemTypes[myTarget.Stacks[i].Item.type].color;
-                            GUILayout.Box(myTarget.Stacks[i].Item.icon, GUILayout.Width(20), GUILayout.Height(20));
+                            if (myTarget.Stacks[i].Item.uid >= Manager.items.Count)
+                            {
+                                myTarget.Stacks[i].Delete();
+                            }
+                            else
+                            {
+                                myTarget.Stacks[i].Item.type = Mathf.Clamp(myTarget.Stacks[i].Item.type,0,Manager.itemTypes.Count-1);
+                                _item = myTarget.Stacks[i].Item.uid + 1;
+                                _color = Manager.itemTypes[myTarget.Stacks[i].Item.type].color;
+                                GUILayout.Box(myTarget.Stacks[i].Item.icon, GUILayout.Width(20), GUILayout.Height(20));
+                            }
                         }
                         else
                         {
@@ -340,6 +678,7 @@ namespace SoftKitty.InventoryEngine
                             myTarget.Stacks[i].Empty = true;
                             myTarget.Stacks[i].Item=null;
                             myTarget.Stacks[i].Number = 0;
+                            _valueChanged = true;
                         }
                         GUI.backgroundColor = _backgroundColor;
                         GUILayout.EndHorizontal();
@@ -504,12 +843,29 @@ namespace SoftKitty.InventoryEngine
                 }
                 else
                 {
+                    string[] _itemOption = new string[Manager.items.Count + 1];
+                    if (_itemExpand || _hiddenExpand)
+                    {
+                        _itemOption[0] = "Empty";
+                        for (int i = 1; i < _itemOption.Length; i++) _itemOption[i] = Manager.items[i - 1].name;
+                    }
+
                     GUI.backgroundColor = _buttonColor;
                     GUILayout.BeginHorizontal();
                     GUILayout.Space(30);
                     if (GUILayout.Button("Add Item",GUILayout.Width(200)))
                     {
                         myTarget.HiddenStacks.Add(new InventoryStack());
+                        _valueChanged = true;
+                    }
+                    GUI.backgroundColor = _titleColor;
+                    if (GUILayout.Button("Expand All", GUILayout.Width(100)))
+                    {
+                        for (int i = 0; i < myTarget.HiddenStacks.Count; i++) myTarget.HiddenStacks[i].Fold = false;
+                    }
+                    if (GUILayout.Button("Shrink All", GUILayout.Width(100)))
+                    {
+                        for (int i = 0; i < myTarget.HiddenStacks.Count; i++) myTarget.HiddenStacks[i].Fold = true;
                     }
                     GUILayout.EndHorizontal();
                     GUI.backgroundColor = _backgroundColor;
@@ -529,9 +885,17 @@ namespace SoftKitty.InventoryEngine
                         Color _color = Color.white;
                         if (myTarget.HiddenStacks[i].Item != null && !myTarget.HiddenStacks[i].Empty)
                         {
-                            _item = myTarget.HiddenStacks[i].Item.uid + 1;
-                            _color = Manager.itemTypes[myTarget.HiddenStacks[i].Item.type].color;
-                            GUILayout.Box(myTarget.HiddenStacks[i].Item.icon, GUILayout.Width(20), GUILayout.Height(20));
+                            if (myTarget.HiddenStacks[i].Item.uid >= Manager.items.Count)
+                            {
+                                myTarget.HiddenStacks[i].Delete();
+                            }
+                            else
+                            {
+                                myTarget.HiddenStacks[i].Item.type = Mathf.Clamp(myTarget.HiddenStacks[i].Item.type,0,Manager.itemTypes.Count-1);
+                                _item = myTarget.HiddenStacks[i].Item.uid + 1;
+                                _color = Manager.itemTypes[myTarget.HiddenStacks[i].Item.type].color;
+                                GUILayout.Box(myTarget.HiddenStacks[i].Item.icon, GUILayout.Width(20), GUILayout.Height(20));
+                            }
                         }
                         else
                         {
@@ -581,6 +945,7 @@ namespace SoftKitty.InventoryEngine
                         if (GUILayout.Button("X", GUILayout.Width(30)))
                         {
                             myTarget.HiddenStacks.RemoveAt(i);
+                            _valueChanged = true;
                         }
                         GUI.backgroundColor = _backgroundColor;
                         GUILayout.EndHorizontal();

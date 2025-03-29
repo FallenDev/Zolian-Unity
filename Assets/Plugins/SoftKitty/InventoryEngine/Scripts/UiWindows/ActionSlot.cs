@@ -31,7 +31,7 @@ namespace SoftKitty.InventoryEngine
             Index = _index;
             SlotData = _data;
             Holder = _holder;
-            if (SlotData.itemId >= 0)
+            if (SlotData.itemId >= 0 && SlotData.itemId< ItemManager.instance.items.Count)
             {
                 Item _item = ItemManager.itemDic[SlotData.itemId].Copy();
                 _item.upgradeLevel = _data.upgradeLevel;

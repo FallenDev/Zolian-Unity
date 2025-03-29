@@ -75,6 +75,22 @@ namespace SoftKitty.InventoryEngine
         /// </summary>
         public float BuyPriceMultiplier = 1F;
         /// <summary>
+        /// (For merchant only)When set to false, this merchant will accept items within the 'TradeList' and 'TradeCategoryList'.
+        /// </summary>
+        public bool TradeAllItems = true;
+        /// <summary>
+        /// (For merchant only)When 'TradeAllItems'set to false, this merchant will accept items within this list.
+        /// </summary>
+        public List<int> TradeList = new List<int>();
+        /// <summary>
+        /// (For merchant only)When 'TradeAllItems'set to false, this merchant will accept items from categories within this list.
+        /// </summary>
+        public List<int> TradeCategoryList = new List<int>();
+        /// <summary>
+        /// The base stats of this character without any equipment.
+        /// </summary>
+        public List<Attribute> BaseStats = new List<Attribute>();
+        /// <summary>
         /// Enable/Disable the auto save function.
         /// </summary>
         public bool AutoSave = true;
@@ -186,34 +202,50 @@ namespace SoftKitty.InventoryEngine
             {
                 if (!Stacks[i].Empty && Stacks[i].Item != null)
                 {
-                    int _level = Stacks[i].Item.upgradeLevel;
-                    int _socketingCount = Stacks[i].Item.socketingSlots;
-                    List<int> _socketedItems = new List<int>();
-                    _socketedItems.AddRange(Stacks[i].Item.socketedItems);
-                    List<int> _enchantments = new List<int>();
-                    _enchantments.AddRange(Stacks[i].Item.enchantments);
-                    Stacks[i].Item = ItemManager.instance.items[Stacks[i].GetItemId()].Copy();
-                    Stacks[i].Item.upgradeLevel = _level;
-                    Stacks[i].Item.socketingSlots = _socketingCount;
-                    Stacks[i].Item.socketedItems = _socketedItems;
-                    Stacks[i].Item.enchantments = _enchantments;
+                    int _uid = Stacks[i].GetItemId();
+                    if (ItemManager.TryGetItem(_uid) != null)
+                    {
+                        int _level = Stacks[i].Item.upgradeLevel;
+                        int _socketingCount = Stacks[i].Item.socketingSlots;
+                        List<int> _socketedItems = new List<int>();
+                        _socketedItems.AddRange(Stacks[i].Item.socketedItems);
+                        List<int> _enchantments = new List<int>();
+                        _enchantments.AddRange(Stacks[i].Item.enchantments);
+                        Stacks[i].Item = ItemManager.TryGetItem(_uid).Copy();
+                        Stacks[i].Item.upgradeLevel = _level;
+                        Stacks[i].Item.socketingSlots = _socketingCount;
+                        Stacks[i].Item.socketedItems = _socketedItems;
+                        Stacks[i].Item.enchantments = _enchantments;
+                    }
+                    else
+                    {
+                        Stacks[i].Delete();
+                    }
                 }
             }
             for (int i = 0; i < HiddenStacks.Count; i++)
             {
                 if (!HiddenStacks[i].Empty && HiddenStacks[i].Item != null)
                 {
-                    int _level = HiddenStacks[i].Item.upgradeLevel;
-                    int _socketingCount = HiddenStacks[i].Item.socketingSlots;
-                    List<int> _socketedItems = new List<int>();
-                     _socketedItems.AddRange(HiddenStacks[i].Item.socketedItems);
-                    List<int> _enchantments = new List<int>();
-                    _enchantments.AddRange(HiddenStacks[i].Item.enchantments);
-                    HiddenStacks[i].Item = ItemManager.instance.items[HiddenStacks[i].GetItemId()].Copy();
-                    HiddenStacks[i].Item.upgradeLevel = _level;
-                    HiddenStacks[i].Item.socketingSlots = _socketingCount;
-                    HiddenStacks[i].Item.socketedItems = _socketedItems;
-                    HiddenStacks[i].Item.enchantments = _enchantments;
+                    int _uid = HiddenStacks[i].GetItemId();
+                    if (ItemManager.TryGetItem(_uid) != null)
+                    {
+                        int _level = HiddenStacks[i].Item.upgradeLevel;
+                        int _socketingCount = HiddenStacks[i].Item.socketingSlots;
+                        List<int> _socketedItems = new List<int>();
+                        _socketedItems.AddRange(HiddenStacks[i].Item.socketedItems);
+                        List<int> _enchantments = new List<int>();
+                        _enchantments.AddRange(HiddenStacks[i].Item.enchantments);
+                        HiddenStacks[i].Item = ItemManager.TryGetItem(_uid).Copy();
+                        HiddenStacks[i].Item.upgradeLevel = _level;
+                        HiddenStacks[i].Item.socketingSlots = _socketingCount;
+                        HiddenStacks[i].Item.socketedItems = _socketedItems;
+                        HiddenStacks[i].Item.enchantments = _enchantments;
+                    }
+                    else
+                    {
+                        HiddenStacks[i].Delete();
+                    }
                 }
             }
             if (Currency.Count != ItemManager.instance.currencies.Count)
@@ -474,6 +506,19 @@ namespace SoftKitty.InventoryEngine
             UiWindow _newWindow = WindowsManager.GetWindow(_prefabName, this);
             if (_newWindow != null) _newWindow.Initialize(this, null, _displayName);
             return _newWindow;
+        }
+
+        /// <summary>
+        /// Get the base stats value by the attribute ScriptKey.
+        /// </summary>
+        /// <param name="_key"></param>
+        /// <returns></returns>
+        public float GetBaseStatsValue(string _key)
+        {
+            foreach (var obj in BaseStats) {
+                if (obj.key == _key) return obj.GetFloat();
+            }
+            return 0F;
         }
 
 

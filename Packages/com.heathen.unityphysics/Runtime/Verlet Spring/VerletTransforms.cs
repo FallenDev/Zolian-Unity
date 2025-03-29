@@ -149,6 +149,7 @@ namespace HeathenEngineering.UnityPhysics
 
         public static void DrawWireCapsule(Vector3 _pos, Quaternion _rot, float _radius, float _height, Color _color = default(Color))
         {
+#if UNITY_EDITOR
             if (_color != default(Color))
                 Handles.color = _color;
             Matrix4x4 angleMatrix = Matrix4x4.TRS(_pos, _rot, Handles.matrix.lossyScale);
@@ -171,6 +172,7 @@ namespace HeathenEngineering.UnityPhysics
                 Handles.DrawWireDisc(Vector3.down * pointOffset, Vector3.up, _radius);
 
             }
+#endif
         }
     }
 }
