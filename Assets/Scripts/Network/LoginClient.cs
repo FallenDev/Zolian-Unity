@@ -15,20 +15,21 @@ using Assets.Scripts.Network.Converters.ReceiveFromServer;
 using Assets.Scripts.Network.OpCodes;
 using Assets.Scripts.Network.PacketArgs.SendToServer;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
+using Assets.Scripts.Network.PacketHandling;
 using Assets.Scripts.Network.Span;
 
 namespace Assets.Scripts.Network
 {
     public class LoginClient : MonoBehaviour
     {
-        private bool isConnected;
-        private SslStream sslStream;
-        private TcpClient tcpClient;
-        private StreamReader reader;
-        private StreamWriter writer;
-        private readonly Dictionary<byte, IPacketConverter> ServerConverters = new();
-        private readonly Dictionary<byte, IPacketConverter> ClientConverters = new();
-        public List<PlayerSelection> cachedPlayers = new();
+        private bool _isConnected;
+        private SslStream _sslStream;
+        private TcpClient _tcpClient;
+        private StreamReader _reader;
+        private StreamWriter _writer;
+        private readonly Dictionary<byte, IPacketConverter> _serverConverters = new();
+        private readonly Dictionary<byte, IPacketConverter> _clientConverters = new();
+        public List<PlayerSelection> CachedPlayers = new();
         public long SteamId;
         private readonly object _sendLock = new();
 
@@ -70,14 +71,14 @@ namespace Assets.Scripts.Network
 
         private void Cleanup()
         {
-            isConnected = false;
+            _isConnected = false;
 
             try
             {
-                writer?.Close();
-                reader?.Close();
-                sslStream?.Close();
-                tcpClient?.Close();
+                _writer?.Close();
+                _reader?.Close();
+                _sslStream?.Close();
+                _tcpClient?.Close();
             }
             catch (Exception ex)
             {
@@ -92,7 +93,7 @@ namespace Assets.Scripts.Network
             try
             {
                 var args = new ConfirmConnectionArgs();
-                SendPacket(args.OpCode, args);
+                SendPacket(ConfirmConnectionArgs.OpCode, args);
             }
             catch (Exception e)
             {
@@ -116,7 +117,7 @@ namespace Assets.Scripts.Network
                     SteamId = steamId
                 };
 
-                SendPacket(args.OpCode, args);
+                SendPacket(LoginArgs.OpCode, args);
             }
             catch (Exception e)
             {
@@ -138,7 +139,7 @@ namespace Assets.Scripts.Network
                     Name = name
                 };
 
-                SendPacket(args.OpCode, args);
+                SendPacket(DeleteCharacterArgs.OpCode, args);
             }
             catch (Exception e)
             {
@@ -173,7 +174,7 @@ namespace Assets.Scripts.Network
                     SkinColor = skinToneIndex
                 };
 
-                SendPacket(args.OpCode, args);
+                SendPacket(CreateCharacterArgs.OpCode, args);
             }
             catch (Exception e)
             {
@@ -195,7 +196,7 @@ namespace Assets.Scripts.Network
             try
             {
                 // Fetch the appropriate converter from the indexer
-                if (!ClientConverters.TryGetValue(opCode, out var converter))
+                if (!_clientConverters.TryGetValue(opCode, out var converter))
                 {
                     Debug.LogError($"No converter found for OpCode {opCode}.");
                     return;
@@ -221,7 +222,7 @@ namespace Assets.Scripts.Network
                 var data = packet.ToArray();
                 lock (_sendLock)
                 {
-                    sslStream.Write(data, 0, data.Length);
+                    _sslStream.Write(data, 0, data.Length);
                 }
                 Debug.Log($"Packet with OpCode {opCode} sent successfully.");
             }
@@ -238,9 +239,9 @@ namespace Assets.Scripts.Network
             try
             {
                 var buffer = new byte[ushort.MaxValue]; // Adjust size as needed
-                while (isConnected)
+                while (_isConnected)
                 {
-                    var bytesRead = await sslStream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
+                    var bytesRead = await _sslStream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
 
                     if (bytesRead > 0)
                     {
@@ -269,7 +270,7 @@ namespace Assets.Scripts.Network
                 Debug.Log($"Packet received: OpCode={packet.OpCode}, Sequence={packet.Sequence}, Length={packet.Length}");
                 Debug.Log($"Raw Payload: {BitConverter.ToString(packet.Payload)}");
 
-                if (ServerConverters.TryGetValue(packet.OpCode, out var converter))
+                if (_serverConverters.TryGetValue(packet.OpCode, out var converter))
                 {
                     var spanReader = new SpanReader(packet.Payload);
                     var args = converter.Deserialize(ref spanReader);
@@ -332,18 +333,18 @@ namespace Assets.Scripts.Network
                 case (byte)ServerOpCode.PlayerList:
                     {
                         var playerListArgs = (PlayerListArgs)args;
-                        cachedPlayers.Clear();
-                        cachedPlayers = new List<PlayerSelection>();
-                        cachedPlayers = playerListArgs.Players.Where(p => p.Disabled != true).ToList();
+                        CachedPlayers.Clear();
+                        CachedPlayers = new List<PlayerSelection>();
+                        CachedPlayers = playerListArgs.Players.Where(p => p.Disabled != true).ToList();
 
                         MainThreadDispatcher.RunOnMainThread(() =>
                         {
-                            if (cachedPlayers.Count == 0)
+                            if (CachedPlayers.Count == 0)
                                 PopupManager.Instance.ShowMessage("No characters found, create one below!", PopupMessageType.System);
                             else
                             {
-                                CharacterSelectionUI.Instance.PopulateCharacterList();
-                                CharacterSelectionUI.Instance.SelectCharacter(0);
+                                CharacterSelectionUi.Instance.PopulateCharacterList();
+                                CharacterSelectionUi.Instance.SelectCharacter(0);
                             }
 
                             CreationAndAuthManager.Instance.createButton.gameObject.SetActive(true);
@@ -365,20 +366,20 @@ namespace Assets.Scripts.Network
 
         private void IndexServerConverters()
         {
-            ServerConverters.Add((byte)ServerOpCode.AcceptConnection, new AcceptConnectionConverter());
-            ServerConverters.Add((byte)ServerOpCode.LoginMessage, new LoginMessageConverter());
-            ServerConverters.Add((byte)ServerOpCode.ServerMessage, new ServerMessageConverter());
-            ServerConverters.Add((byte)ServerOpCode.CreateCharacterFinalized, new CharacterFinalizedConverter());
-            ServerConverters.Add((byte)ServerOpCode.ConnectionInfo, new ConnectionInfoConverter());
-            ServerConverters.Add((byte)ServerOpCode.PlayerList, new PlayerListConverter());
+            _serverConverters.Add((byte)ServerOpCode.AcceptConnection, new AcceptConnectionConverter());
+            _serverConverters.Add((byte)ServerOpCode.LoginMessage, new LoginMessageConverter());
+            _serverConverters.Add((byte)ServerOpCode.ServerMessage, new ServerMessageConverter());
+            _serverConverters.Add((byte)ServerOpCode.CreateCharacterFinalized, new CharacterFinalizedConverter());
+            _serverConverters.Add((byte)ServerOpCode.ConnectionInfo, new ConnectionInfoConverter());
+            _serverConverters.Add((byte)ServerOpCode.PlayerList, new PlayerListConverter());
         }
 
         private void IndexClientConverters()
         {
-            ClientConverters.Add((byte)ClientOpCode.ClientRedirected, new ConfirmConnectionConverter());
-            ClientConverters.Add((byte)ClientOpCode.Login, new LoginConverter());
-            ClientConverters.Add((byte)ClientOpCode.CreateCharacter, new CreateCharacterConverter());
-            ClientConverters.Add((byte)ClientOpCode.DeleteCharacter, new DeleteCharacterConverter());
+            _clientConverters.Add((byte)ClientOpCode.ClientRedirected, new ConfirmConnectionConverter());
+            _clientConverters.Add((byte)ClientOpCode.Login, new LoginConverter());
+            _clientConverters.Add((byte)ClientOpCode.CreateCharacter, new CreateCharacterConverter());
+            _clientConverters.Add((byte)ClientOpCode.DeleteCharacter, new DeleteCharacterConverter());
         }
 
         public void ConnectToServer(ushort port)
@@ -386,17 +387,17 @@ namespace Assets.Scripts.Network
             try
             {
                 // Initialize the TCP client and SSL stream
-                tcpClient = new TcpClient(_serverIp, port);
-                ConfigureTcpSocket(tcpClient.Client);
-                sslStream = new SslStream(tcpClient.GetStream(), false, ValidateServerCertificate);
+                _tcpClient = new TcpClient(_serverIp, port);
+                ConfigureTcpSocket(_tcpClient.Client);
+                _sslStream = new SslStream(_tcpClient.GetStream(), false, ValidateServerCertificate);
 
                 // Perform SSL handshake
-                sslStream.AuthenticateAsClient("localhost", null, SslProtocols.Tls12, false);
+                _sslStream.AuthenticateAsClient("localhost", null, SslProtocols.Tls12, false);
 
                 // Initialize reader and writer for the stream
-                writer = new StreamWriter(sslStream) { AutoFlush = true };
-                reader = new StreamReader(sslStream);
-                isConnected = true;
+                _writer = new StreamWriter(_sslStream) { AutoFlush = true };
+                _reader = new StreamReader(_sslStream);
+                _isConnected = true;
                 if (port == _worldPort)
                     SendConnectionConfirmation();
             }

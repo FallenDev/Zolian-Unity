@@ -4,9 +4,9 @@ namespace Assets.Scripts.Managers
 {
     public class CharacterDisplayManager : MonoBehaviour
     {
-        public Transform characterSpawnPoint; // Empty GameObject in the scene
+        public Transform CharacterSpawnPoint; // Empty GameObject in the scene
         [Header("This remains empty and is dynamically filled")]
-        private GameObject currentCharacter; // Active character prefab
+        private GameObject _currentCharacter; // Active character prefab
 
         public static CharacterDisplayManager Instance;
 
@@ -19,8 +19,8 @@ namespace Assets.Scripts.Managers
         public GameObject LoadCharacter(GameObject characterPrefab)
         {
             // Destroy previous character
-            if (currentCharacter != null)
-                Destroy(currentCharacter);
+            if (_currentCharacter != null)
+                Destroy(_currentCharacter);
 
             if (characterPrefab == null)
             {
@@ -29,21 +29,21 @@ namespace Assets.Scripts.Managers
             }
 
             // Instantiate new character at the spawn point
-            currentCharacter = Instantiate(characterPrefab, characterSpawnPoint.position, Quaternion.identity);
-            currentCharacter.transform.SetParent(characterSpawnPoint);
+            _currentCharacter = Instantiate(characterPrefab, CharacterSpawnPoint.position, Quaternion.identity);
+            _currentCharacter.transform.SetParent(CharacterSpawnPoint);
 
             // Adjust scale
-            currentCharacter.transform.localScale = Vector3.one * 4f;
+            _currentCharacter.transform.localScale = Vector3.one * 4f;
 
             Debug.Log($"Spawned character prefab: {characterPrefab.name}");
 
-            var animator = currentCharacter.GetComponent<Animator>();
+            var animator = _currentCharacter.GetComponent<Animator>();
             if (animator != null)
                 animator.Play("Idle");
             else
                 Debug.LogWarning("Animator not found on character prefab.");
 
-            return currentCharacter;
+            return _currentCharacter;
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Assets.Scripts.Network.Span
         /// <summary>
         /// Gets a value indicating whether the reader has reached or exceeded the end of the span.
         /// </summary>
-        public bool EndOfSpan => _position >= _buffer.Length;
+        private bool EndOfSpan => _position >= _buffer.Length;
 
         /// <summary>
         /// Gets the number of unread bytes remaining in the buffer.

@@ -8,49 +8,49 @@ using Assets.Scripts.Network;
 
 namespace Assets.Scripts.CharacterSelection
 {
-    public class CharacterSelectionUI : MonoBehaviour
+    public class CharacterSelectionUi : MonoBehaviour
     {
-        [Header("UI Elements")] public GameObject characterListPanel;
-        public GameObject characterEntryPrefab;
-        public Transform contentListContainer;
-        public RawImage characterPreview;
-        public TextMeshProUGUI characterNameText;
-        public Button leftArrowButton;
-        public Button rightArrowButton;
+        [Header("UI Elements")] 
+        public GameObject CharacterListPanel;
+        public GameObject CharacterEntryPrefab;
+        public Transform ContentListContainer;
+        public TextMeshProUGUI CharacterNameText;
+        public Button LeftArrowButton;
+        public Button RightArrowButton;
 
-        private List<PlayerSelection> characters = new();
-        private int selectedCharacterIndex;
+        private List<PlayerSelection> _characters = new();
+        private int _selectedCharacterIndex;
 
-        public static CharacterSelectionUI Instance;
+        public static CharacterSelectionUi Instance;
 
         private void Awake()
         {
             Instance = this;
-            leftArrowButton.onClick.AddListener(NavigateLeft);
-            rightArrowButton.onClick.AddListener(NavigateRight);
+            LeftArrowButton.onClick.AddListener(NavigateLeft);
+            RightArrowButton.onClick.AddListener(NavigateRight);
         }
 
         private void Start()
         {
-            characterListPanel.SetActive(false);
-            leftArrowButton.gameObject.SetActive(false);
-            rightArrowButton.gameObject.SetActive(false);
+            CharacterListPanel.SetActive(false);
+            LeftArrowButton.gameObject.SetActive(false);
+            RightArrowButton.gameObject.SetActive(false);
         }
 
         private void Update()
         {
-            if (characters.Equals(LoginClient.Instance.cachedPlayers)) return;
+            if (_characters.Equals(LoginClient.Instance.CachedPlayers)) return;
             PopulateCharacterList();
         }
 
         public void PopulateCharacterList()
         {
-            characters = LoginClient.Instance.cachedPlayers;
+            _characters = LoginClient.Instance.CachedPlayers;
 
             List<Transform> childrenToDestroy = new List<Transform>();
 
             // Collect only character slot entries, NOT the Content object itself
-            foreach (Transform child in contentListContainer)
+            foreach (Transform child in ContentListContainer)
             {
                 if (child.CompareTag("CharacterSlot")) // Ensure only character slots are deleted
                 {
@@ -65,25 +65,25 @@ namespace Assets.Scripts.CharacterSelection
             }
 
             // Force UI to update after clearing
-            LayoutRebuilder.ForceRebuildLayoutImmediate(contentListContainer.GetComponent<RectTransform>());
+            LayoutRebuilder.ForceRebuildLayoutImmediate(ContentListContainer.GetComponent<RectTransform>());
 
 
-            if (LoginClient.Instance.cachedPlayers.Count >= 1)
+            if (LoginClient.Instance.CachedPlayers.Count >= 1)
             {
-                characterListPanel.SetActive(true);
-                leftArrowButton.gameObject.SetActive(true);
-                rightArrowButton.gameObject.SetActive(true);
+                CharacterListPanel.SetActive(true);
+                LeftArrowButton.gameObject.SetActive(true);
+                RightArrowButton.gameObject.SetActive(true);
             }
 
-            for (var i = 0; i < characters.Count; i++)
+            for (var i = 0; i < _characters.Count; i++)
             {
-                var entry = Instantiate(characterEntryPrefab, contentListContainer);
-                entry.transform.SetParent(contentListContainer, false);
-                entry.GetComponentInChildren<TextMeshProUGUI>().text = $"{characters[i].Name} (Lvl {characters[i].Level} {characters[i].BaseClass})";
+                var entry = Instantiate(CharacterEntryPrefab, ContentListContainer);
+                entry.transform.SetParent(ContentListContainer, false);
+                entry.GetComponentInChildren<TextMeshProUGUI>().text = $"{_characters[i].Name} (Lvl {_characters[i].Level} {_characters[i].BaseClass})";
                 var index = i;
                 entry.GetComponent<Button>().onClick.AddListener(() =>
                 {
-                    selectedCharacterIndex = index;
+                    _selectedCharacterIndex = index;
                     UpdateCharacterDisplay();
                 });
             }
@@ -91,24 +91,24 @@ namespace Assets.Scripts.CharacterSelection
 
         public void SelectCharacter(int index)
         {
-            if (characters.Count == 0) return;
-            selectedCharacterIndex = index;
+            if (_characters.Count == 0) return;
+            _selectedCharacterIndex = index;
             UpdateCharacterDisplay();
         }
 
         private void UpdateCharacterDisplay()
         {
-            if (characters.Count == 0) return;
-            CharacterSelected.Instance.SelectCharacter(characters[selectedCharacterIndex]);
-            var character = characters[selectedCharacterIndex];
-            characterNameText.text = $"{character.Name} - Lvl {character.Level} {character.BaseClass}";
+            if (_characters.Count == 0) return;
+            CharacterSelected.Instance.SelectCharacter(_characters[_selectedCharacterIndex]);
+            var character = _characters[_selectedCharacterIndex];
+            CharacterNameText.text = $"{character.Name} - Lvl {character.Level} {character.BaseClass}";
 
             // TODO: Update 3D character preview
         }
 
         public void EnterWorld()
         {
-            Debug.Log($"Entering world as {characters[selectedCharacterIndex].Name}");
+            Debug.Log($"Entering world as {_characters[_selectedCharacterIndex].Name}");
             CreationAndAuthManager.Instance.OnLoginButtonClick();
         }
 
@@ -119,22 +119,22 @@ namespace Assets.Scripts.CharacterSelection
 
         public void DeleteCharacter()
         {
-            Debug.Log($"Deleting character {characters[selectedCharacterIndex].Name}");
+            Debug.Log($"Deleting character {_characters[_selectedCharacterIndex].Name}");
             // TODO: Implement character deletion logic
         }
 
-        public void NavigateLeft()
+        private void NavigateLeft()
         {
-            if (characters.Count == 0) return;
-            selectedCharacterIndex = (selectedCharacterIndex - 1 + characters.Count) % characters.Count;
-            SelectCharacter(selectedCharacterIndex);
+            if (_characters.Count == 0) return;
+            _selectedCharacterIndex = (_selectedCharacterIndex - 1 + _characters.Count) % _characters.Count;
+            SelectCharacter(_selectedCharacterIndex);
         }
 
-        public void NavigateRight()
+        private void NavigateRight()
         {
-            if (characters.Count == 0) return;
-            selectedCharacterIndex = (selectedCharacterIndex + 1) % characters.Count;
-            SelectCharacter(selectedCharacterIndex);
+            if (_characters.Count == 0) return;
+            _selectedCharacterIndex = (_selectedCharacterIndex + 1) % _characters.Count;
+            SelectCharacter(_selectedCharacterIndex);
         }
     }
 }

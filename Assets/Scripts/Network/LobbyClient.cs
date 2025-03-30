@@ -7,7 +7,6 @@ using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using System.Security.Authentication;
 using System.Collections.Generic;
-using System.Threading;
 using Assets.Scripts.Managers;
 using Assets.Scripts.Models;
 using Assets.Scripts.Network.Converters.SendToServer;
@@ -15,6 +14,7 @@ using Assets.Scripts.Network.Converters.ReceiveFromServer;
 using Assets.Scripts.Network.OpCodes;
 using Assets.Scripts.Network.PacketArgs.SendToServer;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
+using Assets.Scripts.Network.PacketHandling;
 using Assets.Scripts.Network.Span;
 using TMPro;
 using UnityEngine.SceneManagement;
@@ -24,15 +24,14 @@ namespace Assets.Scripts.Network
 {
     public class LobbyClient : MonoBehaviour
     {
-        private bool isConnected;
-        private bool sceneTransfer;
-        private SslStream sslStream;
-        private TcpClient tcpClient;
-        private StreamReader reader;
-        private StreamWriter writer;
-        private readonly Dictionary<byte, IPacketConverter> ServerConverters = new();
-        private readonly Dictionary<byte, IPacketConverter> ClientConverters = new();
-        private static SynchronizationContext _mainThreadContext;
+        private bool _isConnected;
+        private bool _sceneTransfer;
+        private SslStream _sslStream;
+        private TcpClient _tcpClient;
+        private StreamReader _reader;
+        private StreamWriter _writer;
+        private readonly Dictionary<byte, IPacketConverter> _serverConverters = new();
+        private readonly Dictionary<byte, IPacketConverter> _clientConverters = new();
         private readonly object _sendLock = new();
 
         [SerializeField] private string _serverIp = "127.0.0.1";
@@ -62,13 +61,6 @@ namespace Assets.Scripts.Network
             }
         }
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void Initialize()
-        {
-            // Save the main thread context
-            _mainThreadContext = SynchronizationContext.Current;
-        }
-
         private void Start()
         {
             IndexServerConverters();
@@ -78,8 +70,8 @@ namespace Assets.Scripts.Network
 
         private void Update()
         {
-            if (!sceneTransfer) return;
-            sceneTransfer = false;
+            if (!_sceneTransfer) return;
+            _sceneTransfer = false;
             SceneManager.LoadSceneAsync("Login");
         }
 
@@ -87,14 +79,14 @@ namespace Assets.Scripts.Network
 
         private void Cleanup()
         {
-            isConnected = false;
+            _isConnected = false;
 
             try
             {
-                writer?.Close();
-                reader?.Close();
-                sslStream?.Close();
-                tcpClient?.Close();
+                _writer?.Close();
+                _reader?.Close();
+                _sslStream?.Close();
+                _tcpClient?.Close();
             }
             catch (Exception ex)
             {
@@ -107,13 +99,13 @@ namespace Assets.Scripts.Network
         private void SendVersionNumber()
         {
             var args = new VersionArgs();
-            SendPacket(args.OpCode, args);
+            SendPacket(VersionArgs.OpCode, args);
         }
 
         private void SendConnectionConfirmation()
         {
             var args = new ConfirmConnectionArgs();
-            SendPacket(args.OpCode, args);
+            SendPacket(ConfirmConnectionArgs.OpCode, args);
         }
 
         #endregion
@@ -126,7 +118,7 @@ namespace Assets.Scripts.Network
             try
             {
                 // Fetch the appropriate converter from the indexer
-                if (!ClientConverters.TryGetValue(opCode, out var converter))
+                if (!_clientConverters.TryGetValue(opCode, out var converter))
                 {
                     Debug.LogError($"No converter found for OpCode {opCode}.");
                     return;
@@ -152,7 +144,7 @@ namespace Assets.Scripts.Network
                 var data = packet.ToArray();
                 lock (_sendLock)
                 {
-                    sslStream.Write(data, 0, data.Length);
+                    _sslStream.Write(data, 0, data.Length);
                 }
                 Debug.Log($"Packet with OpCode {opCode} sent successfully.");
             }
@@ -169,9 +161,9 @@ namespace Assets.Scripts.Network
             try
             {
                 var buffer = new byte[ushort.MaxValue]; // Adjust size as needed
-                while (isConnected)
+                while (_isConnected)
                 {
-                    var bytesRead = await sslStream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
+                    var bytesRead = await _sslStream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
 
                     if (bytesRead > 0)
                     {
@@ -200,7 +192,7 @@ namespace Assets.Scripts.Network
                 Debug.Log($"Packet received: OpCode={packet.OpCode}, Sequence={packet.Sequence}, Length={packet.Length}");
                 Debug.Log($"Raw Payload: {BitConverter.ToString(packet.Payload)}");
 
-                if (ServerConverters.TryGetValue(packet.OpCode, out var converter))
+                if (_serverConverters.TryGetValue(packet.OpCode, out var converter))
                 {
                     var spanReader = new SpanReader(packet.Payload);
                     var args = converter.Deserialize(ref spanReader);
@@ -241,7 +233,7 @@ namespace Assets.Scripts.Network
                         var connectionInfoArgs = (ConnectionInfoArgs)args;
                         if (connectionInfoArgs.PortNumber == _loginPort)
                         {
-                            sceneTransfer = true;
+                            _sceneTransfer = true;
                             Cleanup();
                         }
                         break;
@@ -261,15 +253,15 @@ namespace Assets.Scripts.Network
 
         private void IndexServerConverters()
         {
-            ServerConverters.Add((byte)ServerOpCode.AcceptConnection, new AcceptConnectionConverter());
-            ServerConverters.Add((byte)ServerOpCode.LoginMessage, new LoginMessageConverter());
-            ServerConverters.Add((byte)ServerOpCode.ConnectionInfo, new ConnectionInfoConverter());
+            _serverConverters.Add((byte)ServerOpCode.AcceptConnection, new AcceptConnectionConverter());
+            _serverConverters.Add((byte)ServerOpCode.LoginMessage, new LoginMessageConverter());
+            _serverConverters.Add((byte)ServerOpCode.ConnectionInfo, new ConnectionInfoConverter());
         }
 
         private void IndexClientConverters()
         {
-            ClientConverters.Add((byte)ClientOpCode.ClientRedirected, new ConfirmConnectionConverter());
-            ClientConverters.Add((byte)ClientOpCode.Version, new VersionConverter());
+            _clientConverters.Add((byte)ClientOpCode.ClientRedirected, new ConfirmConnectionConverter());
+            _clientConverters.Add((byte)ClientOpCode.Version, new VersionConverter());
         }
 
         private void ConnectToServer(ushort port)
@@ -277,17 +269,17 @@ namespace Assets.Scripts.Network
             try
             {
                 // Initialize the TCP client and SSL stream
-                tcpClient = new TcpClient(_serverIp, port);
-                ConfigureTcpSocket(tcpClient.Client);
-                sslStream = new SslStream(tcpClient.GetStream(), false, ValidateServerCertificate);
+                _tcpClient = new TcpClient(_serverIp, port);
+                ConfigureTcpSocket(_tcpClient.Client);
+                _sslStream = new SslStream(_tcpClient.GetStream(), false, ValidateServerCertificate);
 
                 // Perform SSL handshake
-                sslStream.AuthenticateAsClient("localhost", null, SslProtocols.Tls12, false);
+                _sslStream.AuthenticateAsClient("localhost", null, SslProtocols.Tls12, false);
 
                 // Initialize reader and writer for the stream
-                writer = new StreamWriter(sslStream) { AutoFlush = true };
-                reader = new StreamReader(sslStream);
-                isConnected = true;
+                _writer = new StreamWriter(_sslStream) { AutoFlush = true };
+                _reader = new StreamReader(_sslStream);
+                _isConnected = true;
                 if (port == _lobbyPort)
                     SendVersionNumber();
                 else

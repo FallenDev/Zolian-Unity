@@ -1,14 +1,14 @@
 ﻿using System;
 
-namespace Assets.Scripts.Network
+namespace Assets.Scripts.Network.PacketHandling
 {
     public class Packet
     {
-        public byte Signature { get; private set; }
-        public ushort Length { get; private set; }
-        public byte OpCode { get; private set; }
-        public byte Sequence { get; private set; }
-        public byte[] Payload { get; private set; }
+        private byte Signature { get; }
+        public ushort Length { get; }
+        public byte OpCode { get; }
+        public byte Sequence { get; }
+        public byte[] Payload { get; }
 
         // Constructor for incoming packets
         public Packet(ReadOnlySpan<byte> span)

@@ -1,6 +1,7 @@
 using Assets.Scripts.Models;
 using Assets.Scripts.Network.OpCodes;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
+using Assets.Scripts.Network.PacketHandling;
 using Assets.Scripts.Network.Span;
 
 namespace Assets.Scripts.Network.Converters.ReceiveFromServer
@@ -9,12 +10,11 @@ namespace Assets.Scripts.Network.Converters.ReceiveFromServer
     {
         public override byte OpCode => (byte)ServerOpCode.LoginMessage;
 
-        public override LoginMessageArgs Deserialize(ref SpanReader reader)
+        protected override LoginMessageArgs Deserialize(ref SpanReader reader)
         {
             var loginMessageType = (PopupMessageType)reader.ReadByte();
             var message = reader.ReadString();
             return new LoginMessageArgs { LoginMessageType = loginMessageType, Message = message };
         }
     }
-
 }

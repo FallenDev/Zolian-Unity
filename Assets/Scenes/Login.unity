@@ -21866,14 +21866,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6eb655be94c35243b5056392f0ebf9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterListPanel: {fileID: 581294643}
-  characterEntryPrefab: {fileID: 333253968087552150, guid: 54ecd6a272f1303468d9c963d2920330,
+  CharacterListPanel: {fileID: 581294643}
+  CharacterEntryPrefab: {fileID: 333253968087552150, guid: 54ecd6a272f1303468d9c963d2920330,
     type: 3}
-  contentListContainer: {fileID: 1390831130}
-  characterPreview: {fileID: 0}
-  characterNameText: {fileID: 1002929814}
-  leftArrowButton: {fileID: 432052032}
-  rightArrowButton: {fileID: 1548732515}
+  ContentListContainer: {fileID: 1390831130}
+  CharacterNameText: {fileID: 1002929814}
+  LeftArrowButton: {fileID: 432052032}
+  RightArrowButton: {fileID: 1548732515}
 --- !u!114 &2141719637
 MonoBehaviour:
   m_ObjectHideFlags: 0

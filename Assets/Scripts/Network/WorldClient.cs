@@ -13,6 +13,7 @@ using Assets.Scripts.Network.Converters.ReceiveFromServer;
 using Assets.Scripts.Network.OpCodes;
 using Assets.Scripts.Network.PacketArgs.SendToServer;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
+using Assets.Scripts.Network.PacketHandling;
 using Assets.Scripts.Network.Span;
 
 namespace Assets.Scripts.Network
@@ -84,13 +85,13 @@ namespace Assets.Scripts.Network
         private void SendVersionNumber()
         {
             var args = new VersionArgs();
-            SendPacket(args.OpCode, args);
+            SendPacket(VersionArgs.OpCode, args);
         }
 
         private void SendConnectionConfirmation()
         {
             var args = new ConfirmConnectionArgs();
-            SendPacket(args.OpCode, args);
+            SendPacket(ConfirmConnectionArgs.OpCode, args);
         }
         
         #endregion

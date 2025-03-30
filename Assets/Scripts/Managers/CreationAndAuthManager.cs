@@ -1,5 +1,3 @@
-using System;
-
 using Assets.Scripts.CharacterSelection;
 using Assets.Scripts.Entity;
 using Assets.Scripts.Models;
@@ -205,7 +203,7 @@ namespace Assets.Scripts.Managers
             RaceDropdown.value = 0;
             CharacterCreationGroup.gameObject.SetActive(false);
             // Only show SelectionPanel if characters exist to select from
-            CharacterListPanel.SetActive(LoginClient.Instance.cachedPlayers.Count >= 1);
+            CharacterListPanel.SetActive(LoginClient.Instance.CachedPlayers.Count >= 1);
             CharacterSelectionGroup.gameObject.SetActive(true);
             UnloadCharacterScene();
         }

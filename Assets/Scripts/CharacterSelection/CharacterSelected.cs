@@ -3,8 +3,6 @@ using Assets.Scripts.Managers;
 using Assets.Scripts.Models;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using TMPro;
-using Unity.VisualScripting;
-
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

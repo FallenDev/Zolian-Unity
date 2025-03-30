@@ -25,11 +25,6 @@ namespace Assets.Scripts.Network.Span
         }
 
         /// <summary>
-        /// Gets a value indicating whether the writer has reached or exceeded the end of the span.
-        /// </summary>
-        public bool EndOfSpan => _position >= _buffer.Length;
-
-        /// <summary>
         /// Ensures there is enough space to write the specified number of bytes.
         /// If not, resizes the buffer dynamically.
         /// </summary>
