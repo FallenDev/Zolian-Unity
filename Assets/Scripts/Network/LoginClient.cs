@@ -17,12 +17,14 @@ using Assets.Scripts.Network.PacketArgs.SendToServer;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using Assets.Scripts.Network.PacketHandling;
 using Assets.Scripts.Network.Span;
+using UnityEngine.SceneManagement;
 
 namespace Assets.Scripts.Network
 {
     public class LoginClient : MonoBehaviour
     {
         private bool _isConnected;
+        private bool _sceneTransfer;
         private SslStream _sslStream;
         private TcpClient _tcpClient;
         private StreamReader _reader;
@@ -65,7 +67,12 @@ namespace Assets.Scripts.Network
             ConnectToServer(_loginPort);
         }
 
-        private void Update() { }
+        private void Update()
+        {
+            if (!_sceneTransfer) return;
+            _sceneTransfer = false;
+            SceneManager.LoadSceneAsync("World");
+        }
 
         private void OnApplicationQuit() => Cleanup();
 
@@ -122,6 +129,29 @@ namespace Assets.Scripts.Network
             catch (Exception e)
             {
                 Debug.LogError($"Failed to send login credentials: {e.Message}");
+                MainThreadDispatcher.RunOnMainThread(() =>
+                {
+                    PopupManager.Instance.ShowMessage(e.Message, PopupMessageType.System);
+                });
+            }
+        }
+
+        public void SendEnterGame(Guid serial, long steamId, string userName)
+        {
+            try
+            {
+                var args = new EnterGameArgs
+                {
+                    Serial = serial,
+                    SteamId = steamId,
+                    UserName = userName
+                };
+
+                SendPacket(EnterGameArgs.OpCode, args);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to enter world: {e.Message}");
                 MainThreadDispatcher.RunOnMainThread(() =>
                 {
                     PopupManager.Instance.ShowMessage(e.Message, PopupMessageType.System);
@@ -314,6 +344,12 @@ namespace Assets.Scripts.Network
                     {
                         var connectionInfoArgs = (ConnectionInfoArgs)args;
                         // Redirect to World Scene
+                        Debug.Log($"Redirecting to World Server at {connectionInfoArgs.PortNumber}");
+                        if (connectionInfoArgs.PortNumber == _worldPort)
+                        {
+                            _sceneTransfer = true;
+                            Cleanup();
+                        }
                         break;
                     }
                 case (byte)ServerOpCode.CreateCharacterFinalized: // Character finalized
@@ -343,8 +379,8 @@ namespace Assets.Scripts.Network
                                 PopupManager.Instance.ShowMessage("No characters found, create one below!", PopupMessageType.System);
                             else
                             {
-                                CharacterSelectionUi.Instance.PopulateCharacterList();
-                                CharacterSelectionUi.Instance.SelectCharacter(0);
+                                CharacterSelectionUI.Instance.PopulateCharacterList();
+                                CharacterSelectionUI.Instance.SelectCharacter(0);
                             }
 
                             CreationAndAuthManager.Instance.createButton.gameObject.SetActive(true);

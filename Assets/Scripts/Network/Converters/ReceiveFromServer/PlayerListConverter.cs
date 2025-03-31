@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Assets.Scripts.Models;
-using Assets.Scripts.Network.OpCodes;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using Assets.Scripts.Network.PacketHandling;
 using Assets.Scripts.Network.Span;
@@ -10,8 +9,6 @@ namespace Assets.Scripts.Network.Converters.ReceiveFromServer
 {
     public sealed class PlayerListConverter : PacketConverterBase<PlayerListArgs>
     {
-        public override byte OpCode => (byte)ServerOpCode.PlayerList;
-
         protected override PlayerListArgs Deserialize(ref SpanReader reader)
         {
             var numberOfCharacters = reader.ReadByte();

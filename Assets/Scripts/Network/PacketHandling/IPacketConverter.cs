@@ -7,7 +7,6 @@ namespace Assets.Scripts.Network.PacketHandling
     /// </summary>
     public interface IPacketConverter
     {
-        byte OpCode { get; }
         object Deserialize(ref SpanReader reader);
         void Serialize(ref SpanWriter writer, object args);
     }

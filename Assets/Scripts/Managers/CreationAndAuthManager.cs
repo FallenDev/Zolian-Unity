@@ -211,6 +211,14 @@ namespace Assets.Scripts.Managers
         public void OnLoginButtonClick()
         {
             Debug.Log($"OnLoginButtonClick called");
+            // Send selected character to server for login
+            // On the server side, the player will be loaded in as an active client and the player will be loaded
+            // from the database. The player will then be sent back to the client with all of their data.
+            // World server will then run the save routine every 15 seconds, saving the players latest state.
+            // If they get disconnected for any reason, whether it is a crash or disconnect, the player is to be
+            // saved immediately from server cache. 
+            // This can obviously be added upon similar to how the server works today. We will also need a new
+            // ping component to run to remove stale connections keeping the server fresh. 
         }
 
         /// <summary>

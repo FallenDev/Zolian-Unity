@@ -1,4 +1,3 @@
-using Assets.Scripts.Network.OpCodes;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using Assets.Scripts.Network.PacketHandling;
 using Assets.Scripts.Network.Span;
@@ -7,8 +6,6 @@ namespace Assets.Scripts.Network.Converters.ReceiveFromServer
 {
     public sealed class SoundConverter : PacketConverterBase<SoundArgs>
     {
-        public override byte OpCode => (byte)ServerOpCode.Sound;
-
         protected override SoundArgs Deserialize(ref SpanReader reader)
         {
             var indicatorOrIndex = reader.ReadByte();

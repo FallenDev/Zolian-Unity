@@ -4,12 +4,13 @@ using Assets.Scripts.Network.Span;
 
 namespace Assets.Scripts.Network.Converters.SendToServer
 {
-    public sealed class DeleteCharacterConverter : PacketConverterBase<DeleteCharacterArgs>
+    public sealed class EnterGameConverter : PacketConverterBase<EnterGameArgs>
     {
-        public override void Serialize(ref SpanWriter writer, DeleteCharacterArgs args)
+        public override void Serialize(ref SpanWriter writer, EnterGameArgs args)
         {
+            writer.WriteGuid(args.Serial);
             writer.WriteInt64(args.SteamId);
-            writer.WriteString(args.Name);
+            writer.WriteString(args.UserName);
         }
     }
 }

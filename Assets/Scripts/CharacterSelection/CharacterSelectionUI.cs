@@ -2,13 +2,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
-using Assets.Scripts.Managers;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using Assets.Scripts.Network;
 
 namespace Assets.Scripts.CharacterSelection
 {
-    public class CharacterSelectionUi : MonoBehaviour
+    public class CharacterSelectionUI : MonoBehaviour
     {
         [Header("UI Elements")] 
         public GameObject CharacterListPanel;
@@ -17,11 +16,13 @@ namespace Assets.Scripts.CharacterSelection
         public TextMeshProUGUI CharacterNameText;
         public Button LeftArrowButton;
         public Button RightArrowButton;
+        private readonly List<Button> _characterButtons = new();
+        private Button _currentlySelectedButton;
 
         private List<PlayerSelection> _characters = new();
         private int _selectedCharacterIndex;
 
-        public static CharacterSelectionUi Instance;
+        public static CharacterSelectionUI Instance;
 
         private void Awake()
         {
@@ -39,6 +40,15 @@ namespace Assets.Scripts.CharacterSelection
 
         private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                NavigateLeft();
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                NavigateRight();
+            }
+
             if (_characters.Equals(LoginClient.Instance.CachedPlayers)) return;
             PopulateCharacterList();
         }
@@ -64,6 +74,8 @@ namespace Assets.Scripts.CharacterSelection
                 DestroyImmediate(child.gameObject);
             }
 
+            _characterButtons.Clear();
+
             // Force UI to update after clearing
             LayoutRebuilder.ForceRebuildLayoutImmediate(ContentListContainer.GetComponent<RectTransform>());
 
@@ -81,11 +93,15 @@ namespace Assets.Scripts.CharacterSelection
                 entry.transform.SetParent(ContentListContainer, false);
                 entry.GetComponentInChildren<TextMeshProUGUI>().text = $"{_characters[i].Name} (Lvl {_characters[i].Level} {_characters[i].BaseClass})";
                 var index = i;
-                entry.GetComponent<Button>().onClick.AddListener(() =>
+                var button = entry.GetComponent<Button>();
+
+                button.onClick.AddListener(() =>
                 {
                     _selectedCharacterIndex = index;
                     UpdateCharacterDisplay();
                 });
+
+                _characterButtons.Add(button);
             }
         }
 
@@ -98,29 +114,18 @@ namespace Assets.Scripts.CharacterSelection
 
         private void UpdateCharacterDisplay()
         {
-            if (_characters.Count == 0) return;
+            if (_characters.Count == 0 || _selectedCharacterIndex >= _characterButtons.Count) return;
+
+            if (_currentlySelectedButton != null)
+                _currentlySelectedButton.OnDeselect(null);
+
+            _currentlySelectedButton = _characterButtons[_selectedCharacterIndex];
+            if (_characterButtons[_selectedCharacterIndex] != null)
+                _characterButtons[_selectedCharacterIndex].SetSelected();
+            
             CharacterSelected.Instance.SelectCharacter(_characters[_selectedCharacterIndex]);
             var character = _characters[_selectedCharacterIndex];
             CharacterNameText.text = $"{character.Name} - Lvl {character.Level} {character.BaseClass}";
-
-            // TODO: Update 3D character preview
-        }
-
-        public void EnterWorld()
-        {
-            Debug.Log($"Entering world as {_characters[_selectedCharacterIndex].Name}");
-            CreationAndAuthManager.Instance.OnLoginButtonClick();
-        }
-
-        public void CreateCharacter()
-        {
-            CreationAndAuthManager.Instance.OnCreateButtonClick();
-        }
-
-        public void DeleteCharacter()
-        {
-            Debug.Log($"Deleting character {_characters[_selectedCharacterIndex].Name}");
-            // TODO: Implement character deletion logic
         }
 
         private void NavigateLeft()
