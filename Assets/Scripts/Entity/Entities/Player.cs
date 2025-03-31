@@ -1,14 +1,11 @@
-﻿using System;
-using Assets.Scripts.Models;
-using UnityEngine;
+﻿using Assets.Scripts.Models;
+using Assets.Scripts.Network;
 
-namespace Assets.Scripts.Entity
+namespace Assets.Scripts.Entity.Entities
 {
-    public class Player : MonoBehaviour
+    public class Player : Damageable
     {
-        // Character Selection Properties
-        public Guid Serial { get; set; }
-        public bool Disabled { get; set; }
+        public WorldClient Client { get; set; }
         public string Name { get; set; }
         public uint Level { get; set; }
         public BaseClass BaseClass { get; set; }

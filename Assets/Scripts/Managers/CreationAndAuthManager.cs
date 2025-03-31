@@ -1,5 +1,6 @@
 using Assets.Scripts.CharacterSelection;
 using Assets.Scripts.Entity;
+using Assets.Scripts.Entity.ScriptableObjects;
 using Assets.Scripts.Models;
 using Assets.Scripts.Network;
 
