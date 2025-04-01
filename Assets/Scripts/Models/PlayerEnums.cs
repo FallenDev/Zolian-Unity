@@ -59,11 +59,22 @@ namespace Assets.Scripts.Models
         Female = 1
     }
 
+    [Flags]
+    public enum ClassStage
+    {
+        Class = 1, // Stage 1
+        Advance = 1 << 1, // Stage 2
+        Job = 1 << 2, // Stage 3
+        Master = 1 << 3 | Job, // Stage 4
+        Quest = 1 << 4 // Quest Restricted
+    }
+
     public static class PlayerEnums
     {
         public static bool BaseClassFlagIsSet(this BaseClass self, BaseClass flag) => (self & flag) == flag;
         public static bool JobClassFlagIsSet(this JobClass self, JobClass flag) => (self & flag) == flag;
         public static bool RaceFlagIsSet(this Race self, Race flag) => (self & flag) == flag;
         public static bool SexFlagIsSet(this Sex self, Sex flag) => (self & flag) == flag;
+        public static bool ClassStageFlagIsSet(this ClassStage self, ClassStage flag) => (self & flag) == flag;
     }
 }

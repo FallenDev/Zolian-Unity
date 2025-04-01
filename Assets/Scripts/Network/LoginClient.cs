@@ -136,14 +136,14 @@ namespace Assets.Scripts.Network
             }
         }
 
-        public void SendEnterGame(Guid serial, long steamId, string userName)
+        public void SendEnterGame(Guid serial, string userName)
         {
             try
             {
                 var args = new EnterGameArgs
                 {
                     Serial = serial,
-                    SteamId = steamId,
+                    SteamId = SteamId,
                     UserName = userName
                 };
 
@@ -416,6 +416,7 @@ namespace Assets.Scripts.Network
             _clientConverters.Add((byte)ClientOpCode.Login, new LoginConverter());
             _clientConverters.Add((byte)ClientOpCode.CreateCharacter, new CreateCharacterConverter());
             _clientConverters.Add((byte)ClientOpCode.DeleteCharacter, new DeleteCharacterConverter());
+            _clientConverters.Add((byte)ClientOpCode.EnterGame, new EnterGameConverter());
         }
 
         public void ConnectToServer(ushort port)

@@ -20,7 +20,6 @@ namespace Assets.Scripts.CharacterSelection
 
         public PlayerSelection selectedPlayer;
         private GameObject instantiatedCharacter;
-        private Sex lastSexChosen;
         private const string characterSceneName = "CharacterSelectionDisplay";
         private bool isSceneLoaded = false;
 
