@@ -38,7 +38,7 @@ namespace Assets.Scripts.Entity.Entities
         // Add any additional properties needed for in-game representation
 
 
-        private Player()
+        public Player()
         {
             // Initialize any default values if needed
         }

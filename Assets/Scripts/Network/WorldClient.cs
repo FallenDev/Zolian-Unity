@@ -8,6 +8,7 @@ using UnityEngine;
 using System.Security.Authentication;
 using System.Text;
 using System.Collections.Generic;
+using Assets.Scripts.Entity.Entities;
 using Assets.Scripts.Network.Converters.SendToServer;
 using Assets.Scripts.Network.Converters.ReceiveFromServer;
 using Assets.Scripts.Network.OpCodes;
@@ -57,6 +58,7 @@ namespace Assets.Scripts.Network
         {
             IndexServerConverters();
             IndexClientConverters();
+            ConnectToServer(serverPort);
         }
 
         private void Update() { }
@@ -93,7 +95,7 @@ namespace Assets.Scripts.Network
             var args = new ConfirmConnectionArgs();
             SendPacket(ConfirmConnectionArgs.OpCode, args);
         }
-        
+
         #endregion
 
         #region Client -> Server
@@ -249,6 +251,14 @@ namespace Assets.Scripts.Network
                         //ConnectToServer(connectionInfoArgs.PortNumber);
                         break;
                     }
+                case (byte)ServerOpCode.CharacterData: // Character Data Received
+                    {
+                        var player = new Player
+                        {
+                            Client = this
+                        };
+                        break;
+                    }
                 default:
                     Debug.LogWarning($"Unhandled OpCode: {opCode}");
                     break;
@@ -267,6 +277,7 @@ namespace Assets.Scripts.Network
             ServerConverters.Add((byte)ServerOpCode.ServerMessage, new ServerMessageConverter());
             ServerConverters.Add((byte)ServerOpCode.Sound, new SoundConverter());
             ServerConverters.Add((byte)ServerOpCode.ConnectionInfo, new ConnectionInfoConverter());
+            ServerConverters.Add((byte)ServerOpCode.CharacterData, new CharacterDataConverter());
         }
 
         private void IndexClientConverters()

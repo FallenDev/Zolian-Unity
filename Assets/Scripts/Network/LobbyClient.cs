@@ -37,7 +37,6 @@ namespace Assets.Scripts.Network
         [SerializeField] private string _serverIp = "127.0.0.1";
         [SerializeField] private ushort _lobbyPort = 4200;
         [SerializeField] private ushort _loginPort = 4201;
-        [SerializeField] private ushort _worldPort = 4202;
         [SerializeField] private TMP_Text _statusText;
 
         // Static instance of NetworkClient
@@ -98,14 +97,36 @@ namespace Assets.Scripts.Network
 
         private void SendVersionNumber()
         {
-            var args = new VersionArgs();
-            SendPacket(VersionArgs.OpCode, args);
+            try
+            {
+                var args = new VersionArgs();
+                SendPacket(VersionArgs.OpCode, args);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to send connection confirmation: {e.Message}");
+                MainThreadDispatcher.RunOnMainThread(() =>
+                {
+                    PopupManager.Instance.ShowMessage(e.Message, PopupMessageType.System);
+                });
+            }
         }
 
         private void SendConnectionConfirmation()
         {
-            var args = new ConfirmConnectionArgs();
-            SendPacket(ConfirmConnectionArgs.OpCode, args);
+            try
+            {
+                var args = new ConfirmConnectionArgs();
+                SendPacket(ConfirmConnectionArgs.OpCode, args);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to send connection confirmation: {e.Message}");
+                MainThreadDispatcher.RunOnMainThread(() =>
+                {
+                    PopupManager.Instance.ShowMessage(e.Message, PopupMessageType.System);
+                });
+            }
         }
 
         #endregion
