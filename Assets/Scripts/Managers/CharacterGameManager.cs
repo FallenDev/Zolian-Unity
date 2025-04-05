@@ -1,23 +1,44 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Assets.Scripts.Managers
 {
     /// <summary>
-    /// Manages the loading and unloading of character-related scenes
+    /// Manages static information for the Game
     /// </summary>
-    public class CharacterSceneManager : MonoBehaviour
+    public class CharacterGameManager : MonoBehaviour
     {
-        public static CharacterSceneManager Instance;
+        public long SteamId;
+        // Character Login to World Server
+        public ushort WorldPort = 4202; // ToDo: Change to a UI box to pick a world server
+        public Guid Serial;
+        public string UserName;
+
+        private static CharacterGameManager _instance;
+
+        public static CharacterGameManager Instance
+        {
+            get
+            {
+                if (_instance != null) return _instance;
+                _instance = FindFirstObjectByType<CharacterGameManager>();
+                if (_instance != null) return _instance;
+
+                Debug.LogError("CharacterSceneManager instance not found in the scene!");
+                return null;
+            }
+        }
 
         private void Awake()
         {
-            if (Instance == null)
+            if (_instance == null)
             {
-                Instance = this;
+                _instance = this;
+                transform.SetParent(null);
                 DontDestroyOnLoad(gameObject);
             }
-            else
+            else if (_instance != this)
             {
                 Destroy(gameObject);
             }

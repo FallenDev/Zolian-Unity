@@ -193,7 +193,11 @@ namespace Assets.Scripts.Managers
 
         private void OnDeleteButtonClick()
         {
-            // Show character deletion
+            MainThreadDispatcher.RunOnMainThread(() =>
+            {
+                PopupManager.Instance.ShowMessage($"{CharacterSelected.Instance.selectedPlayer.Name} has been deleted.", PopupMessageType.System);
+            });
+            LoginClient.Instance.SendCharacterDelete(CharacterSelected.Instance.selectedPlayer.Serial, CharacterSelected.Instance.selectedPlayer.Name);
         }
 
         private void OnCancelButtonClick()
@@ -209,10 +213,14 @@ namespace Assets.Scripts.Managers
             UnloadCharacterScene();
         }
 
-        public void OnLoginButtonClick()
+        /// <summary>
+        /// Directs the LoginClient to Send a port # to the server and kick off the login process
+        /// </summary>
+        private void OnLoginButtonClick()
         {
-            Debug.Log($"OnLoginButtonClick called");
-            LoginClient.Instance.SendEnterGame(CharacterSelected.Instance.selectedPlayer.Serial, CharacterSelected.Instance.selectedPlayer.Name);
+            CharacterGameManager.Instance.Serial = CharacterSelected.Instance.selectedPlayer.Serial;
+            CharacterGameManager.Instance.UserName = CharacterSelected.Instance.selectedPlayer.Name;
+            LoginClient.Instance.SendWorldPortAndEnterWorld(CharacterGameManager.Instance.WorldPort);
         }
 
         /// <summary>
@@ -232,7 +240,7 @@ namespace Assets.Scripts.Managers
             UpdateCharacterDisplay(false);
         }
 
-        private void OnContinueButtonClick() => LoginClient.Instance.SendCharacterCreation(LoginClient.Instance.SteamId, CharacterName.text, classChosen, raceChosen, 
+        private void OnContinueButtonClick() => LoginClient.Instance.SendCharacterCreation(CharacterGameManager.Instance.SteamId, CharacterName.text, classChosen, raceChosen, 
             genderChosen, lastHairIndex, lastBangsIndex, lastBeardIndex, lastMustacheIndex, lastHairColorIndex, lastHairHighlightColorIndex, lastEyeColorIndex, lastSkinToneIndex);
         public void CharacterFinalized() => OnCancelButtonClick();
 

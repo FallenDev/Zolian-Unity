@@ -2,11 +2,26 @@
 using Assets.Scripts.Entity.Abstractions;
 using Assets.Scripts.Models;
 using Assets.Scripts.Network;
+using UnityEngine;
 
 namespace Assets.Scripts.Entity.Entities
 {
     public class Player : Damageable, IPlayer
     {
+        private static Player _playerInstance;
+
+        public static Player PlayerInstance
+        {
+            get
+            {
+                if (_playerInstance != null) return _playerInstance;
+                _playerInstance = FindFirstObjectByType<Player>();
+                if (_playerInstance != null) return _playerInstance;
+
+                Debug.LogError("Player cannot be found!");
+                return null;
+            }
+        }
         // Base properties
         public WorldClient Client { get; set; }
         public long SteamId { get; set; }
@@ -34,13 +49,31 @@ namespace Assets.Scripts.Entity.Entities
         // Equipment
 
 
-        // In-Game Properties
         // Add any additional properties needed for in-game representation
-
-
+        
         public Player()
         {
             // Initialize any default values if needed
+        }
+
+        private void Awake()
+        {
+            if (_playerInstance == null)
+            {
+                _playerInstance = this;
+                // Remove from parent for persistence
+                transform.SetParent(null);
+                DontDestroyOnLoad(gameObject);
+            }
+            else if (_playerInstance != this)
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        private void Update()
+        {
+
         }
     }
 }

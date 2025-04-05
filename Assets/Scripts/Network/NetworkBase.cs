@@ -14,7 +14,6 @@ using Assets.Scripts.Network.Span;
 using UnityEngine.SceneManagement;
 using Assets.Scripts.Managers;
 using Assets.Scripts.Models;
-using Assets.Scripts.Network.Converters.ReceiveFromServer;
 using Assets.Scripts.Network.Converters.SendToServer;
 using Assets.Scripts.Network.OpCodes;
 
@@ -28,17 +27,14 @@ namespace Assets.Scripts.Network
         private StreamWriter _writer;
         private readonly object _sendLock = new();
 
-        protected bool IsConnected;
+        private bool _isConnected;
+        private const string CentralServerIp = "127.0.0.1";
         protected readonly Dictionary<byte, IPacketConverter> ServerConverters = new();
         protected readonly Dictionary<byte, IPacketConverter> ClientConverters = new();
-        protected string CentralServerIp = "127.0.0.1";
-        protected ushort LobbyPort = 4200;
-        protected ushort LoginPort = 4201;
-        protected ushort WorldPort = 4202;
-
         protected bool LobbySceneTransfer;
         protected bool LoginSceneTransfer;
-
+        protected ushort LobbyPort = 4200;
+        protected ushort LoginPort = 4201;
 
         private void Start()
         {
@@ -65,7 +61,7 @@ namespace Assets.Scripts.Network
 
         private void Cleanup()
         {
-            IsConnected = false;
+            _isConnected = false;
 
             try
             {
@@ -129,7 +125,7 @@ namespace Assets.Scripts.Network
             try
             {
                 var buffer = new byte[ushort.MaxValue]; // Adjust size as needed
-                while (IsConnected)
+                while (_isConnected)
                 {
                     var bytesRead = await _sslStream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
 
@@ -234,7 +230,7 @@ namespace Assets.Scripts.Network
                 // Initialize reader and writer for the stream
                 _writer = new StreamWriter(_sslStream) { AutoFlush = true };
                 _reader = new StreamReader(_sslStream);
-                IsConnected = true;
+                _isConnected = true;
                 if (port == LobbyPort)
                     LobbyClient.LobbyInstance.SendVersionNumber();
                 else

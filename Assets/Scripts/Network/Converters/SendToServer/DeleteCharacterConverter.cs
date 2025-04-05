@@ -8,6 +8,7 @@ namespace Assets.Scripts.Network.Converters.SendToServer
     {
         public override void Serialize(ref SpanWriter writer, DeleteCharacterArgs args)
         {
+            writer.WriteGuid(args.Serial);
             writer.WriteInt64(args.SteamId);
             writer.WriteString(args.Name);
         }

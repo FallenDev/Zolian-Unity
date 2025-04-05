@@ -12,10 +12,10 @@ namespace Assets.Scripts.Network.PacketArgs.ReceiveFromServer
         public Guid Serial { get; set; }
         public bool Disabled { get; set; }
         public string UserName { get; set; }
-        public string Stage { get; set; }
-        public string Job { get; set; }
-        public string FirstClass { get; set; }
-        public string SecondClass { get; set; }
+        public ClassStage Stage { get; set; }
+        public JobClass Job { get; set; }
+        public BaseClass FirstClass { get; set; }
+        public BaseClass SecondClass { get; set; }
         public uint EntityLevel { get; set; }
         public uint JobLevel { get; set; }
         public bool GameMaster { get; set; }
