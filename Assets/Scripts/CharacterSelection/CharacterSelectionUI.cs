@@ -40,11 +40,11 @@ namespace Assets.Scripts.CharacterSelection
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.UpArrow))
+            if (Input.GetKeyDown(KeyCode.UpArrow) && LeftArrowButton.gameObject.activeInHierarchy)
             {
                 NavigateLeft();
             }
-            else if (Input.GetKeyDown(KeyCode.DownArrow))
+            else if (Input.GetKeyDown(KeyCode.DownArrow) && RightArrowButton.gameObject.activeInHierarchy)
             {
                 NavigateRight();
             }
