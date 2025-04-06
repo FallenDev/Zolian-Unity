@@ -1,11 +1,12 @@
 ﻿using System;
-using Assets.Scripts.CharacterSelection;
+
 using Assets.Scripts.Entity.Abstractions;
 using Assets.Scripts.Entity.ScriptableObjects;
 using Assets.Scripts.Managers;
 using Assets.Scripts.Models;
 using Assets.Scripts.Network;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
+
 using UnityEngine;
 
 namespace Assets.Scripts.Entity.Entities
@@ -25,7 +26,7 @@ namespace Assets.Scripts.Entity.Entities
         public BaseClass SecondClass { get; set; }
         public bool GameMaster { get; set; }
 
-        [Header("Character Looks")] 
+        [Header("Character Looks")]
         public CharacterSO CharacterSo { get; set; }
         public Race Race { get; set; }
         public Sex Gender { get; set; }
@@ -132,6 +133,8 @@ namespace Assets.Scripts.Entity.Entities
                 _ => CreationAndAuthManager.Instance.HumanCharacterSO
             };
         }
+
+        #region Character Display
 
         /// <summary>
         /// Creates character prefab based on initial data
@@ -332,6 +335,8 @@ namespace Assets.Scripts.Entity.Entities
 
             foreach (var colorData in colorCustomization.m_Colors)
             {
+                if (colorData.sharedMaterial.name.Contains("eye")) continue;
+                if (colorData.sharedMaterial.name.Contains("mouth")) continue;
                 colorData.mainColor_A = SkinColor;
             }
 
@@ -354,22 +359,22 @@ namespace Assets.Scripts.Entity.Entities
                 if (colorData.sharedMaterial == null)
                     continue;
 
-                if (colorData.sharedMaterial.name.Contains("mat_face"))
+                if (colorData.sharedMaterial.name.Contains("face"))
                 {
                     colorData.mainColor_A = SkinColor;
                 }
-                else if (colorData.sharedMaterial.name.Contains("mat_eye.002"))
+                else if (colorData.sharedMaterial.name.Contains("eye"))
                 {
                     colorData.mainColor_B = EyeColor;
                 }
 
-                if (Race is Race.Merfolk && colorData.sharedMaterial.name.Contains("mat_scales"))
+                if (Race is Race.Merfolk && colorData.sharedMaterial.name.Contains("scales"))
                 {
                     colorData.mainColor_A = CreationAndAuthManager.Instance.ScalesSO.ScalesColor[0]; ;
                     colorData.metallic = 0.8f;
                     colorData.smoothness = 0.5f;
                 }
-                else
+                else if (colorData.sharedMaterial.name.Contains("scales"))
                 {
                     colorData.mainColor_A = SkinColor;
                     colorData.metallic = 0.2f;
@@ -536,5 +541,7 @@ namespace Assets.Scripts.Entity.Entities
                     break;
             }
         }
+
+        #endregion
     }
 }

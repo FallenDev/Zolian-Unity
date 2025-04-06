@@ -806,6 +806,8 @@ namespace Assets.Scripts.Managers
 
             foreach (var colorData in colorCustomization.m_Colors)
             {
+                if (colorData.sharedMaterial.name.Contains("eye")) continue;
+                if (colorData.sharedMaterial.name.Contains("mouth")) continue;
                 colorData.mainColor_A = SkinColor;
             }
 
@@ -828,22 +830,22 @@ namespace Assets.Scripts.Managers
                 if (colorData.sharedMaterial == null)
                     continue;
 
-                if (colorData.sharedMaterial.name.Contains("mat_face"))
+                if (colorData.sharedMaterial.name.Contains("face"))
                 {
                     colorData.mainColor_A = SkinColor;
                 }
-                else if (colorData.sharedMaterial.name.Contains("mat_eye.002"))
+                else if (colorData.sharedMaterial.name.Contains("eye"))
                 {
                     colorData.mainColor_B = EyeColor;
                 }
 
-                if (raceChosen is Race.Merfolk && colorData.sharedMaterial.name.Contains("mat_scales"))
+                if (raceChosen is Race.Merfolk && colorData.sharedMaterial.name.Contains("scales"))
                 {
-                    colorData.mainColor_A = ScalesSO.ScalesColor[0];;
+                    colorData.mainColor_A = CreationAndAuthManager.Instance.ScalesSO.ScalesColor[0]; ;
                     colorData.metallic = 0.8f;
                     colorData.smoothness = 0.5f;
                 }
-                else
+                else if (colorData.sharedMaterial.name.Contains("scales"))
                 {
                     colorData.mainColor_A = SkinColor;
                     colorData.metallic = 0.2f;
