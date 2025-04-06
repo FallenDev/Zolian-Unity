@@ -15,7 +15,9 @@ namespace Assets.Scripts.Managers
             Instance = this;
         }
 
-        // Call this method when Race/Sex selection changes
+        /// <summary>
+        /// Call this method when Race/Sex selection changes
+        /// </summary>
         public GameObject LoadCharacter(GameObject characterPrefab)
         {
             // Destroy previous character

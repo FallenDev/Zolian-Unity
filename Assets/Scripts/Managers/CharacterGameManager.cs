@@ -1,4 +1,9 @@
 ﻿using System;
+
+using Assets.Scripts.CharacterSelection;
+using Assets.Scripts.Entity.Entities;
+using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,6 +19,7 @@ namespace Assets.Scripts.Managers
         public ushort WorldPort = 4202; // ToDo: Change to a UI box to pick a world server
         public Guid Serial;
         public string UserName;
+        private GameObject _spawnedPlayer;
 
         private static CharacterGameManager _instance;
 
@@ -62,6 +68,31 @@ namespace Assets.Scripts.Managers
             if (!isSceneLoaded) return true;
             SceneManager.UnloadSceneAsync(characterSceneName);
             return false;
+        }
+
+        public void SpawnPlayerPrefab(CharacterDataArgs args)
+        {
+            var prefab = CharacterPrefabLoader.GetPrefabForSelection(args.Sex);
+            if (prefab == null)
+            {
+                Debug.LogError($"No prefab found for gender: {args.Sex}");
+                return;
+            }
+
+            if (_spawnedPlayer != null)
+                Destroy(_spawnedPlayer);
+
+            _spawnedPlayer = Instantiate(prefab, args.Position, Quaternion.identity);
+
+            var playerScript = _spawnedPlayer.GetComponent<Player>();
+            if (playerScript == null)
+            {
+                Debug.LogError("Spawned prefab is missing the Player component!");
+                return;
+            }
+
+            playerScript.InitializeFromData(args);           // Set stats and metadata
+            Debug.Log($"Spawned player '{args.UserName}' at position {args.Position}");
         }
     }
 }

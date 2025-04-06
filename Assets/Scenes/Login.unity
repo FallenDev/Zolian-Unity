@@ -4407,6 +4407,8 @@ MonoBehaviour:
   SteamId: 0
   WorldPort: 4202
   UserName: 
+  PlayerPrefab: {fileID: 4951117415078265363, guid: 1514ec4d684faa843ae4add76046a7e1,
+    type: 3}
 --- !u!1 &551126709
 GameObject:
   m_ObjectHideFlags: 0
