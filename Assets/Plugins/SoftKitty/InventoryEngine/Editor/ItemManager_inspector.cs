@@ -19,6 +19,7 @@ namespace SoftKitty.InventoryEngine
         bool _upgradeExpand = false;
         bool _itemExpand = false;
         bool _socketingExpand = false;
+        int _newAttSel = 0;
         Color _activeColor = new Color(0.1F, 0.3F, 0.5F);
         Color _disableColor = new Color(0F, 0.1F, 0.3F);
         Color _activeColor2 = new Color(0.3F, 0.25F, 0.5F);
@@ -67,6 +68,10 @@ namespace SoftKitty.InventoryEngine
                 Texture copyIcon = (Texture)AssetDatabase.LoadAssetAtPath(_thePath + "copy.png", typeof(Texture));
                 Texture pasteIcon = (Texture)AssetDatabase.LoadAssetAtPath(_thePath + "paste.png", typeof(Texture));
                 Texture resetIcon = (Texture)AssetDatabase.LoadAssetAtPath(_thePath + "reset.png", typeof(Texture));
+                Texture visibleIcon0 = (Texture)AssetDatabase.LoadAssetAtPath(_thePath + "visible0.png", typeof(Texture));
+                Texture visibleIcon1 = (Texture)AssetDatabase.LoadAssetAtPath(_thePath + "visible1.png", typeof(Texture));
+                Texture upIcon = (Texture)AssetDatabase.LoadAssetAtPath(_thePath + "Up.png", typeof(Texture));
+                Texture downIcon = (Texture)AssetDatabase.LoadAssetAtPath(_thePath + "Down.png", typeof(Texture));
                 GUILayout.BeginHorizontal();
                 GUILayout.Box(logoIcon);
                 GUILayout.EndHorizontal();
@@ -162,6 +167,10 @@ namespace SoftKitty.InventoryEngine
                 string[] _currencyOption = new string[myTarget.currencies.Count];
                 for (int i = 0; i < myTarget.currencies.Count; i++) _currencyOption[i] = myTarget.currencies[i].name;
 
+                string[] _attFormatOption = new string[2];
+                _attFormatOption[0] = "+";
+                _attFormatOption[1] = ":";
+
                 GUILayout.BeginHorizontal();
                 EditorGUILayout.HelpBox("You must have this prefab in your scene as a database to access it. " +
                     "This prefab will not be destroyed when switching scenes, and its script will prevent duplication.", MessageType.Info,true);
@@ -227,7 +236,32 @@ namespace SoftKitty.InventoryEngine
                 if (_generalExpand) {
                     GUILayout.BeginHorizontal();
                     GUILayout.Space(30);
-                    GUILayout.Label("Merchant interface style:",GUILayout.Width(150));
+                    GUILayout.Label(new GUIContent("Canvas GameObject Tag:", "[Optional] Specify the tag of your main Canvas GameObject. This ensures the system finds the correct canvas, especially in scenes with multiple canvases."),GUILayout.Width(160));
+                    GUILayout.Space(10);
+                    myTarget.CanvasTag = GUILayout.TextField(myTarget.CanvasTag,GUILayout.Width(120));
+                    if (GUILayout.Button("X",GUILayout.Width(30))) {
+                        myTarget.CanvasTag = "";
+                        EditorGUI.FocusTextInControl(null);
+                        _valueChanged = true;
+
+                    }
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    EditorGUILayout.HelpBox("[Optional] Specify the tag of your main Canvas GameObject. This ensures the system finds the correct canvas, especially in scenes with multiple canvases.", MessageType.Info, true);
+                    GUILayout.EndHorizontal();
+
+                    EditorGUILayout.Separator();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    myTarget.AllowDropItem = GUILayout.Toggle(myTarget.AllowDropItem, "Allow player drop item by dragging out of the window.");
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    GUILayout.Label("Merchant interface style:",GUILayout.Width(160));
                     GUILayout.Space(10);
                     string[] _styleNames = new string[2] { "Simple Style","DOS Style"};
                     int _style = myTarget.MerchantStyle;
@@ -251,6 +285,133 @@ namespace SoftKitty.InventoryEngine
                     GUILayout.EndHorizontal();
 
                     EditorGUILayout.Separator();
+
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    int _keySel = 0;
+                    for (int i = 0; i < myTarget.itemAttributes.Count; i++)
+                    {
+                        if (myTarget.itemAttributes[i].key == myTarget.NameAttributeKey) _keySel = i;
+                    }
+                    GUILayout.Label(new GUIContent("Character Name Attribute:", "Select the attribute you've created to represent the character's name. Ensure it's a string value, with no visibility options enabled, and added to the Player/NPC's Base Stats in the InventoryHolder."), GUILayout.Width(200));
+                    GUI.backgroundColor = _attColor;
+                    EditorGUI.BeginChangeCheck();
+                    _keySel = EditorGUILayout.Popup(_keySel, _attOptions, GUILayout.Width(100F));
+                    if (EditorGUI.EndChangeCheck()) myTarget.NameAttributeKey = myTarget.itemAttributes[_keySel].key;
+                    GUI.backgroundColor = Color.white;
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    EditorGUILayout.HelpBox("Select the attribute you've created to represent the character's name. Ensure it's a string value, with no visibility options enabled, and added to the Player/NPC's Base Stats in the InventoryHolder.", MessageType.Info,true);
+                    GUILayout.EndHorizontal();
+
+                    EditorGUILayout.Separator();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    _keySel = 0;
+                    for (int i = 0; i < myTarget.itemAttributes.Count; i++)
+                    {
+                        if (myTarget.itemAttributes[i].key == myTarget.LevelAttributeKey) _keySel = i;
+                    }
+                    GUILayout.Label(new GUIContent("Character Level Attribute:", "Select the attribute you've created to represent the character's level. Ensure no visibility options enabled, and added to the Player/NPC's Base Stats in the InventoryHolder."), GUILayout.Width(200));
+                    GUI.backgroundColor = _attColor;
+                    EditorGUI.BeginChangeCheck();
+                    _keySel = EditorGUILayout.Popup(_keySel, _attOptions, GUILayout.Width(100F));
+                    if (EditorGUI.EndChangeCheck()) myTarget.LevelAttributeKey = myTarget.itemAttributes[_keySel].key;
+                    GUI.backgroundColor = Color.white;
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    EditorGUILayout.HelpBox("Select the attribute you've created to represent the character's level. Ensure no visibility options enabled, and added to the Player/NPC's Base Stats in the InventoryHolder.", MessageType.Info, true);
+                    GUILayout.EndHorizontal();
+
+                    EditorGUILayout.Separator();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    _keySel = 0;
+                    for (int i = 0; i < myTarget.itemAttributes.Count; i++)
+                    {
+                        if (myTarget.itemAttributes[i].key == myTarget.XpAttributeKey) _keySel = i;
+                    }
+                    GUILayout.Label(new GUIContent("Character XP Attribute:", "Select the attribute you've created to represent the character's XP points. Ensure no visibility options enabled, and added to the Player/NPC's Base Stats in the InventoryHolder."), GUILayout.Width(200));
+                    GUI.backgroundColor = _attColor;
+                    EditorGUI.BeginChangeCheck();
+                    _keySel = EditorGUILayout.Popup(_keySel, _attOptions, GUILayout.Width(100F));
+                    if (EditorGUI.EndChangeCheck()) myTarget.XpAttributeKey = myTarget.itemAttributes[_keySel].key;
+                    GUI.backgroundColor = Color.white;
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    EditorGUILayout.HelpBox("Select the attribute you've created to represent the character's XP points. Ensure no visibility options enabled, and added to the Player/NPC's Base Stats in the InventoryHolder.", MessageType.Info, true);
+                    GUILayout.EndHorizontal();
+
+                    EditorGUILayout.Separator();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    _keySel = 0;
+                    for (int i = 0; i < myTarget.itemAttributes.Count; i++)
+                    {
+                        if (myTarget.itemAttributes[i].key == myTarget.MaxXpAttributeKey) _keySel = i;
+                    }
+                    GUILayout.Label(new GUIContent("Character Max XP Attribute:", "Select the attribute you've created to represent the character's Max XP points. Ensure no visibility options enabled, and added to the Player/NPC's Base Stats in the InventoryHolder."), GUILayout.Width(200));
+                    GUI.backgroundColor = _attColor;
+                    EditorGUI.BeginChangeCheck();
+                    _keySel = EditorGUILayout.Popup(_keySel, _attOptions, GUILayout.Width(100F));
+                    if (EditorGUI.EndChangeCheck()) myTarget.MaxXpAttributeKey = myTarget.itemAttributes[_keySel].key;
+                    GUI.backgroundColor = Color.white;
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    EditorGUILayout.HelpBox("Select the attribute you've created to represent the character's Max XP points. Ensure no visibility options enabled, and added to the Player/NPC's Base Stats in the InventoryHolder.", MessageType.Info, true);
+                    GUILayout.EndHorizontal();
+
+                    EditorGUILayout.Separator();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    _keySel = 0;
+                    for (int i = 0; i < myTarget.itemAttributes.Count; i++)
+                    {
+                        if (myTarget.itemAttributes[i].key == myTarget.CoolDownAttributeKey) _keySel = i;
+                    }
+                    GUILayout.Label(new GUIContent("Item Cool Down Attribute:", "Select the numerical attribute you've created to represent cool down time. Ensure it's added to the items with cool down functionality."),GUILayout.Width(200));
+                    GUI.backgroundColor = _attColor;
+                    EditorGUI.BeginChangeCheck();
+                    _keySel=EditorGUILayout.Popup(_keySel,_attOptions,GUILayout.Width(100F));
+                    if (EditorGUI.EndChangeCheck()) myTarget.CoolDownAttributeKey = myTarget.itemAttributes[_keySel].key;
+                    GUI.backgroundColor = Color.white;
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    EditorGUILayout.HelpBox("Select the numerical attribute you've created to represent cool down time. Ensure it's added to the items with cool down functionality.", MessageType.Info, true);
+                    GUILayout.EndHorizontal();
+
+                    EditorGUILayout.Separator();
+
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    GUILayout.Label(new GUIContent("Shared Global Cool Down Time:", "Sets a global cool down. When any item/skill is used, all usable items/skills enter this shared cool down period."), GUILayout.Width(200));
+                    myTarget.SharedGlobalCoolDown = Mathf.RoundToInt( GUILayout.HorizontalSlider(myTarget.SharedGlobalCoolDown, 0F, 2F, GUILayout.Width(100F))*10F)*0.1F;
+                    GUILayout.Label(myTarget.SharedGlobalCoolDown.ToString("0.0")+" sec", GUILayout.Width(100));
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    EditorGUILayout.HelpBox("Sets a global cool down. When any item/skill is used, all usable items/skills enter this shared cool down period.", MessageType.Info, true);
+                    GUILayout.EndHorizontal();
+
+
+                    EditorGUILayout.Separator();
                     GUILayout.BeginHorizontal();
                     GUILayout.Space(30);
                     GUILayout.Label("Input Binding For Inventory Items:", GUILayout.Width(200));
@@ -264,6 +425,8 @@ namespace SoftKitty.InventoryEngine
                             _newSetting.mouseButton = MouseButtons.LeftClick;
                             _newSetting.function = ClickFunctions.Use;
                             myTarget.clickSettings.Add(_newSetting);
+                            EditorGUI.FocusTextInControl(null);
+                            _valueChanged = true;
                         }
                         GUI.backgroundColor = Color.white;
                     }
@@ -296,6 +459,8 @@ namespace SoftKitty.InventoryEngine
                         if (GUILayout.Button("X", GUILayout.Width(20)))
                         {
                             myTarget.clickSettings.RemoveAt(i);
+                            EditorGUI.FocusTextInControl(null);
+                            _valueChanged = true;
                         }
                         GUI.backgroundColor = Color.white;
                         GUILayout.EndHorizontal();
@@ -477,7 +642,7 @@ namespace SoftKitty.InventoryEngine
                 GUI.color = Color.white;
                 GUILayout.Label(_currencyExpand ? "[-]" : "[+]", GUILayout.Width(20));
                 if (GUILayout.Button(new GUIContent(" Currency Settings (" + myTarget.currencies.Count.ToString() + ")",
-                    "You can create as many currency types as needed. Each currency will have an index displayed as blue text at the front. When your script accesses the currency value of an InventoryHolder component, you¡¯ll need to call <InventoryHolder>().GetCurrency(int _type) using the index number as the parameter."
+                    "You can create as many currency types as needed. Each currency will have an index displayed as blue text at the front. When your script accesses the currency value of an <InventoryHolder> component, you¡¯ll need to call <InventoryHolder>().GetCurrency(int _type) using the index number as the parameter."
                     ), _titleButtonStyle))
                 {
                     _currencyExpand = !_currencyExpand;
@@ -492,7 +657,7 @@ namespace SoftKitty.InventoryEngine
                     GUILayout.BeginHorizontal();
                     GUI.backgroundColor = _activeColor;
                     GUILayout.Space(30);
-                    EditorGUILayout.HelpBox("You can create as many currency types as needed. Each currency will have an index displayed as blue text at the front. When your script accesses the currency value of an InventoryHolder component, you¡¯ll need to call <InventoryHolder>().GetCurrency(int _type) using the index number as the parameter. ", MessageType.Info, true);
+                    EditorGUILayout.HelpBox("You can create as many currency types as needed. Each currency will have an index displayed as blue text at the front. When your script accesses the currency value of an <InventoryHolder> component, you¡¯ll need to call <InventoryHolder>().GetCurrency(int _type) using the index number as the parameter. ", MessageType.Info, true);
                     GUILayout.Space(30);
                     GUILayout.EndHorizontal();
 
@@ -686,6 +851,36 @@ namespace SoftKitty.InventoryEngine
                             myTarget.itemAttributes[i].fold = !myTarget.itemAttributes[i].fold;
                             EditorGUI.FocusTextInControl(null);
                         }
+
+                        GUI.color = i > 0 ? Color.white : Color.gray;
+                        if (GUILayout.Button(new GUIContent(upIcon, "Move this attribute up."), _toolButtonStyle, GUILayout.Width(15)))
+                        {
+                            if (i > 0)
+                            {
+                                Attribute _mAtt = myTarget.itemAttributes[i].Copy();
+                                _mAtt.fold = false;
+                                myTarget.itemAttributes.RemoveAt(i);
+                                myTarget.itemAttributes.Insert(i - 1, _mAtt);
+                                EditorGUI.FocusTextInControl(null);
+                                myTarget.UpdatePrefab();
+                                return;
+                            }
+                        }
+                        GUI.color = i < myTarget.itemAttributes.Count - 1 ? Color.white : Color.gray;
+                        if (GUILayout.Button(new GUIContent(downIcon, "Move this attribute down."), _toolButtonStyle, GUILayout.Width(15)))
+                        {
+                            if (i < myTarget.itemAttributes.Count - 1)
+                            {
+                                Attribute _mAtt = myTarget.itemAttributes[i].Copy();
+                                _mAtt.fold = false;
+                                myTarget.itemAttributes.RemoveAt(i);
+                                myTarget.itemAttributes.Insert(i + 1, _mAtt);
+                                EditorGUI.FocusTextInControl(null);
+                                myTarget.UpdatePrefab();
+                                return;
+                            }
+                        }
+                        GUI.color = Color.white;
                         if (i > 0)
                         {
                             GUI.backgroundColor = Color.red;
@@ -744,9 +939,45 @@ namespace SoftKitty.InventoryEngine
 
                             GUILayout.BeginHorizontal();
                             GUILayout.Space(70);
-                            GUILayout.Label(new GUIContent("Visible:", "Determines whether the attribute is visible in the interface or hidden for backend use."), GUILayout.Width(130));
+                            GUILayout.Label(new GUIContent("Display Format:", "How this attribute displayed in the mouse hover infomation panel."), GUILayout.Width(130));
+                            myTarget.itemAttributes[i].displayFormat = EditorGUILayout.Popup(myTarget.itemAttributes[i].displayFormat, _attFormatOption, GUILayout.Width(50));
+                            GUILayout.Label(" Suffixes:",GUILayout.Width(60));
+                            myTarget.itemAttributes[i].suffixes = GUILayout.TextField(myTarget.itemAttributes[i].suffixes,GUILayout.Width(35));
+                            GUILayout.EndHorizontal();
+
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Space(90);
+                            GUILayout.Label("Preview:",GUILayout.Width(100));
+                            GUI.color = _buttonColor;
+                            GUILayout.Label(myTarget.itemAttributes[i].name+ " "+_attFormatOption[myTarget.itemAttributes[i].displayFormat]+" 5"+ myTarget.itemAttributes[i].suffixes);
+                            GUI.color = Color.white;
+                            GUILayout.EndHorizontal();
+
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Space(70);
+                            GUILayout.Label(new GUIContent("Core Attribute:", "Determines whether the attribute is displayed in bold font and ahead of other attributes."), GUILayout.Width(130));
+                            myTarget.itemAttributes[i].coreStats = EditorGUILayout.Toggle(myTarget.itemAttributes[i].coreStats, GUILayout.Width(150));
+                            GUILayout.EndHorizontal();
+
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Space(70);
+                            GUILayout.Label(new GUIContent("Compare Info:", "Whether display compare information for this attribute in mouse hover information panel."), GUILayout.Width(130));
+                            myTarget.itemAttributes[i].compareInfo = EditorGUILayout.Toggle(myTarget.itemAttributes[i].compareInfo, GUILayout.Width(150));
+                            GUILayout.EndHorizontal();
+
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Space(70);
+                            GUILayout.Label(new GUIContent("Visible in Hover Info:", "Determines whether the attribute is visible in the mouse hover information panel."), GUILayout.Width(130));
                             myTarget.itemAttributes[i].visible = EditorGUILayout.Toggle(myTarget.itemAttributes[i].visible, GUILayout.Width(150));
                             GUILayout.EndHorizontal();
+
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Space(70);
+                            GUILayout.Label(new GUIContent("Visible in Stats Panel:", "Determines whether the attribute is visible in the stats panel."), GUILayout.Width(130));
+                            myTarget.itemAttributes[i].visibleInStatsPanel = EditorGUILayout.Toggle(myTarget.itemAttributes[i].visibleInStatsPanel, GUILayout.Width(150));
+                            GUILayout.EndHorizontal();
+
+
 
                             if (EditorGUI.EndChangeCheck())
                             {
@@ -761,6 +992,11 @@ namespace SoftKitty.InventoryEngine
                                             myTarget.items[w].attributes[v].stringValue = myTarget.itemAttributes[i].stringValue;
                                             myTarget.items[w].attributes[v].upgradeIncrement = myTarget.itemAttributes[i].upgradeIncrement;
                                             myTarget.items[w].attributes[v].visible = myTarget.itemAttributes[i].visible;
+                                            myTarget.items[w].attributes[v].visibleInStatsPanel= myTarget.itemAttributes[i].visibleInStatsPanel;
+                                            myTarget.items[w].attributes[v].displayFormat = myTarget.itemAttributes[i].displayFormat;
+                                            myTarget.items[w].attributes[v].suffixes = myTarget.itemAttributes[i].suffixes;
+                                            myTarget.items[w].attributes[v].coreStats = myTarget.itemAttributes[i].coreStats;
+                                            myTarget.items[w].attributes[v].compareInfo = myTarget.itemAttributes[i].compareInfo;
                                         }
                                     }
                                 }
@@ -1249,7 +1485,7 @@ namespace SoftKitty.InventoryEngine
 
                             GUILayout.BeginHorizontal();
                             GUILayout.Space(30);
-                            GUILayout.Label(new GUIContent("Maxmium Enhancing Level:", "The maximum level an item can be enhanced."), GUILayout.Width(170));
+                            GUILayout.Label(new GUIContent("Maximum Enhancing Level:", "The maximum level an item can be enhanced."), GUILayout.Width(170));
                             myTarget.MaxiumEnhancingLevel = EditorGUILayout.IntSlider(myTarget.MaxiumEnhancingLevel, 1, 30, GUILayout.Width(180));
                             GUILayout.EndHorizontal();
 
@@ -1556,6 +1792,7 @@ namespace SoftKitty.InventoryEngine
                         //===Item List
                         GUILayout.BeginHorizontal();
                         GUILayout.Space(30);
+                        GUI.backgroundColor = _tagColor;
                         if (GUILayout.Button("Expand All", GUILayout.Width(80)))
                         {
                             for (int i = 0; i < myTarget.items.Count; i++) myTarget.items[i].fold = true;
@@ -1662,6 +1899,11 @@ namespace SoftKitty.InventoryEngine
 
                                 GUILayout.BeginHorizontal();
                                 GUILayout.Space(70);
+                                EditorGUILayout.HelpBox("Use <br> for new line, use {attribute key} for dynamic value of an attribute, for example: {atk}",MessageType.Info ,true);
+                                GUILayout.EndHorizontal();
+
+                                GUILayout.BeginHorizontal();
+                                GUILayout.Space(70);
                                 GUILayout.Label(new GUIContent("Category: ", "The category to which this item belongs."), GUILayout.Width(130));
                                 int _type = Mathf.Clamp(myTarget.items[i].type,0, myTarget.itemTypes.Count-1);
                                 GUI.color = myTarget.itemTypes[_type].color;
@@ -1690,7 +1932,7 @@ namespace SoftKitty.InventoryEngine
 
                                 GUILayout.BeginHorizontal();
                                 GUILayout.Space(70);
-                                GUILayout.Label(new GUIContent("Maxmium Stack:", "The maximum number of items that can stack in a single slot."), GUILayout.Width(130));
+                                GUILayout.Label(new GUIContent("Maximum Stack:", "The maximum number of items that can stack in a single slot."), GUILayout.Width(130));
                                 myTarget.items[i].maxiumStack = EditorGUILayout.IntField(myTarget.items[i].maxiumStack, GUILayout.Width(50));
                                 GUILayout.EndHorizontal();
 
@@ -1723,9 +1965,57 @@ namespace SoftKitty.InventoryEngine
 
                                 GUILayout.BeginHorizontal();
                                 GUILayout.Space(70);
-                                GUILayout.Label(new GUIContent("Useable:", "Toggle whether this item can be used via right-click or a key press on an action slot."), GUILayout.Width(130));
+                                GUILayout.Label(new GUIContent("Useable:", "Toggle whether this item can be used/equipped via right-click or a key press on an action slot."), GUILayout.Width(130));
                                 myTarget.items[i].useable = EditorGUILayout.Toggle(myTarget.items[i].useable);
                                 GUILayout.EndHorizontal();
+
+                                if (myTarget.items[i].useable) {
+                                    GUILayout.BeginHorizontal();
+                                    GUILayout.Space(70);
+                                    GUILayout.Label(new GUIContent("Use/Equip restriction:", "Player won't be able to use/equip this item if their stats not fulfill the below setting."), GUILayout.Width(130));
+                                    bool _useRestriction = EditorGUILayout.Toggle(myTarget.items[i].restrictionValue > 0 && myTarget.items[i].restrictionKey != "");
+                                    GUILayout.EndHorizontal();
+
+                                    
+                                    if (_useRestriction)
+                                    {
+                                        if (myTarget.items[i].restrictionValue < 1) myTarget.items[i].restrictionValue = 1;
+                                        if (myTarget.items[i].restrictionKey == "") myTarget.items[i].restrictionKey = myTarget.itemAttributes[0].key;
+                                        GUILayout.BeginHorizontal();
+                                        GUILayout.Space(90);
+                                        int _sel = 0;
+                                        string _attName = "";
+                                        for (int x = 0; x < myTarget.itemAttributes.Count; x++)
+                                        {
+                                            if (myTarget.itemAttributes[x].key == myTarget.items[i].restrictionKey)
+                                            {
+                                                _sel = x;
+                                                _attName = myTarget.itemAttributes[x].name;
+                                                break;
+                                            }
+                                        }
+                                        GUI.backgroundColor = _attColor;
+                                        EditorGUI.BeginChangeCheck();
+                                        _sel = EditorGUILayout.Popup("", _sel, _attOptions, GUILayout.Width(70));
+                                        if (EditorGUI.EndChangeCheck())
+                                        {
+                                            myTarget.items[i].restrictionKey = myTarget.itemAttributes[_sel].key;
+                                        }
+                                        GUILayout.Label(">=", GUILayout.Width(30));
+                                        myTarget.items[i].restrictionValue = EditorGUILayout.IntField(myTarget.items[i].restrictionValue, GUILayout.Width(50));
+                                        GUILayout.EndHorizontal();
+                                        GUI.backgroundColor = Color.white;
+                                        GUILayout.BeginHorizontal();
+                                        GUILayout.Space(90);
+                                        EditorGUILayout.HelpBox("Player/NPC won't be able to use/equip this item if their "+ _attName +" is less than "+ myTarget.items[i].restrictionValue.ToString(),MessageType.Info,true);
+                                        GUILayout.EndHorizontal();
+                                    }
+                                    else
+                                    {
+                                        myTarget.items[i].restrictionValue = 0;
+                                        myTarget.items[i].restrictionKey = "";
+                                    }
+                                }
 
                                 GUILayout.BeginHorizontal();
                                 GUILayout.Space(70);
@@ -1753,22 +2043,15 @@ namespace SoftKitty.InventoryEngine
 
                                 GUILayout.BeginHorizontal();
                                 GUILayout.Space(70);
-                                GUILayout.Label(new GUIContent("Attributes: (" + myTarget.items[i].attributes.Count + ")", " The attributes of this item. Access the attributes using <InventoryHolder>().GetAttributeValue(key)."), GUILayout.Width(130));
+                                GUILayout.Label(new GUIContent("Attributes: (" + myTarget.items[i].attributes.Count + ")", " The attributes of this item. Access the attributes using <InventoryHolder>().GetAttributeValue(key)."), GUILayout.Width(160));
                                 GUI.color = Color.white;
-
-                                GUI.backgroundColor = _buttonColor;
-                                if (GUILayout.Button(new GUIContent("+", "Add a new attribute."), GUILayout.Width(30)))
-                                {
-                                    myTarget.items[i].attributes.Add(myTarget.itemAttributes[0].Copy());
-                                    myTarget.items[i].attributes[myTarget.items[i].attributes.Count - 1].value = "0";
-                                    _valueChanged = true;
-                                    EditorGUI.FocusTextInControl(null);
-                                }
-                                GUI.backgroundColor = _backgroundColor;
 
                                 if (GUILayout.Button(new GUIContent(copyIcon, "Copy the settings of the attributes"), _toolButtonStyle, GUILayout.Width(25)))
                                 {
-                                    ClipboardAttributeList = myTarget.items[i].attributes;
+                                    ClipboardAttributeList = new List<Attribute>();
+                                    for (int x=0;x< myTarget.items[i].attributes.Count;x++) {
+                                        ClipboardAttributeList.Add(myTarget.items[i].attributes[x].Copy());
+                                    }
                                 }
                                 if (GUILayout.Button(new GUIContent(pasteIcon, "Paste the settings of the attributes"), _toolButtonStyle, GUILayout.Width(25)))
                                 {
@@ -1790,33 +2073,126 @@ namespace SoftKitty.InventoryEngine
                                     EditorGUI.FocusTextInControl(null);
                                 }
 
+                                List<string> _mAttList = new List<string>();
+                                int _randomStats = 0;
+                                foreach (var obj in myTarget.items[i].attributes) {
+                                    if (!_mAttList.Contains(obj.key)) _mAttList.Add(obj.key);
+                                    if (!obj.isFixed) _randomStats ++;
+                                }
                                 GUILayout.EndHorizontal();
+
+                                List<string> _attOptionsList = new List<string>();
+                              
+                                foreach (var obj in myTarget.itemAttributes)
+                                {
+                                    if (!_mAttList.Contains(obj.key)) _attOptionsList.Add(obj.key);
+                                }
+
+                                if (_randomStats>0)
+                                {
+                                    GUILayout.BeginHorizontal();
+                                    GUILayout.Space(90);
+                                    GUILayout.Label(new GUIContent("Maximum non-static attributes: ", "The maximum number of non-static extra attributes this item can have."), GUILayout.Width(200));
+                                    myTarget.items[i].maximumRandomAttributes = EditorGUILayout.IntSlider(myTarget.items[i].maximumRandomAttributes, 1, _randomStats, GUILayout.Width(160));
+                                    GUILayout.Label("/"+ _randomStats.ToString(), GUILayout.Width(30));
+                                    GUILayout.EndHorizontal();
+
+                                    GUILayout.BeginHorizontal();
+                                    GUILayout.Space(70);
+                                    EditorGUILayout.HelpBox("When an item is generated, it's assigned its static attributes, as defined by the 'Static' checkbox. " +
+                                        "In addition, it may receive a random number of dynamic, non-static attributes. The chance of receiving each non-static attribute is configurable. " +
+                                        "The specific values of these dynamic attributes are then randomized between the minimum and maximum values you set.", MessageType.Info, true);
+                                    GUILayout.EndHorizontal();
+                                }
+
+                                if (_attOptionsList.Count > 0)
+                                {
+                                    GUILayout.BeginHorizontal();
+                                    GUILayout.Space(90);
+                                    GUI.color = _buttonColor;
+                                    GUILayout.Label("New: ", GUILayout.Width(40));
+                                    GUI.color = Color.white;
+                                    List<string> _allAtt = new List<string>(_attOptions);
+                                    _newAttSel = Mathf.Clamp(_newAttSel, 0, _attOptionsList.Count-1);
+                                    GUI.backgroundColor = _attColor;
+                                    _newAttSel = EditorGUILayout.Popup("", _newAttSel, _attOptionsList.ToArray(), GUILayout.Width(100));
+                                    GUI.backgroundColor = _buttonColor;
+                                    if (GUILayout.Button("Add", GUILayout.Width(80)))
+                                    {
+                                        Attribute _newAttribute = myTarget.itemAttributes[_allAtt.IndexOf(_attOptionsList[_newAttSel])].Copy();
+                                        if (_newAttribute.stringValue)
+                                            _newAttribute.value = "";
+                                        else
+                                            _newAttribute.value = "0";
+                                        myTarget.items[i].attributes.Add(_newAttribute);
+                                        EditorGUI.FocusTextInControl(null);
+                                        _valueChanged = true;
+                                    }
+                                    GUI.backgroundColor = Color.white;
+                                    GUILayout.EndHorizontal();
+                                }
+
+                               
+
                                 for (int u = 0; u < myTarget.items[i].attributes.Count; u++)
                                 {
                                     GUILayout.BeginHorizontal();
                                     GUILayout.Space(90);
-                                    int _sel = 0;
-                                    for (int x = 0; x < myTarget.itemAttributes.Count; x++)
+
+                                    GUILayout.Box(myTarget.items[i].attributes[u].visible ? visibleIcon0 : visibleIcon1, GUILayout.Width(20), GUILayout.Height(20));
+
+                                    GUI.color = _attColor;
+                                    GUILayout.Box(new GUIContent( myTarget.items[i].attributes[u].name,"Script Key: "+ myTarget.items[i].attributes[u].key), _titleButtonStyle, GUILayout.Width(100));
+                                    GUI.color = Color.white;
+                                    GUILayout.Label(" :", GUILayout.Width(15));
+                                    if (myTarget.items[i].attributes[u].stringValue)
                                     {
-                                        if (myTarget.itemAttributes[x].key == myTarget.items[i].attributes[u].key)
+                                        myTarget.items[i].attributes[u].value = EditorGUILayout.TextField(myTarget.items[i].attributes[u].value, GUILayout.Width(122)).ToString();
+                                    }
+                                    else if (myTarget.items[i].attributes[u].isFixed)
+                                    {
+                                        myTarget.items[i].attributes[u].value = EditorGUILayout.FloatField(float.Parse(myTarget.items[i].attributes[u].value), GUILayout.Width(122)).ToString();
+                                        myTarget.items[i].attributes[u].minValue = float.Parse(myTarget.items[i].attributes[u].value);
+                                        myTarget.items[i].attributes[u].maxValue = float.Parse(myTarget.items[i].attributes[u].value);
+                                    }
+                                    else
+                                    {
+                                        myTarget.items[i].attributes[u].minValue = EditorGUILayout.FloatField(myTarget.items[i].attributes[u].minValue, GUILayout.Width(50));
+                                        GUILayout.Label("~",GUILayout.Width(15));
+                                        myTarget.items[i].attributes[u].maxValue = EditorGUILayout.FloatField(myTarget.items[i].attributes[u].maxValue, GUILayout.Width(50));
+                                        myTarget.items[i].attributes[u].value = myTarget.items[i].attributes[u].minValue.ToString();
+                                    }
+                                    
+                                    GUI.backgroundColor = Color.white;
+                                    myTarget.items[i].attributes[u].isFixed = GUILayout.Toggle(myTarget.items[i].attributes[u].isFixed, new GUIContent("Static", "Whether this attribute is Static"), GUILayout.Width(55));
+
+                                    GUI.color = u > 0 ? Color.white : Color.gray;
+                                    if (GUILayout.Button(new GUIContent(upIcon, "Move this attribute up."), _toolButtonStyle, GUILayout.Width(15)))
+                                    {
+                                        if (u > 0)
                                         {
-                                            _sel = x;
-                                            break;
+                                            Attribute _mAtt = myTarget.items[i].attributes[u].Copy();
+                                            myTarget.items[i].attributes.RemoveAt(u);
+                                            myTarget.items[i].attributes.Insert(u-1,_mAtt);
+                                            EditorGUI.FocusTextInControl(null);
+                                            myTarget.UpdatePrefab();
+                                            return;
                                         }
                                     }
-                                    GUI.backgroundColor = _attColor;
-                                    GUILayout.Label(">", GUILayout.Width(15));
-                                    EditorGUI.BeginChangeCheck();
-                                    _sel = EditorGUILayout.Popup("", _sel, _attOptions, GUILayout.Width(100));
-                                    if (EditorGUI.EndChangeCheck())
+                                    GUI.color = u < myTarget.items[i].attributes.Count-1 ? Color.white : Color.gray;
+                                    if (GUILayout.Button(new GUIContent(downIcon, "Move this attribute down."), _toolButtonStyle,GUILayout.Width(15)))
                                     {
-                                        string _value = myTarget.items[i].attributes[u].value;
-                                        myTarget.items[i].attributes[u] = myTarget.itemAttributes[_sel].Copy();
-                                        myTarget.items[i].attributes[u].value = _value;
+                                        if (u < myTarget.items[i].attributes.Count - 1)
+                                        {
+                                            Attribute _mAtt = myTarget.items[i].attributes[u].Copy();
+                                            myTarget.items[i].attributes.RemoveAt(u);
+                                            myTarget.items[i].attributes.Insert(u + 1, _mAtt);
+                                            EditorGUI.FocusTextInControl(null);
+                                            myTarget.UpdatePrefab();
+                                            return;
+                                        }
                                     }
 
-                                    GUILayout.Label(" :", GUILayout.Width(15));
-                                    myTarget.items[i].attributes[u].value = EditorGUILayout.FloatField(float.Parse(myTarget.items[i].attributes[u].value), GUILayout.Width(60)).ToString();
                                     GUI.backgroundColor = Color.red;
                                     GUI.color = Color.white;
                                     if (GUILayout.Button(new GUIContent("X","Delete this attribute."), GUILayout.Width(30)))
@@ -1829,6 +2205,15 @@ namespace SoftKitty.InventoryEngine
                                     GUI.backgroundColor = _backgroundColor;
 
                                     GUILayout.EndHorizontal();
+
+                                    if (!myTarget.items[i].attributes[u].isFixed)
+                                    {
+                                        GUILayout.BeginHorizontal();
+                                        GUILayout.Space(110);
+                                        myTarget.items[i].attributes[u].randomChange = Mathf.FloorToInt(GUILayout.HorizontalSlider(myTarget.items[i].attributes[u].randomChange, 1, 100, GUILayout.Width(60)));
+                                        GUILayout.Label(myTarget.items[i].attributes[u].randomChange.ToString() + "% chance to have this extra attribute.", GUILayout.Width(250));
+                                        GUILayout.EndHorizontal();
+                                    }
                                 }
 
                                 GUILayout.BeginHorizontal();
@@ -2081,6 +2466,56 @@ namespace SoftKitty.InventoryEngine
                                     }
 
                                    
+                                }
+
+                                GUILayout.BeginHorizontal();
+                                GUILayout.Space(70);
+                                GUILayout.Label(new GUIContent("Custom Data: (" + myTarget.items[i].customData.Count + ")", "Setup custom data for audio clips,prefabs,images,etc"), GUILayout.Width(130));
+                                if (myTarget.items[i].customData.Count < 4)
+                                {
+                                    GUI.backgroundColor = _buttonColor;
+                                    if (GUILayout.Button(new GUIContent("+", "Add a new custom data"), GUILayout.Width(30)))
+                                    {
+                                        myTarget.items[i].customData.Add(new CustomField() { key= "Custom" + myTarget.items[i].customData.Count.ToString(),value = null });
+                                        _valueChanged = true;
+                                        EditorGUI.FocusTextInControl(null);
+                                    }
+                                    GUI.backgroundColor = _backgroundColor;
+                                }
+                                if (GUILayout.Button(new GUIContent(resetIcon, "Reset the settings of the custom data"), _toolButtonStyle, GUILayout.Width(25)))
+                                {
+                                    myTarget.items[i].customData.Clear();
+                                    _valueChanged = true;
+                                    EditorGUI.FocusTextInControl(null);
+                                }
+                                GUILayout.EndHorizontal();
+                                GUILayout.BeginHorizontal();
+                                GUILayout.Space(70);
+                                EditorGUILayout.HelpBox("You can attach custom data of any Object type to items, identified by unique string keys.\n" +
+                                    "Use the item.GetCustomData(string _key) function to retrieve this data at any time.", MessageType.Info, true);
+                                GUILayout.EndHorizontal();
+
+                                for (int u = 0; u < myTarget.items[i].customData.Count; u++)
+                                {
+                                    GUILayout.BeginHorizontal();
+                                    GUILayout.Space(90);
+                                    GUI.backgroundColor = _matColor;
+                                    GUILayout.Label(">", GUILayout.Width(15));
+                                    GUILayout.Label("Key:",GUILayout.Width(30));
+                                    myTarget.items[i].customData[u].key = GUILayout.TextField(myTarget.items[i].customData[u].key,GUILayout.Width(80));
+
+                                    GUILayout.Label("Data:", GUILayout.Width(40));
+                                    myTarget.items[i].customData[u].value = EditorGUILayout.ObjectField(myTarget.items[i].customData[u].value,typeof(Object),false, GUILayout.Width(150));
+                                    GUI.backgroundColor = Color.red;
+                                    GUI.color = Color.white;
+                                    if (GUILayout.Button(new GUIContent("X", "Remove this custom data."), GUILayout.Width(30)))
+                                    {
+                                        myTarget.items[i].customData.RemoveAt(u);
+                                        _valueChanged = true;
+                                        EditorGUI.FocusTextInControl(null);
+                                    }
+                                    GUI.backgroundColor = _backgroundColor;
+                                    GUILayout.EndHorizontal();
                                 }
 
                                 EditorGUILayout.Separator();

@@ -211,11 +211,31 @@ namespace SoftKitty.InventoryEngine
                         _socketedItems.AddRange(Stacks[i].Item.socketedItems);
                         List<int> _enchantments = new List<int>();
                         _enchantments.AddRange(Stacks[i].Item.enchantments);
+                        Dictionary<string, bool> _attLock = new Dictionary<string, bool>();
+                        Dictionary<string, string> _attValue = new Dictionary<string, string>();
+                        foreach (var obj in Stacks[i].Item.attributes) {
+                            if (!_attLock.ContainsKey(obj.key))
+                            {
+                                _attLock.Add(obj.key, obj.locked);
+                                _attValue.Add(obj.key, obj.value);
+                            } 
+                        }
                         Stacks[i].Item = ItemManager.TryGetItem(_uid).Copy();
                         Stacks[i].Item.upgradeLevel = _level;
                         Stacks[i].Item.socketingSlots = _socketingCount;
                         Stacks[i].Item.socketedItems = _socketedItems;
                         Stacks[i].Item.enchantments = _enchantments;
+                        foreach (var obj in Stacks[i].Item.attributes)
+                        {
+                            if (_attLock.ContainsKey(obj.key))
+                            {
+                                obj.locked = _attLock[obj.key];
+                                obj.value= _attValue[obj.key];
+                                _attLock.Remove(obj.key);
+                            }
+                        }
+                        _attLock.Clear();
+                        _attValue.Clear();
                     }
                     else
                     {
@@ -236,11 +256,32 @@ namespace SoftKitty.InventoryEngine
                         _socketedItems.AddRange(HiddenStacks[i].Item.socketedItems);
                         List<int> _enchantments = new List<int>();
                         _enchantments.AddRange(HiddenStacks[i].Item.enchantments);
+                        Dictionary<string, bool> _attLock = new Dictionary<string, bool>();
+                        Dictionary<string, string> _attValue = new Dictionary<string, string>();
+                        foreach (var obj in HiddenStacks[i].Item.attributes)
+                        {
+                            if (!_attLock.ContainsKey(obj.key))
+                            {
+                                _attLock.Add(obj.key, obj.locked);
+                                _attValue.Add(obj.key, obj.value);
+                            }
+                        }
                         HiddenStacks[i].Item = ItemManager.TryGetItem(_uid).Copy();
                         HiddenStacks[i].Item.upgradeLevel = _level;
                         HiddenStacks[i].Item.socketingSlots = _socketingCount;
                         HiddenStacks[i].Item.socketedItems = _socketedItems;
                         HiddenStacks[i].Item.enchantments = _enchantments;
+                        foreach (var obj in HiddenStacks[i].Item.attributes)
+                        {
+                            if (_attLock.ContainsKey(obj.key))
+                            {
+                                obj.locked = _attLock[obj.key];
+                                obj.value = _attValue[obj.key];
+                                _attLock.Remove(obj.key);
+                            }
+                        }
+                        _attLock.Clear();
+                        _attValue.Clear();
                     }
                     else
                     {
@@ -305,7 +346,7 @@ namespace SoftKitty.InventoryEngine
                     {
                         RemoveItem(Mathf.FloorToInt(_materials[i].x), Mathf.FloorToInt(_materials[i].y));
                     }
-                    AddItem(ItemManager.itemDic[_itemId].Copy(), 1);
+                    AddItem(new Item(_itemId,true,true), 1);
                     mCraftedItemNumber++;
                     mCraftingFailed = false;
                 }
@@ -509,7 +550,7 @@ namespace SoftKitty.InventoryEngine
         }
 
         /// <summary>
-        /// Get the base stats value by the attribute ScriptKey.
+        /// Retrieves the base stats value by the attribute ScriptKey.
         /// </summary>
         /// <param name="_key"></param>
         /// <returns></returns>
@@ -520,16 +561,73 @@ namespace SoftKitty.InventoryEngine
             }
             return 0F;
         }
+        /// <summary>
+        /// Retrieves the base stats string value by the attribute ScriptKey.
+        /// </summary>
+        /// <param name="_key"></param>
+        /// <returns></returns>
+        public string GetBaseStatsString(string _key)
+        {
+            foreach (var obj in BaseStats)
+            {
+                if (obj.key == _key) return obj.GetString();
+            }
+            return "";
+        }
+
+        /// <summary>
+        /// Override the base stats value by the attribute ScriptKey.
+        /// </summary>
+        /// <param name="_key"></param>
+        /// <param name="_value"></param>
+        public void SetBaseStatsValue(string _key,string _value)
+        {
+            foreach (var obj in BaseStats)
+            {
+                if (obj.key == _key) obj.UpdateValue(_value);
+            }
+        }
+        /// <summary>
+        /// Set the base stats value by the attribute ScriptKey.
+        /// </summary>
+        /// <param name="_key"></param>
+        /// <param name="_value"></param>
+        public void SetBaseStatsValue(string _key, int _value)
+        {
+            foreach (var obj in BaseStats)
+            {
+                if (obj.key == _key) obj.UpdateValue(_value);
+            }
+        }
+        /// <summary>
+        /// Set the base stats value by the attribute ScriptKey.
+        /// </summary>
+        /// <param name="_key"></param>
+        /// <param name="_value"></param>
+        public void SetBaseStatsValue(string _key, float _value)
+        {
+            foreach (var obj in BaseStats)
+            {
+                if (obj.key == _key) obj.UpdateValue(_value);
+            }
+        }
 
 
         /// <summary>
-        /// Retrieves the total value of an attribute by its ScriptKey from all equipped items.
+        /// Retrieves the total value of an attribute by its ScriptKey from all equipped items and the base stats.
         /// </summary>
         /// <param name="_attributeKey"></param>
         /// <returns></returns>
-        public float GetAttributeValue(string _attributeKey)
+        public float GetAttributeValue(string _attributeKey,bool _includeBaseStats=false)
         {
             float _value = 0F;
+            if (_includeBaseStats)
+            {
+                foreach (var obj in BaseStats)
+                {
+                    if (obj.key == _attributeKey && obj.isNumber()) _value += obj.GetFloat();
+                }
+            }
             for (int i = 0; i < Stacks.Count; i++)
             {
                 if (!Stacks[i].isEmpty())
@@ -729,6 +827,8 @@ namespace SoftKitty.InventoryEngine
                     _saveItems[i].enchantments = new int[0];
                     _saveItems[i].socketedItem = new int[0];
                     _saveItems[i].number = 0;
+                    _saveItems[i].attributeLock = new bool[0];
+                    _saveItems[i].attributeValue = new string[0];
                     _saveItems[i].fav = false;
                 }
                 else
@@ -738,6 +838,13 @@ namespace SoftKitty.InventoryEngine
                     _saveItems[i].enchantments= Stacks[i].Item.enchantments.ToArray();
                     _saveItems[i].socketedItem = Stacks[i].Item.socketedItems.ToArray();
                     _saveItems[i].number = Stacks[i].Number;
+                    _saveItems[i].attributeLock = new bool[Stacks[i].Item.attributes.Count];
+                    _saveItems[i].attributeValue = new string[Stacks[i].Item.attributes.Count];
+                    for (int u = 0; u < Stacks[i].Item.attributes.Count; u++)
+                    {
+                        _saveItems[i].attributeLock[u] = Stacks[i].Item.attributes[u].locked;
+                        _saveItems[i].attributeValue[u] = Stacks[i].Item.attributes[u].value;
+                    }
                     _saveItems[i].fav = Stacks[i].Item.favorite;
                 }
             }
@@ -752,6 +859,8 @@ namespace SoftKitty.InventoryEngine
                     _hiddenItems[i].enchantments = new int[0];
                     _hiddenItems[i].socketedItem = new int[0];
                     _hiddenItems[i].number = 0;
+                    _hiddenItems[i].attributeLock = new bool[0];
+                    _hiddenItems[i].attributeValue = new string[0];
                     _hiddenItems[i].fav = false;
                 }
                 else
@@ -761,6 +870,13 @@ namespace SoftKitty.InventoryEngine
                     _hiddenItems[i].enchantments = HiddenStacks[i].Item.enchantments.ToArray();
                     _hiddenItems[i].socketedItem = HiddenStacks[i].Item.socketedItems.ToArray();
                     _hiddenItems[i].number = HiddenStacks[i].Number;
+                    _hiddenItems[i].attributeLock = new bool[HiddenStacks[i].Item.attributes.Count];
+                    _hiddenItems[i].attributeValue = new string[HiddenStacks[i].Item.attributes.Count];
+                    for (int u = 0; u < HiddenStacks[i].Item.attributes.Count; u++)
+                    {
+                        _hiddenItems[i].attributeLock[u] = HiddenStacks[i].Item.attributes[u].locked;
+                        _hiddenItems[i].attributeValue[u] = HiddenStacks[i].Item.attributes[u].value;
+                    }
                     _hiddenItems[i].fav = HiddenStacks[i].Item.favorite;
                 }
             }
@@ -850,32 +966,16 @@ namespace SoftKitty.InventoryEngine
         /// Captures a snapshot of the current data state of this InventoryHolder. You can revert to this snapshot later if needed.
         /// </summary>
         /// <returns></returns>
-        public InventoryHolder GetSnapShot()
+        public InventorySnapShot GetSnapShot()
         {
-            InventoryHolder _holder = new InventoryHolder();
-            _holder.InventorySize = InventorySize;
-            _holder.MaxiumCarryWeight = MaxiumCarryWeight;
-            _holder.BuyPriceMultiplier = BuyPriceMultiplier;
-            _holder.SellPriceMultiplier = SellPriceMultiplier;
-            _holder._weight = _weight;
-            _holder.Stacks = new List<InventoryStack>();
-            _holder.HiddenStacks = new List<InventoryStack>();
-            for (int i=0;i<Stacks.Count;i++) {
-                _holder.Stacks.Add(Stacks[i].Copy());
-            }
-            for (int i = 0; i < HiddenStacks.Count; i++)
-            {
-                _holder.HiddenStacks.Add(HiddenStacks[i].Copy());
-            }
-            _holder.Currency = Currency.Copy();
-            return _holder;
+            return new InventorySnapShot(this);
         }
 
         /// <summary>
         /// Reverts all item data to the provided snapshot.
         /// </summary>
         /// <param name="_snapshot"></param>
-        public void RevertSnapShot(InventoryHolder _snapshot)
+        public void RevertSnapShot(InventorySnapShot _snapshot)
         {
             for (int i = 0; i < Stacks.Count; i++)
             {
@@ -886,6 +986,7 @@ namespace SoftKitty.InventoryEngine
                 HiddenStacks[i].Set(_snapshot.HiddenStacks[i]);
             }
             Currency = _snapshot.Currency.Copy();
+            _weight = _snapshot.Weight;
         }
 
         /// <summary>
@@ -1348,7 +1449,27 @@ namespace SoftKitty.InventoryEngine
         {
             if (ItemManager.itemDic.ContainsKey(_uid))
             {
+                if (Type == HolderType.PlayerInventory)
+                {
+                    if (!ItemManager.itemDic[_uid].AbleToUse(GetInventoryHolderByType(gameObject, HolderType.PlayerEquipment)))
+                    {
+                        if (ItemManager.instance.GetAtttibute(ItemManager.itemDic[_uid].restrictionKey)!=null) DynamicMsg.PopMsg("You can not use this item because of your " + ItemManager.instance.GetAtttibute(ItemManager.itemDic[_uid].restrictionKey).name + " is less than " + ItemManager.itemDic[_uid].restrictionValue + ".");
+                        return;
+                    }
+                }
+                else if (Type == HolderType.NpcInventory)
+                {
+                    if (!ItemManager.itemDic[_uid].AbleToUse(GetInventoryHolderByType(gameObject, HolderType.NpcEquipment)))
+                    {
+                        if (ItemManager.instance.GetAtttibute(ItemManager.itemDic[_uid].restrictionKey) != null) DynamicMsg.PopMsg("Can not use this item because of the " + ItemManager.instance.GetAtttibute(ItemManager.itemDic[_uid].restrictionKey).name + " is less than " + ItemManager.itemDic[_uid].restrictionValue + ".");
+                        return;
+                    }
+                }
+                if (!ItemManager.itemDic[_uid].useable) return;
+                if (ItemManager.itemDic[_uid].isCoolDown()) return;
                 int _count = ItemManager.itemDic[_uid].consumable?RemoveItem(_uid, _number, _index):1;
+                ItemManager.itemDic[_uid].SetCoolDownTimeStamp();
+                ItemManager.SetSharedGlobalCoolDown(ItemManager.instance.SharedGlobalCoolDown);
                 for (int i = 0; i < _count; i++)
                 {
                     if (mItemUseCallbacks != null)

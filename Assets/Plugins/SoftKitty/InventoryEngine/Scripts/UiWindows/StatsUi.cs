@@ -29,7 +29,7 @@ namespace SoftKitty.InventoryEngine
 
             for (int i = 0; i < ItemManager.instance.itemAttributes.Count; i++)
             {
-                if (ItemManager.instance.itemAttributes[i].visible && ItemManager.instance.itemAttributes[i].isNumber())
+                if (ItemManager.instance.itemAttributes[i].visibleInStatsPanel && ItemManager.instance.itemAttributes[i].isNumber())
                 {
                     float _currentValue = GetValue(ItemManager.instance.itemAttributes[i].key);
                     if (StatList[ItemManager.instance.itemAttributes[i].key].mValue != _currentValue)
@@ -43,7 +43,7 @@ namespace SoftKitty.InventoryEngine
                             StartCoroutine(PopStat(StatList[ItemManager.instance.itemAttributes[i].key].mTexts[1], Color.red));
                         }
                         StatList[ItemManager.instance.itemAttributes[i].key].mValue = _currentValue;
-                        StatList[ItemManager.instance.itemAttributes[i].key].mTexts[1].text = _currentValue.ToString();
+                        StatList[ItemManager.instance.itemAttributes[i].key].mTexts[1].text = _currentValue.ToString()+ ItemManager.instance.itemAttributes[i].suffixes;
                     }
                 }
             }
@@ -107,14 +107,14 @@ namespace SoftKitty.InventoryEngine
                 }
             }
             for(int i=0;i<ItemManager.instance.itemAttributes.Count;i++) {
-                if (ItemManager.instance.itemAttributes[i].visible && ItemManager.instance.itemAttributes[i].isNumber() && !StatList.ContainsKey(ItemManager.instance.itemAttributes[i].key))
+                if (ItemManager.instance.itemAttributes[i].visibleInStatsPanel && ItemManager.instance.itemAttributes[i].isNumber() && !StatList.ContainsKey(ItemManager.instance.itemAttributes[i].key))
                 {
                     GameObject _newStat = Instantiate(StatPrefab, StatPrefab.transform.parent);
                     _newStat.transform.localScale = Vector3.one;
                     _newStat.GetComponent<ListItem>().mTexts[0].text = ItemManager.instance.itemAttributes[i].name+" : ";
                     _newStat.SetActive(true);
                     _newStat.GetComponent<ListItem>().mValue = GetValue(ItemManager.instance.itemAttributes[i].key);
-                    _newStat.GetComponent<ListItem>().mTexts[1].text = GetValue(ItemManager.instance.itemAttributes[i].key).ToString();
+                    _newStat.GetComponent<ListItem>().mTexts[1].text = GetValue(ItemManager.instance.itemAttributes[i].key).ToString()+ ItemManager.instance.itemAttributes[i].suffixes;
                     StatList.Add(ItemManager.instance.itemAttributes[i].key,_newStat.GetComponent<ListItem>());
                 }
             }

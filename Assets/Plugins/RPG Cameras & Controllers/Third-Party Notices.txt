@@ -1,0 +1,12 @@
+Asset is governed by the Asset Store EULA; however, the following components are governed by the licenses indicated below:
+
+The Third-Party Assets folder contains various assets that are provided directly by other Asset Store publishers who agreed on a partnership with me, John Stairs. They all follow the same rules.
+
+These assets:
+- Are provided by their respective developers to be included directly inside this RPG Cameras & Controllers asset.
+- Can be used and modified for any project developed with this asset.
+- Can in no way be re-distributed.
+
+List of Partners:
+- Blink
+- NakedFighter

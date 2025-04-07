@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6c84c19482e854549a946cb7c6719918
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 145324
+  packageName: RPG Cameras & Controllers
+  packageVersion: 6.1.3
+  assetPath: Assets/RPG Cameras & Controllers/Third-Party Assets/Unity/3DGamekit/Art/Materials/Skybox/Clouds/Cloud_03_Mat.mat
+  uploadId: 740787

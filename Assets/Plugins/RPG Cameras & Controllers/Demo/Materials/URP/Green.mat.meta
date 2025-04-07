@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6e687144dfa871f49befc8832a5786f5
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 145324
+  packageName: RPG Cameras & Controllers
+  packageVersion: 6.1.3
+  assetPath: Assets/RPG Cameras & Controllers/Demo/Materials/URP/Green.mat
+  uploadId: 740787

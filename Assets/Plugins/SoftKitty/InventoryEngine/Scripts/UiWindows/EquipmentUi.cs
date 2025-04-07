@@ -34,7 +34,15 @@ namespace SoftKitty.InventoryEngine
             mInventoryHolder.RegisterItemUseCallback(OnInventoryItemClick);
             StatsScript.Init(_equipHolder, _equipHolder.BaseStats.ToArray());
             TitleText.text = _name.ToUpper();
-
+            if (ItemManager.instance.GetAtttibute(ItemManager.instance.LevelAttributeKey) !=null)
+            {
+                SetPlayerLevelText("Level . "+ Mathf.FloorToInt( _equipHolder.GetAttributeValue(ItemManager.instance.LevelAttributeKey,true)).ToString());
+            }
+            if (ItemManager.instance.GetAtttibute(ItemManager.instance.NameAttributeKey) != null)
+            {
+                SetPlayerName(_equipHolder.GetBaseStatsString(ItemManager.instance.NameAttributeKey));
+            }
+            LayoutRebuilder.ForceRebuildLayoutImmediate(PlayerNameText.transform.parent.GetComponent<RectTransform>());
             EquipSlotsDic.Clear();
             int _index = 0;
             List<string> Tags = new List<string>();

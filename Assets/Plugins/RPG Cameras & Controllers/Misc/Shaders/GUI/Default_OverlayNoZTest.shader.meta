@@ -1,0 +1,24 @@
+fileFormatVersion: 2
+guid: 3bbd89cdbec09b345a1bbd94a2341d20
+labels:
+- Camera
+- Controller
+- MMO
+- MMORPG
+- RPG
+- Script
+- WoW
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 145324
+  packageName: RPG Cameras & Controllers
+  packageVersion: 6.1.3
+  assetPath: Assets/RPG Cameras & Controllers/Misc/Shaders/GUI/Default_OverlayNoZTest.shader
+  uploadId: 740787

@@ -28,6 +28,8 @@ namespace SoftKitty.InventoryEngine
         [HideInInspector]
         public InventoryStack StackData;
         public delegate void OnItemChange(Item _item, int _changedNumber, InventoryItem _itemIcon);
+        public Image CoolDownMask;
+        public Text CoolDownText;
         private OnItemChange OnItemChangeCallback;
         private float mouseDownTime = 0F;
         private Vector3 mouseDownPos;
@@ -81,6 +83,31 @@ namespace SoftKitty.InventoryEngine
             CheckDropping();
             if (itemId < 0) return;
             CheckDragging();
+            CheckCoolDown();
+        }
+
+        private void CheckCoolDown()
+        {
+            if (!Empty && itemId >= 0 && number > 0 && CoolDownMask && CoolDownText)
+            {
+                float _cd = ItemManager.itemDic[itemId].GetCoolDownTime();
+                if (_cd > 0F)
+                {
+                    if (CoolDownMask.gameObject.activeSelf != ItemManager.itemDic[itemId].isCoolDown()) CoolDownMask.gameObject.SetActive(ItemManager.itemDic[itemId].isCoolDown());
+                    if (ItemManager.itemDic[itemId].isCoolDown())
+                    {
+                        CoolDownMask.fillAmount = ItemManager.itemDic[itemId].GetRemainCoolDownTime() / _cd;
+                        if (ItemManager.itemDic[itemId].GetRemainCoolDownTime() >= 1F)
+                        {
+                            CoolDownText.text = Mathf.CeilToInt(ItemManager.itemDic[itemId].GetRemainCoolDownTime()).ToString();
+                        }
+                        else
+                        {
+                            CoolDownText.text = ItemManager.itemDic[itemId].GetRemainCoolDownTime().ToString("0.0");
+                        }
+                    }
+                }
+            }
         }
 
         private void StateUpdate()
@@ -137,6 +164,8 @@ namespace SoftKitty.InventoryEngine
                         int _number = 0;
                         if (LimitedByOwner != null && _source.Holder != LimitedByOwner && _source.Holder!=Holder) return;
                         if (_source.LimitedByOwner != null && Holder != _source.LimitedByOwner && _source.Holder != Holder) return;
+                        if ((Holder.Type == InventoryHolder.HolderType.PlayerEquipment || Holder.Type == InventoryHolder.HolderType.NpcEquipment) && !_source.GetItem().AbleToUse(Holder)) return;
+                        if ((_source.Holder.Type == InventoryHolder.HolderType.PlayerEquipment || _source.Holder.Type == InventoryHolder.HolderType.NpcEquipment) && !GetItem().AbleToUse(_source.Holder)) return;
                         if (LimitedByTag.Length > 0 && !_source.isTagMatchText(LimitedByTag)) return;
                         if (_source.LimitedByTag.Length > 0 && !isTagMatchText(_source.LimitedByTag) && !isEmpty()) return;
                         if (!RecieveDragging) return;

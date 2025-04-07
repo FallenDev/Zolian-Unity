@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: d0063548e49510f488493b14242c4948
+timeCreated: 1505899842
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 145324
+  packageName: RPG Cameras & Controllers
+  packageVersion: 6.1.3
+  assetPath: Assets/RPG Cameras & Controllers/Third-Party Assets/Unity/3DGamekit/Prefabs/Environment/Rock/CliffBig03.prefab
+  uploadId: 740787

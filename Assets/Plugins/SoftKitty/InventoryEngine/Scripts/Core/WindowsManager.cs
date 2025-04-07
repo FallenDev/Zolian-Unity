@@ -37,8 +37,36 @@ namespace SoftKitty.InventoryEngine
             _window.ActiveWindow();
         }
 
-      
-     
+        public static GameObject GetMainCanvas(GameObject _base=null)
+        {
+            if (ItemManager.instance.CanvasTag.Replace(" ", "").Length > 0)
+            {
+                Canvas[] _canvas = FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.InstanceID);
+                foreach (var obj in _canvas) {
+                    if (obj.gameObject.tag == ItemManager.instance.CanvasTag) return obj.gameObject;
+                }
+                Debug.LogError("[InventoryEngine] Could not find Canvas GameObject with the tag you specified!");
+            }
+            //If it fails to get canvas with the specified tag or the tag is null, search canvas from the parent of the base gameObject.
+            if (_base != null && _base.GetComponentInParent<CanvasScaler>()) return _base.GetComponentInParent<CanvasScaler>().gameObject;
+            //If there is no base gameObject, or could not find root canvas from the parents, then search canvas from the scene.
+            //The reason we use <CanvasScaler> instead of <Canvas> is becuase Canvas can be nested, we only aiming to find the root canvas which usually come with <CanvasScaler> together.
+            if (FindFirstObjectByType<CanvasScaler>()!=null) return FindFirstObjectByType<CanvasScaler>().gameObject;
+            Debug.LogError("[InventoryEngine] Could not find Canvas GameObject in your scene! Creating one...");
+            //If there is no canvas at all in the scene, we're going to create one.
+            GameObject _tempCanvasObj = new GameObject("InventoryEngineCanvas");
+            Canvas _tempCanvas= _tempCanvasObj.AddComponent<Canvas>();
+            _tempCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            if (ItemManager.instance.CanvasTag.Replace(" ", "").Length > 0) _tempCanvasObj.tag = ItemManager.instance.CanvasTag;
+            CanvasScaler _tempScaler= _tempCanvasObj.AddComponent<CanvasScaler>();
+            _tempScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            _tempScaler.referenceResolution = new Vector2(1920F,1080F);
+            _tempScaler.matchWidthOrHeight = 1F;
+            _tempCanvasObj.AddComponent<GraphicRaycaster>();
+            return _tempCanvasObj;
+        }
+
+
         public UiWindow OpenWindow(string _prefabName, InventoryHolder _holder, bool _bringToTop = true)
         {
             if (windowsDic.ContainsKey(_holder))
@@ -51,7 +79,7 @@ namespace SoftKitty.InventoryEngine
             if (!_newWindow.GetComponent<UiWindow>().FixedDefaultPosition)
             {
                 float _width = _newWindow.GetComponent<RectTransform>().sizeDelta.x * 0.5F;
-                float _screenWidth = _newWindow.GetComponentInParent<CanvasScaler>().GetComponent<RectTransform>().sizeDelta.x * 0.5F;
+                float _screenWidth = GetMainCanvas(_newWindow).GetComponent<RectTransform>().sizeDelta.x * 0.5F;
                 _newWindow.transform.localPosition = new Vector3(Mathf.Clamp(-450F + (windowsDic.Count + 1) * 50F, _width - _screenWidth + 270F, _screenWidth - _width)
                     , _newWindow.transform.localPosition.y - windowsDic.Count * 50F, 0F);
             }
@@ -97,7 +125,7 @@ namespace SoftKitty.InventoryEngine
         {
             if (instance == null)
             {
-                GameObject newObj = Instantiate(Resources.Load<GameObject>("InventoryEngine/WindowsManager"), FindObjectOfType<CanvasScaler>().transform);
+                GameObject newObj = Instantiate(Resources.Load<GameObject>("InventoryEngine/WindowsManager"),GetMainCanvas().transform);
                 newObj.transform.SetAsLastSibling();
                 newObj.transform.localPosition = Vector3.zero;
                 newObj.transform.localScale = Vector3.one;

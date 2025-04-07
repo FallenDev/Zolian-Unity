@@ -112,7 +112,7 @@ namespace SoftKitty.InventoryEngine
             if (Empty || itemId < 0 || !ItemManager.itemDic[itemId].useable) return;
             Icon.transform.localScale = Vector3.one * 0.5F;
             if(GlowIcon) GlowIcon.transform.localScale = new Vector3(Icon.transform.localScale.x * 1.1F, Icon.transform.localScale.y, 1F);
-            Instantiate(Resources.Load<GameObject>("InventoryEngine/ClickEffect"), transform.position, Quaternion.identity, GetComponentInParent<CanvasScaler>().transform);
+            Instantiate(Resources.Load<GameObject>("InventoryEngine/ClickEffect"), transform.position, Quaternion.identity, WindowsManager.GetMainCanvas().transform);
         }
 
         public void OnPointerExit(PointerEventData eventData)

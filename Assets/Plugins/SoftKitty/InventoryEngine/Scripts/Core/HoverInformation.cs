@@ -37,6 +37,7 @@ namespace SoftKitty.InventoryEngine
         private ItemIcon HoverSource;
         public Image CurrencyIcon;
         public Text CurrencyNumber;
+        public Text RestrictionText;
         #endregion
 
         #region Internal Methods
@@ -80,7 +81,8 @@ namespace SoftKitty.InventoryEngine
             }
             ItemNumber.text = _num > 0 ? _num.ToString() : "";
             ItemFav.SetActive(_item.favorite);
-            DesText.text = _item.description;
+            DesText.text = _item.compiledDescription;
+           
             foreach (var obj in Hints) {
                 obj.SetActive(false);
             }
@@ -130,21 +132,51 @@ namespace SoftKitty.InventoryEngine
             CurrencyNumber.text = Mathf.CeilToInt(_item.price * _priceMultiplier).ToString();
 
             Dictionary<Attribute, float> _attDic = new Dictionary<Attribute, float>();
+            string _restrictionAtt = "";
             foreach (Attribute obj in ItemManager.instance.itemAttributes) {
                 if (obj.isNumber() && _item.GetAttributeFloat(obj.key) != 0F && obj.visible )
                 {
                     _attDic.Add(obj.Copy(), _item.GetAttributeFloat(obj.key));
                 }
+                if (_item.useable && _item.restrictionKey == obj.key) _restrictionAtt = obj.name;
             }
-            List<Attribute> keyList = new List<Attribute>(_attDic.Keys);
+            if (_restrictionAtt != "" && _item.restrictionValue > 0 && _item.useable)
+            {
+                RestrictionText.text = "Restriction:  " + _restrictionAtt + " >= " + _item.restrictionValue.ToString();
+            }
+            else
+            {
+                RestrictionText.text = "";
+            }
+            List<Attribute> _keyList = new List<Attribute>(_attDic.Keys);
+            List<Attribute> keyList = new List<Attribute>();
+            for (int i = _keyList.Count - 1; i >= 0; i--)
+            {
+                if (_keyList[i].coreStats)
+                {
+                    keyList.Add(_keyList[i]);
+                    _keyList.RemoveAt(i);
+                }
+            }
+            keyList.AddRange(_keyList);
+
             for (int i = 0; i < Stats.Length; i++)
             {
                 if (i < keyList.Count)
                 {
-                    Stats[i].text = "<color=#" + ColorUtility.ToHtmlStringRGB(ItemManager.instance.AttributeNameColor) + ">" + keyList[i].name + "</color> : ";
+                    Stats[i].text = "<color=#" + ColorUtility.ToHtmlStringRGB(ItemManager.instance.AttributeNameColor) + ">" + keyList[i].name + "</color> ";
                     float _value = _attDic[keyList[i]];
-                    Stats[i].text += (_value > 0F ? "+" : "") + _value.ToString("0.0");
-                    if (CompareHolder != null)
+                    if (keyList[i].displayFormat == 0)
+                    {
+                        Stats[i].text += (_value > 0F ? "+" : "") + _value.ToString("0.0")+ keyList[i].suffixes;
+                    }
+                    else
+                    {
+                        Stats[i].text += ": " + _value.ToString("0.0") + keyList[i].suffixes;
+                    }
+                    Stats[i].fontStyle = keyList[i].coreStats ? FontStyle.Bold : FontStyle.Normal;
+
+                    if (CompareHolder != null && keyList[i].compareInfo)
                     {
                         float _compareValue = _value - CompareHolder.GetAttributeValueByTag(keyList[i].key, _item.tags);
                         if (_compareValue != 0F)
@@ -187,6 +219,7 @@ namespace SoftKitty.InventoryEngine
             }
             HoverSource = _source;
         }
+
 
 
         void Update()
@@ -247,7 +280,7 @@ namespace SoftKitty.InventoryEngine
         {
             if (instance == null)
             {
-                GameObject newObj = Instantiate(Resources.Load<GameObject>("InventoryEngine/HoverInformation"), _anchor.GetComponentInParent<CanvasScaler>().transform);
+                GameObject newObj = Instantiate(Resources.Load<GameObject>("InventoryEngine/HoverInformation"), WindowsManager.GetMainCanvas(_anchor.gameObject).transform);
                 newObj.transform.SetAsLastSibling();
                 newObj.transform.localPosition = Vector3.zero;
                 newObj.transform.localScale = Vector3.one;

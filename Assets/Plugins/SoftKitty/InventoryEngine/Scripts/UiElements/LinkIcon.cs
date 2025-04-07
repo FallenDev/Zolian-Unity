@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 namespace SoftKitty.InventoryEngine
@@ -28,6 +29,8 @@ namespace SoftKitty.InventoryEngine
         private int ItemNumber = 0;
         private int ItemLinkId = 0;
         public delegate void OnItemLinked(int _index, Item _item);
+        public Image CoolDownMask;
+        public Text CoolDownText;
         protected OnItemLinked LinkedCallback;
         #endregion
 
@@ -64,6 +67,31 @@ namespace SoftKitty.InventoryEngine
             CheckDropping();
             if (itemId < 0) return;
             CheckDragging();
+            CheckCoolDown();
+        }
+
+        private void CheckCoolDown()
+        {
+            if (!Empty && itemId >= 0 && number > 0 && CoolDownMask && CoolDownText)
+            {
+                float _cd = ItemManager.itemDic[itemId].GetCoolDownTime();
+                if (_cd > 0F )
+                {
+                    if (CoolDownMask.gameObject.activeSelf != ItemManager.itemDic[itemId].isCoolDown()) CoolDownMask.gameObject.SetActive(ItemManager.itemDic[itemId].isCoolDown());
+                    if (ItemManager.itemDic[itemId].isCoolDown())
+                    {
+                        CoolDownMask.fillAmount = ItemManager.itemDic[itemId].GetRemainCoolDownTime() / _cd;
+                        if (ItemManager.itemDic[itemId].GetRemainCoolDownTime() >= 1F)
+                        {
+                            CoolDownText.text = Mathf.CeilToInt(ItemManager.itemDic[itemId].GetRemainCoolDownTime()).ToString();
+                        }
+                        else
+                        {
+                            CoolDownText.text = ItemManager.itemDic[itemId].GetRemainCoolDownTime().ToString("0.0");
+                        }
+                    }
+                }
+            }
         }
 
         private void OnDestroy()

@@ -60,13 +60,13 @@ namespace SoftKitty.InventoryEngine
 
         public override void OnItemClick(int _index, int _button)//Callback for when player click an item
         {
-             LootItem(_index);
+            LootItem(_index);
             SoundManager.Play2D("Loot");
         }
 
         private void LootItem(int _index)//Move this item to player's inventory
         {
-            if (!Items[_index].isEmpty())
+            if (!Items[_index].isEmpty() && Items[_index].GetItem()!=null)
             {
                 DynamicMsg.PopItem(Items[_index].GetItem(), Items[_index].GetNumber());
                 InventoryStack _leftStack = ItemManager.PlayerInventoryHolder.AddItem(Items[_index].GetItem(), Items[_index].GetNumber());

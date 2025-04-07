@@ -37,6 +37,7 @@ namespace Assets.Scripts.Network.Converters.ReceiveFromServer
                 characterData.JobLevel = reader.ReadUInt32();
                 characterData.GameMaster = reader.ReadBoolean();
                 characterData.Position = reader.ReadVector3();
+                characterData.CameraYaw = reader.ReadFloat();
                 characterData.CurrentHealth = reader.ReadInt64();
                 characterData.MaxHealth = reader.ReadInt64();
                 characterData.CurrentMana = reader.ReadInt64();
@@ -100,6 +101,7 @@ namespace Assets.Scripts.Network.Converters.ReceiveFromServer
             if (playerType.ServerUpdateTypeFlagIsSet(PlayerUpdateType.Position))
             {
                 characterData.Position = reader.ReadVector3();
+                characterData.CameraYaw = reader.ReadFloat();
             }
 
             if (playerType.ServerUpdateTypeFlagIsSet(PlayerUpdateType.Stats))

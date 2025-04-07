@@ -62,11 +62,56 @@ namespace SoftKitty.InventoryEngine
         /// </summary>
         public float upgradeIncrement = 0F;
         /// <summary>
-        /// Whether this attribute visible in the interface.
+        /// Whether this attribute should display as bold font and sort before other stats.
+        /// </summary>
+        public bool coreStats = false;
+        /// <summary>
+        /// Whether this attribute visible in the hover information panel.
         /// </summary>
         public bool visible = true;
+        /// <summary>
+        /// Whether this attribute visible in the stats panel.
+        /// </summary>
+        public bool visibleInStatsPanel = true;
+        /// <summary>
+        /// The display format type in the hover information panel.
+        /// </summary>
+        public int displayFormat = 0;
+        /// <summary>
+        /// Suffixes string when display this attribute.
+        /// </summary>
+        public string suffixes = "";
+        /// <summary>
+        /// Whether display compare information for this attribute in mouse hover information panel.
+        /// </summary>
+        public bool compareInfo = true;
+        /// <summary>
+        /// Random chance to unlock this attribute when item being created.
+        /// </summary>
+        public int randomChange = 100;
+        /// <summary>
+        /// Whether this attribute is Locked, locked attribute is not valid and invisible.
+        /// </summary>
+        public bool locked = false;
+        /// <summary>
+        /// Whether this attribute has fixed value.
+        /// </summary>
+        public bool isFixed = true;
+        /// <summary>
+        /// The minimal value of this attribute if this attribute has random value.
+        /// </summary>
+        public float minValue = 0F;
+        /// <summary>
+        /// The maximum value of this attribute if this attribute has random value.
+        /// </summary>
+        public float maxValue = 0F;
+
+
+        
         [HideInInspector]
         public bool fold = true;
+
+        
 
         /// <summary>
         /// Get an instance of this attribute.
@@ -81,6 +126,16 @@ namespace SoftKitty.InventoryEngine
             _newAtt.stringValue = stringValue;
             _newAtt.upgradeIncrement = upgradeIncrement;
             _newAtt.visible = visible;
+            _newAtt.locked = locked;
+            _newAtt.randomChange = randomChange;
+            _newAtt.minValue = minValue;
+            _newAtt.maxValue = maxValue;
+            _newAtt.displayFormat = displayFormat;
+            _newAtt.suffixes = suffixes;
+            _newAtt.coreStats = coreStats;
+            _newAtt.compareInfo = compareInfo;
+            _newAtt.visibleInStatsPanel = visibleInStatsPanel;
+            _newAtt.isFixed = isFixed;
             return _newAtt;
         }
 
@@ -94,13 +149,29 @@ namespace SoftKitty.InventoryEngine
         }
 
         /// <summary>
+        /// When creating an item, call this to decide wether this attribute should be locked.
+        /// </summary>
+        public void Init()
+        {
+            if (isFixed)
+            {
+                locked = false;
+            }
+            else
+            {
+                locked = (Random.Range(0, 100) > randomChange);
+                if(!stringValue)value = Random.Range(minValue,maxValue).ToString("0.0");
+            }
+        }
+
+        /// <summary>
         /// Retrieve the float value of this attribute.
         /// </summary>
         /// <param name="_upgradeLevel"></param>
         /// <returns></returns>
         public float GetFloat(int _upgradeLevel = 0)
         {
-            if (stringValue) return 0F;
+            if (stringValue || (locked && !isFixed)) return 0F;
             float _result = 0F;
             float.TryParse(value, out _result);
             _result += upgradeIncrement * _upgradeLevel;
@@ -114,7 +185,7 @@ namespace SoftKitty.InventoryEngine
         /// <returns></returns>
         public int GetInt(int _upgradeLevel = 0)
         {
-            if (stringValue) return 0;
+            if (stringValue || (locked && !isFixed)) return 0;
             int _result = 0;
             int.TryParse(value, out _result);
             _result += Mathf.FloorToInt(upgradeIncrement * _upgradeLevel);
@@ -127,6 +198,7 @@ namespace SoftKitty.InventoryEngine
         /// <returns></returns>
         public string GetString()
         {
+            if (locked && !isFixed) return "None";
             return value;
         }
 
@@ -587,6 +659,10 @@ namespace SoftKitty.InventoryEngine
         /// </summary>
         public List<Attribute> attributes = new List<Attribute>();
         /// <summary>
+        /// Maximum number of random attributes this item can have.
+        /// </summary>
+        public int maximumRandomAttributes = 5;
+        /// <summary>
         /// The enchantments list of this item.
         /// </summary>
         public List<int> enchantments = new List<int>();
@@ -602,6 +678,22 @@ namespace SoftKitty.InventoryEngine
         /// The tag string list of this item.
         /// </summary>
         public List<string> tags = new List<string>();
+
+        /// <summary>
+        /// Custom data. You could use them to link audio clips, prefabs, images, etc.
+        /// </summary>
+        public List<CustomField> customData = new List<CustomField>();
+
+        public float lastUseTimeStamp = 0F;
+
+        /// <summary>
+        /// The attribute key for use/equip restriction.
+        /// </summary>
+        public string restrictionKey;
+        /// <summary>
+        /// The attribute value for use/equip restriction.
+        /// </summary>
+        public int restrictionValue;
 
         /// <summary>
         /// The socketing slots number, if Socketing module is enabled, player will be able to socketing other items with specified tag and category into this item to boost its attributes.
@@ -652,6 +744,52 @@ namespace SoftKitty.InventoryEngine
             }
         }
 
+        public string compiledDescription
+        {
+            get
+            {
+                string _result = description.Replace("<br>","\n");
+                Dictionary<string, Attribute> _attDic = new Dictionary<string, Attribute>();
+                foreach (var att in attributes) {
+                    if (!_attDic.ContainsKey(att.key))
+                    {
+                        _attDic.Add(att.key, att.Copy());
+                    }
+                    else
+                    {
+                        if (!att.stringValue)
+                        {
+                            _attDic[att.key].UpdateValue(_attDic[att.key].GetFloat()+ att.GetFloat());
+                        }
+                    }
+                }
+                int _index = 0;
+                while(_index<_result.Length) {
+                    int _startIndex = _result.IndexOf("{", _index);
+                    int _endIndex = _result.IndexOf("}", _startIndex>-1?(_startIndex +1):(_index+1));
+                    if (_startIndex > -1 && _endIndex>-1)
+                    {
+                        string _attText = _result.Substring(_startIndex + 1, _endIndex - _startIndex - 1);
+                        if (_attDic.ContainsKey(_attText))
+                        {
+                            _result=_result.Replace(_result.Substring(_startIndex, _endIndex + 1 - _startIndex), _attDic[_attText].GetFloat(upgradeLevel).ToString());
+                            _index = _startIndex + 1;
+                        }
+                        else
+                        {
+                            _index = _endIndex + 1;
+                        }
+                    }
+                    else
+                    {
+                        _index = _result.Length;
+                    }
+                }
+                _attDic.Clear();
+                return _result;
+            }
+        }
+
 #if MASTER_CHARACTER_CREATOR
         /// <summary>
         /// The MCC equipment binding
@@ -698,9 +836,17 @@ namespace SoftKitty.InventoryEngine
                 dropRates = _ref.dropRates;
                 favorite = _ref.favorite;
                 attributes.Clear();
+                maximumRandomAttributes = _ref.maximumRandomAttributes;
+                restrictionKey = _ref.restrictionKey;
+                restrictionValue = _ref.restrictionValue;
+                lastUseTimeStamp = _ref.lastUseTimeStamp;
+                int _attCount = 0;
                 foreach (var att in _ref.attributes)
                 {
-                    attributes.Add(att.Copy());
+                    Attribute _newAtt = att.Copy();
+                    _newAtt.Init();
+                    if(att.randomChange >= 100 || _attCount< maximumRandomAttributes)attributes.Add(_newAtt);
+                    if (att.randomChange < 100 && !_newAtt.locked) _attCount++;
                 }
                 craftMaterials.Clear();
                 craftMaterials.AddRange(_ref.craftMaterials);
@@ -715,6 +861,8 @@ namespace SoftKitty.InventoryEngine
                 socketingSlots = _ref.socketingSlots;
                 socketedItems = new List<int>();
                 socketedItems.AddRange(_ref.socketedItems);
+                customData.Clear();
+                customData.AddRange(_ref.customData);
                 if (_initializeEnchantments) RandomEnchantment();
                 if (_initializeSocketingSlots) ResetocketingSlots();
 #if MASTER_CHARACTER_CREATOR
@@ -762,6 +910,10 @@ namespace SoftKitty.InventoryEngine
             _newItem.weight = weight;
             _newItem.dropRates = dropRates;
             _newItem.favorite = favorite;
+            _newItem.restrictionKey = restrictionKey;
+            _newItem.restrictionValue = restrictionValue;
+            _newItem.maximumRandomAttributes = maximumRandomAttributes;
+            _newItem.lastUseTimeStamp = lastUseTimeStamp;
             _newItem.attributes.Clear();
             foreach (var att in attributes)
             {
@@ -780,6 +932,8 @@ namespace SoftKitty.InventoryEngine
             _newItem.socketedItems.AddRange(socketedItems);
             _newItem.socketingTag.Clear();
             _newItem.socketingTag.AddRange(socketingTag);
+            _newItem.customData.Clear();
+            _newItem.customData.AddRange(customData);
 #if MASTER_CHARACTER_CREATOR
             _newItem.equipAppearance= new MasterCharacterCreator.EquipmentAppearance();
             _newItem.equipAppearance.Type = equipAppearance.Type;
@@ -794,6 +948,89 @@ namespace SoftKitty.InventoryEngine
             _newItem.fold = true;
             return _newItem;
         }
+
+        /// <summary>
+        /// Return whether this item can be use or equip by compare the attribute value of the InventoryHolder with the restriction attribute setting.
+        /// </summary>
+        /// <param name="_holder"></param>
+        /// <returns></returns>
+        public bool AbleToUse(InventoryHolder _holder)
+        {
+            if (restrictionKey != "" && restrictionValue > 0)
+                return _holder.GetAttributeValue(restrictionKey,true) >= restrictionValue;
+            else
+                return true;
+        }
+
+
+        /// <summary>
+        /// Get custom data by its key string.
+        /// </summary>
+        /// <param name="_key"></param>
+        /// <returns></returns>
+        public Object GetCustomData(string _key)
+        {
+            foreach (var obj in customData) {
+                if (obj.key == _key) return obj.value;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get the total cool down time of this item.
+        /// </summary>
+        /// <returns></returns>
+        public float GetCoolDownTime()
+        {
+            return GetAttributeFloat(ItemManager.instance.CoolDownAttributeKey);
+        }
+
+        /// <summary>
+        /// Get the remaining cool down time of this item.
+        /// </summary>
+        /// <returns></returns>
+        public float GetRemainCoolDownTime()
+        {
+            return Mathf.Max(0F, lastUseTimeStamp + GetCoolDownTime() - Time.time);
+        }
+
+        /// <summary>
+        /// Return whether this item is being cool down.
+        /// </summary>
+        /// <returns></returns>
+        public bool isCoolDown()
+        {
+            return GetRemainCoolDownTime() > 0F;
+        }
+
+        /// <summary>
+        /// When the item is used, call this function to set the time stamp.
+        /// </summary>
+        public void SetCoolDownTimeStamp()
+        {
+            lastUseTimeStamp = Time.time;
+        }
+
+        /// <summary>
+        /// Override the remaining cool down time.
+        /// </summary>
+        /// <param name="_coolDownTime"></param>
+        public void SetRemainCoolDownTime(float _coolDownTime)
+        {
+            lastUseTimeStamp = Time.time - GetCoolDownTime() + _coolDownTime;
+        }
+
+        /// <summary>
+        /// Add time in seconds to the remaining cool down time, the _addValue can be either postive or negative.
+        /// </summary>
+        /// <param name="_addValue"></param>
+        public void AddRemainCoolDownTime(float _addValue)
+        {
+            lastUseTimeStamp = Time.time - (GetCoolDownTime()- GetRemainCoolDownTime())+ _addValue;
+        }
+
+       
+  
 
         /// <summary>
         /// Get the float value of an Attribute of this item with the attribute key.
@@ -1201,10 +1438,20 @@ namespace SoftKitty.InventoryEngine
         public void ResetAttributes()
         {
             attributes.Clear();
+            Dictionary<string, bool> _attLock = new Dictionary<string, bool>();
+            foreach (var obj in attributes)
+            {
+                if (!_attLock.ContainsKey(obj.key)) _attLock.Add(obj.key, obj.locked);
+            }
             foreach (var _att in ItemManager.itemDic[uid].attributes)
             {
                 attributes.Add(_att.Copy());
             }
+            foreach (var obj in attributes)
+            {
+                if (_attLock.ContainsKey(obj.key)) obj.locked = _attLock[obj.key];
+            }
+            _attLock.Clear();
         }
 
         /// <summary>
@@ -1303,6 +1550,14 @@ namespace SoftKitty.InventoryEngine
                 Item.socketedItems.Clear();
                 if(_item.socketedItem!=null) Item.socketedItems.AddRange(_item.socketedItem);
                 Item.socketingSlots = Item.socketedItems.Count;
+                if (_item.attributeLock != null && _item.attributeValue!=null)
+                {
+                    for (int i = 0; i < Mathf.Min(_item.attributeValue.Length, _item.attributeLock.Length, Item.attributes.Count); i++)
+                    {
+                        Item.attributes[i].locked = _item.attributeLock[i];
+                        Item.attributes[i].value = _item.attributeValue[i];
+                    }
+                }
                 Item.favorite = _item.fav;
                 Number = _item.number;
                 Empty = false;
@@ -1722,6 +1977,8 @@ namespace SoftKitty.InventoryEngine
         public bool fav=false;
         public int[] enchantments;
         public int[] socketedItem;
+        public bool[] attributeLock=new bool[0];
+        public string[] attributeValue=new string[0];
     }
 
     [System.Serializable]
@@ -1754,6 +2011,66 @@ namespace SoftKitty.InventoryEngine
         public ActionBarSave[] sets;
     }
 
+    #endregion
+
+    #region InventorySnapShot
+    [System.Serializable]
+    public class InventorySnapShot
+    {
+        public List<InventoryStack> Stacks = new List<InventoryStack>();
+        public List<InventoryStack> HiddenStacks = new List<InventoryStack>();
+        public CurrencySet Currency = new CurrencySet();
+        public float Weight = 0F;
+        public List<int> CurrencyValue
+        {
+            get
+            {
+                return Currency.Currency;
+            }
+        }
+        public int GetCurrency(int _type, bool _includeExchangedValue = false)
+        {
+            return Currency.GetCurrency(_type, _includeExchangedValue);
+        }
+
+        public int GetItemNumber(int _uid)
+        {
+            int _result = 0;
+            for (int i = 0; i < Stacks.Count; i++)
+            {
+                if (Stacks[i].isSameItem(_uid))
+                {
+                    _result += Stacks[i].Number;
+                }
+            }
+            for (int i = 0; i < HiddenStacks.Count; i++)
+            {
+                if (HiddenStacks[i].isSameItem(_uid))
+                {
+                    _result += HiddenStacks[i].Number;
+                }
+            }
+            return _result;
+        }
+
+        public InventorySnapShot(InventoryHolder _holder)
+        {
+            Weight = _holder.GetWeight();
+            Stacks = new List<InventoryStack>();
+            HiddenStacks = new List<InventoryStack>();
+            for (int i = 0; i < _holder.Stacks.Count; i++)
+            {
+               Stacks.Add(_holder.Stacks[i].Copy());
+            }
+            for (int i = 0; i < _holder.HiddenStacks.Count; i++)
+            {
+                HiddenStacks.Add(_holder.HiddenStacks[i].Copy());
+            }
+            Currency = _holder.Currency.Copy();
+        }
+
+
+    }
     #endregion
 
     #region Misc Class
@@ -1825,6 +2142,13 @@ namespace SoftKitty.InventoryEngine
         public string tag="";
         public ItemIcon blockIcon;
         public InventoryItem blockedItem;
+    }
+
+    [System.Serializable]
+    public class CustomField
+    {
+        public string key;
+        public Object value;
     }
     #endregion
 

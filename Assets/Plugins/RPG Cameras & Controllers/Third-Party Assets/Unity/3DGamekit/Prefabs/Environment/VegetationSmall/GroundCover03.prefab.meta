@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f8b565dbb4e633842941cde9af7a298d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 145324
+  packageName: RPG Cameras & Controllers
+  packageVersion: 6.1.3
+  assetPath: Assets/RPG Cameras & Controllers/Third-Party Assets/Unity/3DGamekit/Prefabs/Environment/VegetationSmall/GroundCover03.prefab
+  uploadId: 740787

@@ -33,8 +33,8 @@ namespace SoftKitty.InventoryEngine
         public Button TradeButton;
         private bool filterFav = false;
         private bool inited = false;
-        private InventoryHolder playerSnapshot;
-        private InventoryHolder merchantSnapshot;
+        private InventorySnapShot playerSnapshot;
+        private InventorySnapShot merchantSnapshot;
         private List<CurrenyInfo> playerCurrencyItems = new List<CurrenyInfo>();
         private List<CurrenyInfo> merchantCurrencyItems = new List<CurrenyInfo>();
         private List<CurrenyInfo> playerTradeCurrencyItems = new List<CurrenyInfo>();

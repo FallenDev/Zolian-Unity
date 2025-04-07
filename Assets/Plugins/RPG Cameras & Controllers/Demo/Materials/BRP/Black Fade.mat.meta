@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 85a049b9ed88777489afc4a23a759728
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 145324
+  packageName: RPG Cameras & Controllers
+  packageVersion: 6.1.3
+  assetPath: Assets/RPG Cameras & Controllers/Demo/Materials/BRP/Black Fade.mat
+  uploadId: 740787

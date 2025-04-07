@@ -139,7 +139,7 @@ namespace SoftKitty.InventoryEngine
         {
             if (instance == null)
             {
-                GameObject newObj = Instantiate(Resources.Load<GameObject>("InventoryEngine/ItemDragManager"), _source.GetComponentInParent<CanvasScaler>().transform);
+                GameObject newObj = Instantiate(Resources.Load<GameObject>("InventoryEngine/ItemDragManager"), WindowsManager.GetMainCanvas(_source.gameObject).transform);
                 newObj.transform.SetAsLastSibling();
                 newObj.transform.localPosition = Vector3.zero;
                 newObj.transform.localScale = Vector3.one;
@@ -158,7 +158,7 @@ namespace SoftKitty.InventoryEngine
         {
             if (instance == null)
             {
-                GameObject newObj = Instantiate(Resources.Load<GameObject>("InventoryEngine/ItemDragManager"),_rect.GetComponentInParent<CanvasScaler>().transform);
+                GameObject newObj = Instantiate(Resources.Load<GameObject>("InventoryEngine/ItemDragManager"), WindowsManager.GetMainCanvas(_rect.gameObject).transform);
                 newObj.transform.SetAsLastSibling();
                 newObj.transform.localPosition = Vector3.zero;
                 newObj.transform.localScale = Vector3.one;

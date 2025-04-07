@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 8b43656159c5977458d9687144672d61
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 145324
+  packageName: RPG Cameras & Controllers
+  packageVersion: 6.1.3
+  assetPath: Assets/RPG Cameras & Controllers/Scripts/Character/Motor/Interfaces/IRPGController.cs
+  uploadId: 740787

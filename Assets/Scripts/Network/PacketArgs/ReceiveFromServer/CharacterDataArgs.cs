@@ -20,6 +20,7 @@ namespace Assets.Scripts.Network.PacketArgs.ReceiveFromServer
         public uint JobLevel { get; set; }
         public bool GameMaster { get; set; }
         public Vector3 Position { get; set; }
+        public float CameraYaw { get; set; }
 
         // Stats
         public long CurrentHealth { get; set; }

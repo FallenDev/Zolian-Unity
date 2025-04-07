@@ -32,6 +32,7 @@ namespace SoftKitty.InventoryEngine
 
         public void ShowItem(Item _item, int _number)
         {
+            if (_item == null) return;
             GameObject newObj = Instantiate(ItemPrefab, ItemPrefab.transform.parent);
             newObj.transform.localScale = Vector3.one;
             newObj.GetComponent<ItemIcon>().SetAppearance(_item.Copy(), true, true);
@@ -61,7 +62,7 @@ namespace SoftKitty.InventoryEngine
         
         private static void CreateInstance()
         {
-            GameObject newObj = Instantiate(Resources.Load<GameObject>("InventoryEngine/DynamicMsg"), FindObjectOfType<CanvasScaler>().transform);
+            GameObject newObj = Instantiate(Resources.Load<GameObject>("InventoryEngine/DynamicMsg"), WindowsManager.GetMainCanvas().transform);
             newObj.transform.SetAsLastSibling();
             newObj.transform.localPosition = Vector3.zero;
             newObj.transform.localScale = Vector3.one;

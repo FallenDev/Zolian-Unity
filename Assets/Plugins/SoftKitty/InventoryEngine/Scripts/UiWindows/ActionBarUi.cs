@@ -10,6 +10,8 @@ namespace SoftKitty.InventoryEngine
     {
         [Header("[After click a slot, will this slot be selected?]")]
         public bool SelectableSlot = true;
+        [Header("[Whether display the XP progress bar.]")]
+        public bool EnableXP = true;
         [Header("[Setup the ActionBar Data.]")]
         public List<ActionSlotSet> SlotData=new List<ActionSlotSet>();
         [Header("[Save path of the ActionBar data.]")]
@@ -32,6 +34,8 @@ namespace SoftKitty.InventoryEngine
         private string ProgressBarHintString = "";
         private int SelectedSlot = 0;
         private int LastSelectedSlot = -1;
+        private float xp;
+        private float mxp;
         #endregion
 
         #region Internal Methods
@@ -39,6 +43,8 @@ namespace SoftKitty.InventoryEngine
         {
             instance = this;
             SetProgressHint(ProgressBarHintString);
+            ProgressBar.gameObject.SetActive(EnableXP);
+            ProgressText.gameObject.SetActive(EnableXP);
         }
 
         IEnumerator Start()
@@ -118,6 +124,17 @@ namespace SoftKitty.InventoryEngine
             {
                 LastSelectedSlot = -1;
             }
+            if (EnableXP && ItemManager.PlayerEquipmentHolder != null && Time.frameCount%10==0)
+            {
+                if (xp != ItemManager.PlayerEquipmentHolder.GetBaseStatsValue(ItemManager.instance.XpAttributeKey)
+                    || mxp != ItemManager.PlayerEquipmentHolder.GetBaseStatsValue(ItemManager.instance.MaxXpAttributeKey))
+                {
+                    xp = ItemManager.PlayerEquipmentHolder.GetBaseStatsValue(ItemManager.instance.XpAttributeKey);
+                    mxp = ItemManager.PlayerEquipmentHolder.GetBaseStatsValue(ItemManager.instance.MaxXpAttributeKey);
+                    SetProgress(xp, mxp);
+                    SetProgressHint("Level. "+ Mathf.FloorToInt( ItemManager.PlayerEquipmentHolder.GetBaseStatsValue(ItemManager.instance.LevelAttributeKey)).ToString());
+                }
+            }
         }
         #endregion
 
@@ -187,10 +204,10 @@ namespace SoftKitty.InventoryEngine
             ProgressBarHintString = _text;
             ProgressHint.HintString = ProgressBarHintString;
         }
-        public void SetProgress(int _value,int _maxium)//Set the progress bar progress value and maxmium value
+        public void SetProgress(float _value, float _maxium)//Set the progress bar progress value and maxmium value
         {
-            ProgressBar.transform.localScale = new Vector3( _value * 1F / _maxium,1F,1F);
-            ProgressText.text = _value.ToString() + " / " + _maxium.ToString();
+            ProgressBar.transform.localScale = new Vector3(Mathf.Clamp01(_value /Mathf.Max(0.0001F,_maxium)),1F,1F);
+            ProgressText.text = Mathf.FloorToInt(_value).ToString() + " / " + Mathf.FloorToInt(_maxium).ToString();
         }
         public KeyCode GetAssignedKey(int _index, int _actionBarIndex=-1) //Get the assigned KeyCode by slot index and action bar index.
         {

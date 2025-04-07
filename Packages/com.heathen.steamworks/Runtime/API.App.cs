@@ -302,12 +302,9 @@ namespace Heathen.SteamworksIntegration.API
                                 Debug.LogWarning("Steam API was able to initialize however the user does not have an active logon; no real-time services provided by the Steamworks API will be enabled. The Steam client will automatically be trying to recreate the connection as often as possible. When the connection is restored a API.App.Client.EvenServersConnected event will be posted.");
                             }
 
-                            API.StatsAndAchievements.Client.EventUserStatsReceived.AddListener(HandleUserStatsReceived_t);
-                            API.StatsAndAchievements.Client.RequestCurrentStats();
-
                             if (isDebugging)
                             {
-                                Debug.Log("Steam API has been initialized with App ID: " + SteamUtils.GetAppID() + " user stats have been requested.");
+                                Debug.Log("Steam API has been initialized with App ID: " + SteamUtils.GetAppID() + ".");
                             }
 
                             if (appId != SteamUtils.GetAppID())
@@ -389,14 +386,6 @@ namespace Heathen.SteamworksIntegration.API
                         evtSteamInitializationError.Invoke(InitializationErrorMessage);
                         Debug.LogError("[Steamworks.NET] Steam Initialization failed, check the log for more information");
                     }
-                }
-            }
-
-            private static void HandleUserStatsReceived_t(UserStatsReceived param)
-            {
-                if (isDebugging)
-                {
-                    Debug.Log($"Received User Stats per request response {StatsAndAchievements.Client.UserStatsLoaded.Result}.");
                 }
             }
 

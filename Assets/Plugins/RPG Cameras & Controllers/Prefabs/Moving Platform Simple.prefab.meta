@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2739b0048cd2cb24da072053c3ad9708
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 145324
+  packageName: RPG Cameras & Controllers
+  packageVersion: 6.1.3
+  assetPath: Assets/RPG Cameras & Controllers/Prefabs/Moving Platform Simple.prefab
+  uploadId: 740787

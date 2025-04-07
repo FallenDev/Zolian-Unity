@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 71aab5c4da545394d98ddfc9835e12db
+timeCreated: 1502179794
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 145324
+  packageName: RPG Cameras & Controllers
+  packageVersion: 6.1.3
+  assetPath: Assets/RPG Cameras & Controllers/Third-Party Assets/Unity/3DGamekit/Art/Materials/Environment/VegetationLarge/VegetationLarge07_Mat.mat
+  uploadId: 740787

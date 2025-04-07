@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: f7f335b659c92cf468c6f87e8581c34a
+timeCreated: 1492609829
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 145324
+  packageName: RPG Cameras & Controllers
+  packageVersion: 6.1.3
+  assetPath: Assets/RPG Cameras & Controllers/Third-Party Assets/Unity/3DGamekit/Art/Shaders/Terrain.shader
+  uploadId: 740787

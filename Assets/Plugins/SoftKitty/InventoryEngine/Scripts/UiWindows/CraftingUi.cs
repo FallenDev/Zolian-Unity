@@ -78,7 +78,7 @@ namespace SoftKitty.InventoryEngine
         private Item SocketingItem = null;
         private bool inited = false;
         private int CraftNumber = 0;
-        private InventoryHolder SocketingHolder=new InventoryHolder();
+        public InventoryHolder SocketingHolder;
         public Image BlockImage;
         #endregion
 
@@ -444,7 +444,7 @@ namespace SoftKitty.InventoryEngine
         {
             for (int i = 0; i < Holder.Stacks.Count; i++)
             {
-                Items[i].SetVisible(Holder.Stacks[i].GetType(GetFilterCategory()) == GetFilterCategory() && TagFilter(Holder.Stacks[i]));
+                Items[i].SetVisible((SelectedTab==0 || Holder.Stacks[i].GetType(GetFilterCategory()) == GetFilterCategory()) && TagFilter(Holder.Stacks[i]));
                 Items[i].Draggable = Items[i].Visible;
             }
         }
@@ -544,8 +544,6 @@ namespace SoftKitty.InventoryEngine
             EnchantResultItem.SetItemNumber(0);
             EnchantResultItem.RegisterClickCallback(0, OnEnchantingItemClick);
 
-            SocketingHolder.InventorySize = 200;
-            for (int i = SocketingHolder.Stacks.Count; i < SocketingHolder.InventorySize; i++) SocketingHolder.Stacks.Add(new InventoryStack());
             SocketingResultItem.Initialize(null, true);
             SocketingResultItem.SetItemNumber(0);
             SocketingResultItem.RegisterClickCallback(0, OnSocketingItemClick);
@@ -597,7 +595,6 @@ namespace SoftKitty.InventoryEngine
 
         public void OnInventoryItemClick(int _index, int _button)//Callback for when player click an item
         {
-            Debug.Log("OnInventoryItemClick");
             if (_button == 0) return;
             int _id = Holder.Stacks[_index].GetItemId();
             if (_id>=0 && (SelectedTab==1 && ItemManager.itemDic[_id].type==ItemManager.instance.EnhancingCategoryID)

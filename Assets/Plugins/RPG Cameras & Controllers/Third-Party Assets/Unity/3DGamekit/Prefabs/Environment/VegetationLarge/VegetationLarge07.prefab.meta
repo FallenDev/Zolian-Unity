@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: eeb105ae356d5a44d89468632f77c0ce
+timeCreated: 1505900643
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 145324
+  packageName: RPG Cameras & Controllers
+  packageVersion: 6.1.3
+  assetPath: Assets/RPG Cameras & Controllers/Third-Party Assets/Unity/3DGamekit/Prefabs/Environment/VegetationLarge/VegetationLarge07.prefab
+  uploadId: 740787

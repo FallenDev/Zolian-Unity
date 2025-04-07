@@ -25,6 +25,7 @@ namespace Assets.Scripts.Entity.Entities
         public BaseClass FirstClass { get; set; }
         public BaseClass SecondClass { get; set; }
         public bool GameMaster { get; set; }
+        public float CameraYaw { get; set; }
 
         [Header("Character Looks")]
         public CharacterSO CharacterSo { get; set; }
@@ -73,6 +74,7 @@ namespace Assets.Scripts.Entity.Entities
             Serial = playerArgs.Serial;
             CurrentZoneId = 0;
             Position = playerArgs.Position;
+            CameraYaw = playerArgs.CameraYaw;
             EntityLevel = playerArgs.EntityLevel;
             CurrentHp = playerArgs.CurrentHealth;
             MaxHp = playerArgs.MaxHealth;

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.27466324, g: 0.26500714, b: 0.26806435, a: 1}
+  m_IndirectSpecularColor: {r: 0.41561884, g: 0.40102783, b: 0.40565455, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -328,7 +328,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 348598220}
+      - m_Target: {fileID: 1032275891}
         m_TargetAssemblyTypeName: SoftKitty.InventoryEngine.MainMenu, Assembly-CSharp
         m_MethodName: KillMonster
         m_Mode: 1
@@ -892,7 +892,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 348598220}
+      - m_Target: {fileID: 1032275891}
         m_TargetAssemblyTypeName: SoftKitty.InventoryEngine.MainMenu, Assembly-CSharp
         m_MethodName: OpenPlayerInventory
         m_Mode: 1
@@ -1158,7 +1158,6 @@ GameObject:
   - component: {fileID: 348598218}
   - component: {fileID: 348598217}
   - component: {fileID: 348598216}
-  - component: {fileID: 348598220}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1254,24 +1253,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &348598220
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 348598215}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5071b59fe7371cb41ab9b75de742f655, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  LootPackPrefab: {fileID: 4153987374864549144, guid: 1b4a853248b33904c8ea35e8bbaafce7, type: 3}
-  MerchantNpc: {fileID: 941603880}
-  StorageContainer: {fileID: 929740785}
-  NpcEquipment: {fileID: 5472862025947933859}
-  NpcWorker: {fileID: 1107914227808342550}
-  DebugItem: {fileID: 979694206}
 --- !u!1 &455421820
 GameObject:
   m_ObjectHideFlags: 0
@@ -1741,7 +1722,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 348598220}
+      - m_Target: {fileID: 1032275891}
         m_TargetAssemblyTypeName: SoftKitty.InventoryEngine.MainMenu, Assembly-CSharp
         m_MethodName: OpenStorage
         m_Mode: 1
@@ -1994,7 +1975,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 348598220}
+      - m_Target: {fileID: 1032275891}
         m_TargetAssemblyTypeName: SoftKitty.InventoryEngine.MainMenu, Assembly-CSharp
         m_MethodName: TalkToMerchant
         m_Mode: 1
@@ -2193,7 +2174,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 348598220}
+      - m_Target: {fileID: 1032275891}
         m_TargetAssemblyTypeName: SoftKitty.InventoryEngine.MainMenu, Assembly-CSharp
         m_MethodName: OpenSkills
         m_Mode: 1
@@ -3455,6 +3436,56 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1026340317}
   m_CullTransparentMesh: 1
+--- !u!1 &1032275890
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1032275892}
+  - component: {fileID: 1032275891}
+  m_Layer: 0
+  m_Name: DemoScript
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1032275891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1032275890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5071b59fe7371cb41ab9b75de742f655, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LootPackPrefab: {fileID: 4153987374864549144, guid: 1b4a853248b33904c8ea35e8bbaafce7, type: 3}
+  MerchantNpc: {fileID: 941603880}
+  StorageContainer: {fileID: 929740785}
+  NpcEquipment: {fileID: 5472862025947933859}
+  NpcWorker: {fileID: 1107914227808342550}
+  DebugItem: {fileID: 979694206}
+--- !u!4 &1032275892
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1032275890}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 11
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1032877021
 GameObject:
   m_ObjectHideFlags: 0
@@ -3642,7 +3673,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 348598220}
+      - m_Target: {fileID: 1032275891}
         m_TargetAssemblyTypeName: SoftKitty.InventoryEngine.MainMenu, Assembly-CSharp
         m_MethodName: OpenPlayerEquipment
         m_Mode: 1
@@ -4752,7 +4783,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 348598220}
+      - m_Target: {fileID: 1032275891}
         m_TargetAssemblyTypeName: SoftKitty.InventoryEngine.MainMenu, Assembly-CSharp
         m_MethodName: OpenNpcWorker
         m_Mode: 1
@@ -5831,7 +5862,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 348598220}
+      - m_Target: {fileID: 1032275891}
         m_TargetAssemblyTypeName: SoftKitty.InventoryEngine.MainMenu, Assembly-CSharp
         m_MethodName: OpenCraft
         m_Mode: 1
@@ -6174,7 +6205,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 348598220}
+      - m_Target: {fileID: 1032275891}
         m_TargetAssemblyTypeName: SoftKitty.InventoryEngine.MainMenu, Assembly-CSharp
         m_MethodName: OpenNpcTeamEquipment
         m_Mode: 1
@@ -6803,14 +6834,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4990384160235336904, guid: c69aa7d99b8b8bc40b475383ca828e4a, type: 3}
-      propertyPath: itemAttributes.Array.data[0].fold
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4990384160235336904, guid: c69aa7d99b8b8bc40b475383ca828e4a, type: 3}
-      propertyPath: itemAttributes.Array.data[1].fold
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4990384160235336910, guid: c69aa7d99b8b8bc40b475383ca828e4a, type: 3}
       propertyPath: m_Name
       value: InventoryEngine
@@ -7332,7 +7355,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6404574492673040213, guid: dd92d41cc2e56ae4580d8b4ba5eb155e, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 180
+      value: 230
       objectReference: {fileID: 0}
     - target: {fileID: 6404574492673040213, guid: dd92d41cc2e56ae4580d8b4ba5eb155e, type: 3}
       propertyPath: m_LocalPosition.x

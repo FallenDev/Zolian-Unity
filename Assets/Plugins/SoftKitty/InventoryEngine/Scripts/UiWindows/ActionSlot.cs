@@ -79,6 +79,7 @@ namespace SoftKitty.InventoryEngine
                     SlotData.upgradeLevel = 0;
                     if (Item.GetItem() != null)
                     {
+                       
                         SlotData.upgradeLevel = Item.GetItem().upgradeLevel;
                         SlotData.enchantments.AddRange(Item.GetItem().enchantments);
                         SlotData.sockets.AddRange(Item.GetItem().socketedItems);
@@ -92,11 +93,12 @@ namespace SoftKitty.InventoryEngine
                 Use();
                 ActionBarUi.instance.SetSelectedSlot(Index);
             }
+
         }
         #endregion
         public void Use() // Use the item in this slot.
         {
-            if (Item.GetStackHolder() != null && SlotData.itemId >= 0 && Number > 0)
+            if (Item.GetStackHolder() != null && SlotData.itemId >= 0 && Number > 0 )
             {
                 int _index = ItemManager.PlayerInventoryHolder.GetItemIndex(Item.GetItemId(), Item.GetItem().upgradeLevel, Item.GetItem().enchantments, Item.GetItem().socketedItems);
                 Item.GetStackHolder().UseItem(Item.GetItemId(), 1, _index);

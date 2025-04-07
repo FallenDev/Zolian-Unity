@@ -18,12 +18,21 @@ namespace SoftKitty.InventoryEngine
         public List<Currency> currencies = new List<Currency>();
         public List<Item> items = new List<Item>();
 
+
+        public string NameAttributeKey = "name";
+        public string LevelAttributeKey = "lvl";
+        public string XpAttributeKey = "xp";
+        public string MaxXpAttributeKey = "mxp";
+        public string CoolDownAttributeKey = "cd";
+        public float SharedGlobalCoolDown = 0.5F;
+
         public Color AttributeNameColor=new Color(0.17F,0.53F,0.82F,1F);
         public bool UseQualityColorForItemName = true;
 
         public int MerchantStyle=0;
         public bool HighlightEquipmentSlotWhenHoverItem = true;
         public bool AllowDropItem = true;
+        public string CanvasTag="";
 
         public bool EnableCrafting = true;
         public int CraftingMaterialCategoryID = 0;
@@ -106,6 +115,7 @@ namespace SoftKitty.InventoryEngine
             {
                 enchantmentDic.Add(itemEnchantments[i].uid, itemEnchantments[i]);
             }
+            SetCoolDownForAll(0F);
         }
 
         public void UpdatePrefab()
@@ -120,6 +130,30 @@ namespace SoftKitty.InventoryEngine
         /// Get the instance of the ItemManager component, so you can access its data.
         /// </summary>
         public static ItemManager instance;
+
+        public static void SetCoolDownForAll(float _coolDownTime, bool _onlyUseableItem = true)
+        {
+            foreach (var key in itemDic.Keys)
+            {
+                if (itemDic[key].useable || !_onlyUseableItem) itemDic[key].SetRemainCoolDownTime(_coolDownTime);
+            }
+        }
+
+        public static void AddCoolDownForAll(float _addValue,bool _onlyUseableItem=true)
+        {
+            foreach (var key in itemDic.Keys)
+            {
+                if (itemDic[key].useable || !_onlyUseableItem) itemDic[key].AddRemainCoolDownTime(_addValue);
+            }
+        }
+
+        public static void SetSharedGlobalCoolDown(float _coolDownTime, bool _onlyUseableItem = true)
+        {
+            foreach (var key in itemDic.Keys)
+            {
+                if (itemDic[key].GetRemainCoolDownTime()< _coolDownTime && (itemDic[key].useable || !_onlyUseableItem)) itemDic[key].SetRemainCoolDownTime(_coolDownTime);
+            }
+        }
 
         /// <summary>
         /// Access the [Item Catogory] data by the id.
