@@ -72,7 +72,7 @@ namespace Assets.Scripts.Managers
 
         public void SpawnPlayerPrefab(CharacterDataArgs args)
         {
-            var prefab = CharacterPrefabLoader.GetPrefabForSelection(args.Sex);
+            var prefab = CharacterPrefabLoader.GetPrefabForLogin(args.Sex);
             if (prefab == null)
             {
                 Debug.LogError($"No prefab found for gender: {args.Sex}");

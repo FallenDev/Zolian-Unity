@@ -7,12 +7,19 @@ namespace Assets.Scripts.CharacterSelection
     {
         public static GameObject GetPrefabForCreation(Sex gender)
         {
-            var prefabPath = $"Characters/CharacterCreate_{gender}";
+            var prefabPath = $"Characters/CC_{gender}";
             var prefab = Resources.Load<GameObject>(prefabPath);
-            return prefab != null ? prefab : Resources.Load<GameObject>("Characters/CharacterCreate_Male"); // Default fallback
+            return prefab != null ? prefab : Resources.Load<GameObject>("Characters/CC_Male"); // Default fallback
         }
 
         public static GameObject GetPrefabForSelection(Sex gender)
+        {
+            var prefabPath = $"Characters/CS_{gender}";
+            var prefab = Resources.Load<GameObject>(prefabPath);
+            return prefab != null ? prefab : Resources.Load<GameObject>("Characters/CS_Male"); // Default fallback
+        }
+
+        public static GameObject GetPrefabForLogin(Sex gender)
         {
             var prefabPath = $"Characters/{gender}";
             var prefab = Resources.Load<GameObject>(prefabPath);

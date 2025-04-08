@@ -58,10 +58,24 @@ namespace Assets.Scripts.Network
             catch (Exception e)
             {
                 Debug.LogError($"Failed to enter world: {e.Message}");
-                MainThreadDispatcher.RunOnMainThread(() =>
+            }
+        }
+
+        public void SendMovement(Guid serial, Vector3 position, float cameraYaw)
+        {
+            try
+            {
+                var args = new MovementInputArgs
                 {
-                    PopupManager.Instance.ShowMessage(e.Message, PopupMessageType.System);
-                });
+                    Serial = serial,
+                    MoveDirection = position,
+                    CameraYaw = cameraYaw
+                };
+                SendPacket(MovementInputArgs.OpCode, args);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to send movement: {e.Message}");
             }
         }
 
@@ -113,6 +127,7 @@ namespace Assets.Scripts.Network
         {
             ClientConverters.Add((byte)ClientOpCode.ClientRedirected, new ConfirmConnectionConverter());
             ClientConverters.Add((byte)ClientOpCode.EnterGame, new EnterGameConverter());
+            ClientConverters.Add((byte)ClientOpCode.MovementInput, new MovementInputConverter());
         }
     }
 }
