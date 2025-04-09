@@ -49,6 +49,7 @@ public class NetworkMovementSender : MonoBehaviour
             return;
 
         _player.Client.SendMovement(_player.Serial, currentPosition, currentYaw);
+        Debug.Log($"Sending movement: {currentPosition}, {currentYaw}");
 
         _lastSentPosition = currentPosition;
         _lastSentYaw = currentYaw;

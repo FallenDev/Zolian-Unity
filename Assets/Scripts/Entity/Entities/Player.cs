@@ -6,16 +6,18 @@ using Assets.Scripts.Managers;
 using Assets.Scripts.Models;
 using Assets.Scripts.Network;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
+using JohnStairs.RCC;
+using JohnStairs.RCC.Inputs;
 
 using UnityEngine;
 
 namespace Assets.Scripts.Entity.Entities
 {
-    public class Player : Damageable, IPlayer
+    public class Player : Damageable, IPlayer, IPointerInfo
     {
         public static Player PlayerInstance { get; private set; }
 
-        // Base properties
+        [Header("Base Properties")]
         public WorldClient Client { get; set; }
         public DateTime LastLogged { get; set; }
         public string UserName { get; set; }
@@ -57,6 +59,15 @@ namespace Assets.Scripts.Entity.Entities
         private GameObject Head;
         private SkinnedMeshRenderer _headBlendShapes;
 
+        [Header("Character Controller")]
+        public bool EnableFlying;
+        public bool EnableMovement = true;
+        public bool EnableRotation = true;
+        public bool AllowSprinting = true;
+        public GameObject Target;
+        public bool EnableTargetLock;
+        public LayerMask UiLayers = 32;
+
         // Equipment
 
 
@@ -67,7 +78,44 @@ namespace Assets.Scripts.Entity.Entities
         private void Awake()
         {
             PlayerInstance = this;
+            Client = WorldClient.Instance;
         }
+
+        private void Start()
+        {
+
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.L))
+            {
+                EnableTargetLock = !EnableTargetLock;
+            }
+        }
+
+        #region Character Controller
+
+        public virtual bool CanFly() => EnableFlying;
+
+        public virtual bool CanMove() => EnableMovement;
+
+        public virtual bool CanRotate() => EnableRotation;
+
+        public virtual bool CanSprint() => AllowSprinting;
+
+        // Just return the default value if there is no movement speed impairment (1.0f == 100%)
+        public virtual float GetMovementSpeedModifier() => 1.0f; 
+
+        public virtual Vector3 GetTargetPosition() => Target?.transform.position ?? Vector3.zero;
+
+        public virtual bool LockedOnTarget() => EnableTargetLock;
+
+        public virtual bool IsPointerOverGUI() => Utils.IsPointerOverGUI(UiLayers);
+
+        #endregion
+
+        #region Character Display
 
         public void InitializeFromData(CharacterDataArgs playerArgs)
         {
@@ -135,8 +183,6 @@ namespace Assets.Scripts.Entity.Entities
                 _ => CreationAndAuthManager.Instance.HumanCharacterSO
             };
         }
-
-        #region Character Display
 
         /// <summary>
         /// Creates character prefab based on initial data

@@ -659,15 +659,29 @@ namespace JohnStairs.RCC.Character.Cam {
             foreach (Renderer renderer in _characterRenderersToFade) {
                 // Go through all their materials
                 foreach (Material material in renderer.materials) {
-                    // Adjust their color's alpha value accordingly
-                    Color color = material.color;
-                    color.a = alpha;
-                    // Set for standard (built-in) render pipeline
-                    SetMaterialColor(material, "_Color", color);
-                    // Set for URP (Universal Render Pipeline)
-                    SetMaterialColor(material, "_BaseColor", color);
+                    SafeSetMaterialAlpha(material, "_Color_A_1", alpha);
+                    SafeSetMaterialAlpha(material, "_Color_A_2", alpha);
+                    SafeSetMaterialAlpha(material, "_Color_B_1", alpha);
+                    SafeSetMaterialAlpha(material, "_Color_B_2", alpha);
+                    SafeSetMaterialAlpha(material, "_Color_C_1", alpha);
+                    SafeSetMaterialAlpha(material, "_Color_C_2", alpha);
+                    SafeSetMaterialAlpha(material, "_RimColor", alpha);
+
+                    // Also include legacy fallback support:
+                    SafeSetMaterialAlpha(material, "_Color", alpha);
+                    SafeSetMaterialAlpha(material, "_BaseColor", alpha);
                 }
             }
+        }
+
+        private static void SafeSetMaterialAlpha(Material material, string propertyName, float alpha)
+        {
+            if (!material.HasProperty(propertyName))
+                return;
+
+            var color = material.GetColor(propertyName);
+            color.a = alpha;
+            material.SetColor(propertyName, color);
         }
 
         /// <summary>
