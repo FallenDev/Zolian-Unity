@@ -301,7 +301,7 @@ MonoBehaviour:
   UniStormMenuKey: 27
   UniStormCanvas: {fileID: 0}
   m_MenuToggle: 0
-  TabNumber: 4
+  TabNumber: 3
   TimeTabNumbers: 0
   WeatherTabNumbers: 1
   CelestialTabNumbers: 0
@@ -399,8 +399,8 @@ MonoBehaviour:
   WeatherForecast: []
   ForceLowClouds: 0
   LowCloudHeight: 500
-  CloudDomeTrisCountX: 100
-  CloudDomeTrisCountY: 50
+  CloudDomeTrisCountX: 48
+  CloudDomeTrisCountY: 32
   IgnoreConditions: 0
   CloudyFadeControl:
     serializedVersion: 2
@@ -2045,15 +2045,15 @@ MonoBehaviour:
   SunAngle: 20
   MoonAngle: 35
   SunShaftsEffect: 0
-  MoonShaftsEffect: 1
+  MoonShaftsEffect: 0
   SunObject: {fileID: 0}
   SunObjectMaterial: {fileID: 0}
   Hemisphere: 0
   SunShadowType: 2
   MoonShadowType: 2
   LightningShadowType: 2
-  SunShadowResolution: -1
-  MoonShadowResolution: -1
+  SunShadowResolution: 1
+  MoonShadowResolution: 1
   LightningShadowResolution: 1
   SunShadowStrength: 0.9
   MoonShadowStrength: 0.75
