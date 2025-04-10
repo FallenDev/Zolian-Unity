@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UniStorm;
+﻿using UnityEngine;
 
 namespace UniStorm.Example
 {

@@ -1,8 +1,9 @@
+using UniStorm.Utility;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace UniStorm.Utility
+namespace UniStorm.Effects
 {
     public class UniStormCloudsRendererFeature : ScriptableRendererFeature
     {

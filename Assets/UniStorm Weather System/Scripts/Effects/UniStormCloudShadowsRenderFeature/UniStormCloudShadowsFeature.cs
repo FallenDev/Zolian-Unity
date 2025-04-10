@@ -1,57 +1,57 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-public class UniStormCloudShadowsFeature : ScriptableRendererFeature
+namespace UniStorm.Effects
 {
-
-    [System.Serializable]
-    public class Settings
+    public class UniStormCloudShadowsFeature : ScriptableRendererFeature
     {
-        public bool isEnabled = true;
-        public RenderPassEvent renderPassEvent = RenderPassEvent.AfterRenderingSkybox;
 
-        public float Fade = 0.33f;
-        public RenderTexture CloudShadowTexture;
-        public Color ShadowColor = Color.white;
-        public float CloudTextureScale = 0.1f;
-        public float BottomThreshold = 0f;
-        public float TopThreshold = 1f;
-        public float ShadowIntensity = 1f;
-        public Material ScreenSpaceShadowsMaterial;
-        public Vector3 ShadowDirection;
+        [System.Serializable]
+        public class Settings
+        {
+            public bool isEnabled = true;
+            public RenderPassEvent renderPassEvent = RenderPassEvent.AfterRenderingSkybox;
 
-        public float m_CurrentCloudHeight;
-        public int CloudSpeed;
+            public float Fade = 0.33f;
+            public RenderTexture CloudShadowTexture;
+            public Color ShadowColor = Color.white;
+            public float CloudTextureScale = 0.1f;
+            public float BottomThreshold = 0f;
+            public float TopThreshold = 1f;
+            public float ShadowIntensity = 1f;
+            public Material ScreenSpaceShadowsMaterial;
+            public Vector3 ShadowDirection;
 
-        public float NormalY;
-    }
+            public float m_CurrentCloudHeight;
+            public int CloudSpeed;
 
-    public Settings settings = new Settings();
+            public float NormalY;
+        }
 
-    UniStormCloudShadowsPass cloudShadowsPass;
+        public Settings settings = new Settings();
 
-    public override void Create()
-    {
-        cloudShadowsPass = new UniStormCloudShadowsPass(name);
-    }
+        UniStormCloudShadowsPass cloudShadowsPass;
 
-    #if UNITY_2022_1_OR_NEWER
-    public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
-    {
-        cloudShadowsPass.Setup(renderer.cameraColorTargetHandle);  // use of target after allocation
-    }
+        public override void Create()
+        {
+            cloudShadowsPass = new UniStormCloudShadowsPass(name);
+        }
 
-    public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
-    {
-        if (!settings.isEnabled)
-            return;
+#if UNITY_2022_1_OR_NEWER
+        public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
+        {
+            cloudShadowsPass.Setup(renderer.cameraColorTargetHandle); // use of target after allocation
+        }
 
-        cloudShadowsPass.settings = settings;
-        renderer.EnqueuePass(cloudShadowsPass);
-    }
-    #else
+        public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
+        {
+            if (!settings.isEnabled)
+                return;
+
+            cloudShadowsPass.settings = settings;
+            renderer.EnqueuePass(cloudShadowsPass);
+        }
+#else
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
         if (!settings.isEnabled)
@@ -61,5 +61,6 @@ public class UniStormCloudShadowsFeature : ScriptableRendererFeature
         cloudShadowsPass.Setup(renderer.cameraColorTarget);
         renderer.EnqueuePass(cloudShadowsPass);
     }
-    #endif
+#endif
+    }
 }

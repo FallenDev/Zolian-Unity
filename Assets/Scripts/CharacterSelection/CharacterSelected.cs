@@ -1,4 +1,3 @@
-using Assets.Scripts.Entity;
 using Assets.Scripts.Entity.ScriptableObjects;
 using Assets.Scripts.Managers;
 using Assets.Scripts.Models;

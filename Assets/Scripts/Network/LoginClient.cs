@@ -10,7 +10,6 @@ using Assets.Scripts.Network.Converters.ReceiveFromServer;
 using Assets.Scripts.Network.OpCodes;
 using Assets.Scripts.Network.PacketArgs.SendToServer;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
-using Steamworks;
 
 namespace Assets.Scripts.Network
 {

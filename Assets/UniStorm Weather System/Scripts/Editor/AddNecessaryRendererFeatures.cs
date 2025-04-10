@@ -5,6 +5,7 @@ using UnityEngine.Rendering.Universal;
 using System.Reflection;
 using System.Collections.Generic;
 using System;
+using UniStorm.Effects;
 
 namespace UniStorm
 {
@@ -182,7 +183,7 @@ namespace UniStorm
             if (!featuresFound.Contains(unistormCloudsRendererFeatureName))
             {
                 //add UniStorm cloud renderer feature
-                UniStorm.Utility.UniStormCloudsRendererFeature unistormCloudRendererFeature = ScriptableObject.CreateInstance<UniStorm.Utility.UniStormCloudsRendererFeature>();
+                UniStormCloudsRendererFeature unistormCloudRendererFeature = ScriptableObject.CreateInstance<UniStormCloudsRendererFeature>();
                 unistormCloudRendererFeature.name = unistormCloudsRendererFeatureName;
                 EditorUtility.SetDirty(unistormCloudRendererFeature);
                 AssetDatabase.AddObjectToAsset(unistormCloudRendererFeature, scriptableRendererData);

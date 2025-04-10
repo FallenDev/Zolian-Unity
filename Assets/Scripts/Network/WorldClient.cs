@@ -5,7 +5,6 @@ using Assets.Scripts.Network.OpCodes;
 using Assets.Scripts.Network.PacketArgs.SendToServer;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using Assets.Scripts.Managers;
-using Assets.Scripts.Models;
 using System;
 
 namespace Assets.Scripts.Network

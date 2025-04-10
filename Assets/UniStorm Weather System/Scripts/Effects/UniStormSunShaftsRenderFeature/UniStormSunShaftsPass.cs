@@ -4,250 +4,255 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.XR;
 
-public class UniStormSunShaftsPass : ScriptableRenderPass
+namespace UniStorm.Effects
 {
-    public FilterMode filterMode { get; set; }
-    public UniStormSunShaftsFeature.Settings settings;
-
-    RenderTextureDescriptor cameraRenderTextureDescriptor;
-
-    RTHandle source;
-
-    Material sunShaftsMaterial = null;
-
-    string m_ProfilerTag;
-
-    private Transform sunTransform;
-
-    public Transform SunTransform
+    public class UniStormSunShaftsPass : ScriptableRenderPass
     {
-        get
+        public FilterMode filterMode { get; set; }
+        public UniStormSunShaftsFeature.Settings settings;
+
+        RenderTextureDescriptor cameraRenderTextureDescriptor;
+
+        RTHandle source;
+
+        Material sunShaftsMaterial = null;
+
+        string m_ProfilerTag;
+
+        private Transform sunTransform;
+
+        public Transform SunTransform
         {
-            if (sunTransform == null)
+            get
             {
-                Light[] lights = Light.GetLights(LightType.Directional, ~0);
-                if (lights.Length > 0)
+                if (sunTransform == null)
                 {
-                    Light sunLight = lights.FirstOrDefault(x => x.name.Equals(settings.celestialName));
-                    if (sunLight != null)
+                    Light[] lights = Light.GetLights(LightType.Directional, ~0);
+                    if (lights.Length > 0)
                     {
-                        sunTransform = sunLight.transform.GetChild(0);
+                        Light sunLight = lights.FirstOrDefault(x => x.name.Equals(settings.celestialName));
+                        if (sunLight != null)
+                        {
+                            sunTransform = sunLight.transform.GetChild(0);
+                        }
                     }
                 }
+
+                return sunTransform;
+            }
+        }
+
+        public UniStormSunShaftsPass(string tag)
+        {
+            m_ProfilerTag = tag;
+            Shader unistormSunShaftsShader = Shader.Find("UniStorm/URP/UniStormSunShafts");
+#if UNITY_EDITOR
+            if (unistormSunShaftsShader == null) return;
+#endif
+            sunShaftsMaterial = new Material(unistormSunShaftsShader);
+        }
+
+        public void Setup(RTHandle cameraColorTargetHandle)
+        {
+            source = cameraColorTargetHandle;
+        }
+
+        [System.Obsolete]
+        public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
+        {
+            base.Configure(cmd, cameraTextureDescriptor);
+
+            renderPassEvent = settings.renderPassEvent;
+
+            cameraRenderTextureDescriptor = cameraTextureDescriptor;
+            // No need to call ConfigureTarget or ConfigureClear here
+        }
+
+        [System.Obsolete]
+        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        {
+#if UNITY_EDITOR
+            if (sunShaftsMaterial == null || UnityEditor.EditorApplication.isPaused) return;
+#endif
+
+            CameraData cameraData = renderingData.cameraData;
+            Camera camera = cameraData.camera;
+
+            //Skip execution for the Scene View camera or if not in runtime
+            if (cameraData.cameraType == CameraType.SceneView || !Application.isPlaying) return;
+
+            CommandBuffer cmd = CommandBufferPool.Get(m_ProfilerTag);
+
+            cmd.Clear();
+
+            if (XRSettings.stereoRenderingMode == XRSettings.StereoRenderingMode.SinglePassInstanced
+                && cameraRenderTextureDescriptor.volumeDepth == 2)
+            {
+                cmd.EnableShaderKeyword("STEREO_INSTANCING_ON");
             }
 
-            return sunTransform;
-        }
-    }
+            if (XRSettings.stereoRenderingMode == XRSettings.StereoRenderingMode.MultiPass
+                && camera.stereoActiveEye != Camera.MonoOrStereoscopicEye.Mono && camera.stereoEnabled == true)
+            {
+                cmd.EnableShaderKeyword("STEREO_MULTIVIEW_ON");
+            }
 
-    public UniStormSunShaftsPass(string tag)
-    {
-        m_ProfilerTag = tag;
-        Shader unistormSunShaftsShader = Shader.Find("UniStorm/URP/UniStormSunShafts");
-#if UNITY_EDITOR
-        if (unistormSunShaftsShader == null) return;
-#endif
-        sunShaftsMaterial = new Material(unistormSunShaftsShader);
-    }
+            int divider = 4;
+            if (settings.resolution == UniStormSunShaftsFeature.SunShaftsResolution.Normal)
+                divider = 2;
+            else if (settings.resolution == UniStormSunShaftsFeature.SunShaftsResolution.High)
+                divider = 1;
 
-    public void Setup(RTHandle cameraColorTargetHandle)
-    {
-        source = cameraColorTargetHandle;
-    }
+            Vector3 vl = Vector3.one * 0.5f;
+            Vector3 vr = Vector3.one * 0.5f;
 
-    [System.Obsolete]
-    public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
-    {
-        base.Configure(cmd, cameraTextureDescriptor);
+            Camera.MonoOrStereoscopicEye leftEye;
+            if (camera.stereoActiveEye == Camera.MonoOrStereoscopicEye.Left
+                && XRSettings.stereoRenderingMode == XRSettings.StereoRenderingMode.SinglePassInstanced)
+            {
+                leftEye = Camera.MonoOrStereoscopicEye.Left;
+            }
+            else
+            {
+                leftEye = Camera.MonoOrStereoscopicEye.Mono;
+            }
 
-        renderPassEvent = settings.renderPassEvent;
+            if (SunTransform)
+            {
+                var sunPosition = SunTransform.position;
+                vl = camera.WorldToViewportPoint(sunPosition, leftEye);
+                vr = camera.WorldToViewportPoint(sunPosition, Camera.MonoOrStereoscopicEye.Right);
+            }
+            else
+            {
+                vl = new Vector3(0.5f, 0.5f, 0.0f);
+                vr = new Vector3(0.5f, 0.5f, 0.0f);
+            }
 
-        cameraRenderTextureDescriptor = cameraTextureDescriptor;
-        // No need to call ConfigureTarget or ConfigureClear here
-    }
+            int width = cameraRenderTextureDescriptor.width;
+            int height = cameraRenderTextureDescriptor.height;
 
-    [System.Obsolete]
-    public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
-    {
-#if UNITY_EDITOR
-        if (sunShaftsMaterial == null || UnityEditor.EditorApplication.isPaused) return;
-#endif
+            int rtW = width / divider;
+            int rtH = height / divider;
 
-        CameraData cameraData = renderingData.cameraData;
-        Camera camera = cameraData.camera;
+            // Allocate temporary RTHandles for processing
+            RTHandle lrDepthBuffer = GetTemporaryRTHandle(rtW, rtH);
 
-        //Skip execution for the Scene View camera or if not in runtime
-        if (cameraData.cameraType == CameraType.SceneView || !Application.isPlaying) return;
+            sunShaftsMaterial.SetVector("_BlurRadius4",
+                new Vector4(1.0f, 1.0f, 0.0f, 0.0f) * settings.sunShaftBlurRadius);
+            sunShaftsMaterial.SetVectorArray("_SunPositionArray", new Vector4[2]
+            {
+                new Vector4(vl.x, vl.y, vl.z, settings.maxRadius),
+                new Vector4(vr.x, vr.y, vr.z, settings.maxRadius)
+            });
+            sunShaftsMaterial.SetVector("_SunThreshold", settings.sunThreshold);
 
-        CommandBuffer cmd = CommandBufferPool.Get(m_ProfilerTag);
+            if (!settings.useDepthTexture)
+            {
+                var format = camera.allowHDR ? RenderTextureFormat.DefaultHDR : RenderTextureFormat.Default;
 
-        cmd.Clear();
+                RenderTextureDescriptor rtd = new RenderTextureDescriptor(width, height, format);
+                rtd.msaaSamples = 1;
+                rtd.depthBufferBits = 0;
 
-        if (XRSettings.stereoRenderingMode == XRSettings.StereoRenderingMode.SinglePassInstanced
-            && cameraRenderTextureDescriptor.volumeDepth == 2)
-        {
-            cmd.EnableShaderKeyword("STEREO_INSTANCING_ON");
-        }
+                RTHandle tmpBuffer = RTHandles.Alloc(rtd, name: "TempSkyboxBuffer");
 
-        if (XRSettings.stereoRenderingMode == XRSettings.StereoRenderingMode.MultiPass
-            && camera.stereoActiveEye != Camera.MonoOrStereoscopicEye.Mono && camera.stereoEnabled == true)
-        {
-            cmd.EnableShaderKeyword("STEREO_MULTIVIEW_ON");
-        }
+                sunShaftsMaterial.SetTexture("_Skybox", tmpBuffer);
 
-        int divider = 4;
-        if (settings.resolution == UniStormSunShaftsFeature.SunShaftsResolution.Normal)
-            divider = 2;
-        else if (settings.resolution == UniStormSunShaftsFeature.SunShaftsResolution.High)
-            divider = 1;
+                cmd.Blit(source.rt, lrDepthBuffer.rt, sunShaftsMaterial, 3);
 
-        Vector3 vl = Vector3.one * 0.5f;
-        Vector3 vr = Vector3.one * 0.5f;
+                tmpBuffer.Release();
+            }
+            else
+            {
+                cmd.Blit(source.rt, lrDepthBuffer.rt, sunShaftsMaterial, 2);
+            }
 
-        Camera.MonoOrStereoscopicEye leftEye;
-        if (camera.stereoActiveEye == Camera.MonoOrStereoscopicEye.Left
-            && XRSettings.stereoRenderingMode == XRSettings.StereoRenderingMode.SinglePassInstanced)
-        {
-            leftEye = Camera.MonoOrStereoscopicEye.Left;
-        }
-        else
-        {
-            leftEye = Camera.MonoOrStereoscopicEye.Mono;
-        }
+            // Radial blur iterations
+            settings.radialBlurIterations = Mathf.Clamp(settings.radialBlurIterations, 1, 4);
 
-        if (SunTransform)
-        {
-            var sunPosition = SunTransform.position;
-            vl = camera.WorldToViewportPoint(sunPosition, leftEye);
-            vr = camera.WorldToViewportPoint(sunPosition, Camera.MonoOrStereoscopicEye.Right);
-        }
-        else
-        {
-            vl = new Vector3(0.5f, 0.5f, 0.0f);
-            vr = new Vector3(0.5f, 0.5f, 0.0f);
-        }
+            float ofs = settings.sunShaftBlurRadius * (1.0f / 768.0f);
 
-        int width = cameraRenderTextureDescriptor.width;
-        int height = cameraRenderTextureDescriptor.height;
+            sunShaftsMaterial.SetVector("_BlurRadius4", new Vector4(ofs, ofs, 0.0f, 0.0f));
+            sunShaftsMaterial.SetVectorArray("_SunPositionArray", new Vector4[2]
+            {
+                new Vector4(vl.x, vl.y, vl.z, settings.maxRadius),
+                new Vector4(vr.x, vr.y, vr.z, settings.maxRadius)
+            });
 
-        int rtW = width / divider;
-        int rtH = height / divider;
+            for (int it2 = 0; it2 < settings.radialBlurIterations; it2++)
+            {
+                RTHandle lrColorB = GetTemporaryRTHandle(rtW, rtH);
 
-        // Allocate temporary RTHandles for processing
-        RTHandle lrDepthBuffer = GetTemporaryRTHandle(rtW, rtH);
+                cmd.Blit(lrDepthBuffer.rt, lrColorB.rt, sunShaftsMaterial, 1);
+                lrDepthBuffer.Release();
 
-        sunShaftsMaterial.SetVector("_BlurRadius4", new Vector4(1.0f, 1.0f, 0.0f, 0.0f) * settings.sunShaftBlurRadius);
-        sunShaftsMaterial.SetVectorArray("_SunPositionArray", new Vector4[2]
-        {
-            new Vector4(vl.x, vl.y, vl.z, settings.maxRadius),
-            new Vector4(vr.x, vr.y, vr.z, settings.maxRadius)
-        });
-        sunShaftsMaterial.SetVector("_SunThreshold", settings.sunThreshold);
+                ofs = settings.sunShaftBlurRadius * (((it2 * 2.0f + 1.0f) * 6.0f)) / 768.0f;
+                sunShaftsMaterial.SetVector("_BlurRadius4", new Vector4(ofs, ofs, 0.0f, 0.0f));
 
-        if (!settings.useDepthTexture)
-        {
-            var format = camera.allowHDR ? RenderTextureFormat.DefaultHDR : RenderTextureFormat.Default;
+                lrDepthBuffer = GetTemporaryRTHandle(rtW, rtH);
+                cmd.Blit(lrColorB.rt, lrDepthBuffer.rt, sunShaftsMaterial, 1);
+                lrColorB.Release();
 
-            RenderTextureDescriptor rtd = new RenderTextureDescriptor(width, height, format);
-            rtd.msaaSamples = 1;
-            rtd.depthBufferBits = 0;
+                ofs = settings.sunShaftBlurRadius * (((it2 * 2.0f + 2.0f) * 6.0f)) / 768.0f;
+                sunShaftsMaterial.SetVector("_BlurRadius4", new Vector4(ofs, ofs, 0.0f, 0.0f));
+            }
 
-            RTHandle tmpBuffer = RTHandles.Alloc(rtd, name: "TempSkyboxBuffer");
+            // Final composition
+            if (vl.z >= 0.0f)
+                sunShaftsMaterial.SetVector("_SunColor", settings.sunColor * settings.sunShaftIntensity);
+            else
+                sunShaftsMaterial.SetVector("_SunColor", Vector4.zero); // No backprojection
 
-            sunShaftsMaterial.SetTexture("_Skybox", tmpBuffer);
+            sunShaftsMaterial.SetTexture("_ColorBuffer", lrDepthBuffer);
 
-            cmd.Blit(source.rt, lrDepthBuffer.rt, sunShaftsMaterial, 3);
 
-            tmpBuffer.Release();
-        }
-        else
-        {
-            cmd.Blit(source.rt, lrDepthBuffer.rt, sunShaftsMaterial, 2);
-        }
+            // Allocate a temporary RT for the final result
+            RTHandle finalResult = GetTemporaryRTHandle(cameraRenderTextureDescriptor.width / divider,
+                cameraRenderTextureDescriptor.height / divider);
 
-        // Radial blur iterations
-        settings.radialBlurIterations = Mathf.Clamp(settings.radialBlurIterations, 1, 4);
+            // Blit from source to the temporary RT
+            cmd.Blit(source.rt, finalResult.rt, sunShaftsMaterial,
+                (settings.screenBlendMode == UniStormSunShaftsFeature.ShaftsScreenBlendMode.Screen) ? 0 : 4);
 
-        float ofs = settings.sunShaftBlurRadius * (1.0f / 768.0f);
+            // Blit back to the source
+            cmd.Blit(finalResult.rt, source.rt);
 
-        sunShaftsMaterial.SetVector("_BlurRadius4", new Vector4(ofs, ofs, 0.0f, 0.0f));
-        sunShaftsMaterial.SetVectorArray("_SunPositionArray", new Vector4[2]
-        {
-            new Vector4(vl.x, vl.y, vl.z, settings.maxRadius),
-            new Vector4(vr.x, vr.y, vr.z, settings.maxRadius)
-        });
+            // Release the temporary RT
+            finalResult.Release();
 
-        for (int it2 = 0; it2 < settings.radialBlurIterations; it2++)
-        {
-            RTHandle lrColorB = GetTemporaryRTHandle(rtW, rtH);
+            /*
+            // Blit the final result to the camera's color target
+            cmd.Blit(source.rt, source.rt, sunShaftsMaterial,
+                (settings.screenBlendMode == UniStormSunShaftsFeature.ShaftsScreenBlendMode.Screen) ? 0 : 4);
+            */
 
-            cmd.Blit(lrDepthBuffer.rt, lrColorB.rt, sunShaftsMaterial, 1);
+
+            cmd.DisableShaderKeyword("STEREO_INSTANCING_ON");
+            cmd.DisableShaderKeyword("STEREO_MULTIVIEW_ON");
+
+            context.ExecuteCommandBuffer(cmd);
+            cmd.Clear();
+
             lrDepthBuffer.Release();
 
-            ofs = settings.sunShaftBlurRadius * (((it2 * 2.0f + 1.0f) * 6.0f)) / 768.0f;
-            sunShaftsMaterial.SetVector("_BlurRadius4", new Vector4(ofs, ofs, 0.0f, 0.0f));
-
-            lrDepthBuffer = GetTemporaryRTHandle(rtW, rtH);
-            cmd.Blit(lrColorB.rt, lrDepthBuffer.rt, sunShaftsMaterial, 1);
-            lrColorB.Release();
-
-            ofs = settings.sunShaftBlurRadius * (((it2 * 2.0f + 2.0f) * 6.0f)) / 768.0f;
-            sunShaftsMaterial.SetVector("_BlurRadius4", new Vector4(ofs, ofs, 0.0f, 0.0f));
+            CommandBufferPool.Release(cmd);
         }
 
-        // Final composition
-        if (vl.z >= 0.0f)
-            sunShaftsMaterial.SetVector("_SunColor", settings.sunColor * settings.sunShaftIntensity);
-        else
-            sunShaftsMaterial.SetVector("_SunColor", Vector4.zero); // No backprojection
+        private RTHandle GetTemporaryRTHandle(int width, int height)
+        {
+            RenderTextureDescriptor rtd = cameraRenderTextureDescriptor;
+            rtd.width = width;
+            rtd.height = height;
+            rtd.depthBufferBits = 0;
+            rtd.msaaSamples = 1;
 
-        sunShaftsMaterial.SetTexture("_ColorBuffer", lrDepthBuffer);
+            return RTHandles.Alloc(rtd);
+        }
 
-
-        // Allocate a temporary RT for the final result
-        RTHandle finalResult = GetTemporaryRTHandle(cameraRenderTextureDescriptor.width / divider, cameraRenderTextureDescriptor.height / divider);
-
-        // Blit from source to the temporary RT
-        cmd.Blit(source.rt, finalResult.rt, sunShaftsMaterial,
-            (settings.screenBlendMode == UniStormSunShaftsFeature.ShaftsScreenBlendMode.Screen) ? 0 : 4);
-
-        // Blit back to the source
-        cmd.Blit(finalResult.rt, source.rt);
-
-        // Release the temporary RT
-        finalResult.Release();
-
-        /*
-        // Blit the final result to the camera's color target
-        cmd.Blit(source.rt, source.rt, sunShaftsMaterial,
-            (settings.screenBlendMode == UniStormSunShaftsFeature.ShaftsScreenBlendMode.Screen) ? 0 : 4);
-        */
-
-
-        cmd.DisableShaderKeyword("STEREO_INSTANCING_ON");
-        cmd.DisableShaderKeyword("STEREO_MULTIVIEW_ON");
-
-        context.ExecuteCommandBuffer(cmd);
-        cmd.Clear();
-
-        lrDepthBuffer.Release();
-
-        CommandBufferPool.Release(cmd);
-    }
-
-    private RTHandle GetTemporaryRTHandle(int width, int height)
-    {
-        RenderTextureDescriptor rtd = cameraRenderTextureDescriptor;
-        rtd.width = width;
-        rtd.height = height;
-        rtd.depthBufferBits = 0;
-        rtd.msaaSamples = 1;
-
-        return RTHandles.Alloc(rtd);
-    }
-
-    public override void OnCameraCleanup(CommandBuffer cmd)
-    {
-        // No need to release source, as it's provided by the renderer
+        public override void OnCameraCleanup(CommandBuffer cmd)
+        {
+            // No need to release source, as it's provided by the renderer
+        }
     }
 }
