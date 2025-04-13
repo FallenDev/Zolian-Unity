@@ -5,10 +5,8 @@ using Assets.Scripts.Network.OpCodes;
 using Assets.Scripts.Network.PacketArgs.SendToServer;
 using Assets.Scripts.Managers;
 using System;
-using Assets.Scripts.Entity.Entities;
 using Assets.Scripts.Models;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
-using Unity.VisualScripting;
 
 namespace Assets.Scripts.Network
 {
@@ -120,7 +118,7 @@ namespace Assets.Scripts.Network
                             case EntityType.Player:
                                 {
                                     if (CharacterGameManager.Instance.CachedPlayers.TryGetValue(entityArgs.Serial, out var player))
-                                        player.UpdateMovement(entityArgs);
+                                        player.PlayerMethods.UpdateMovement(player, entityArgs);
                                 }
                                 break;
                             case EntityType.NPC:
@@ -150,10 +148,13 @@ namespace Assets.Scripts.Network
                             case EntityType.Player:
                                 {
                                     if (CharacterGameManager.Instance.CachedPlayers.ContainsKey(entityArgs.Serial)) return;
-                                    var player = CharacterGameManager.Instance.SpawnOtherPlayerPrefab(entityArgs);
 
-                                    // Cache for future updates
-                                    CharacterGameManager.Instance.CachedPlayers[entityArgs.Serial] = player;
+                                    MainThreadDispatcher.RunOnMainThread(() =>
+                                    {
+                                        var player = CharacterGameManager.Instance.SpawnOtherPlayerPrefab(entityArgs);
+                                        // Cache for future updates
+                                        CharacterGameManager.Instance.CachedPlayers[entityArgs.Serial] = player;
+                                    });
                                 }
                                 break;
 
@@ -186,6 +187,8 @@ namespace Assets.Scripts.Network
         {
             ServerConverters.Add((byte)ServerOpCode.LoginMessage, new LoginMessageConverter());
             ServerConverters.Add((byte)ServerOpCode.CharacterData, new CharacterDataConverter());
+            ServerConverters.Add((byte)ServerOpCode.EntityMovement, new EntityMovementConverter());
+            ServerConverters.Add((byte)ServerOpCode.AddEntity, new EntitySpawnConveter());
             ServerConverters.Add((byte)ServerOpCode.ServerMessage, new ServerMessageConverter());
         }
 

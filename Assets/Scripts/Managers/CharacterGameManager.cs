@@ -6,6 +6,7 @@ using Assets.Scripts.Entity.Entities;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 namespace Assets.Scripts.Managers
@@ -20,7 +21,7 @@ namespace Assets.Scripts.Managers
         public ushort WorldPort = 4202; // ToDo: Change to a UI box to pick a world server
         public Guid Serial;
         public string UserName;
-        private GameObject _spawnedPlayer;
+        public Player LocalPlayer { get; private set; }
 
         // Cache for entities nearby
         public ConcurrentDictionary<Guid, Player> CachedPlayers { get; set; } = new();
@@ -78,54 +79,64 @@ namespace Assets.Scripts.Managers
             return false;
         }
 
-        public void SpawnPlayerPrefab(CharacterDataArgs args)
+        public Player SpawnPlayerPrefab(CharacterDataArgs args)
         {
+            if (LocalPlayer != null)
+            {
+                Debug.LogWarning("Local player already exists.");
+                return LocalPlayer;
+            }
+
             var prefab = CharacterPrefabLoader.GetPrefabForLogin(args.Sex);
-            if (prefab == null)
-            {
-                Debug.LogError($"No prefab found for gender: {args.Sex}");
-                return;
-            }
+            var playerGO = Instantiate(prefab, args.Position, Quaternion.identity);
 
-            if (_spawnedPlayer != null)
-                Destroy(_spawnedPlayer);
+            var player = playerGO.GetComponent<Player>();
+            player.InitializeLocalPlayerFromData(args);
 
-            _spawnedPlayer = Instantiate(prefab, args.Position, Quaternion.identity);
+            LocalPlayer = player;
+            CachedPlayers[args.Serial] = player;
 
-            var playerScript = _spawnedPlayer.GetComponent<Player>();
-            if (playerScript == null)
-            {
-                Debug.LogError("Spawned prefab is missing the Player component!");
-                return;
-            }
-
-            playerScript.InitializeLocalPlayerFromData(args);
-            Debug.Log($"Spawned player '{args.UserName}' at position {args.Position}");
+            return player;
         }
 
         public Player SpawnOtherPlayerPrefab(EntitySpawnArgs args)
         {
-            var prefab = CharacterPrefabLoader.GetPrefabForLogin(args.Sex);
+            var prefab = CharacterPrefabLoader.GetPrefabForSelection(args.Sex);
             if (prefab == null)
             {
                 Debug.LogError($"No prefab found for gender: {args.Sex}");
                 return null;
             }
 
-            if (_spawnedPlayer != null)
-                Destroy(_spawnedPlayer);
+            // Spawn the remote player at the correct position and rotation
+            var spawnedRemotePlayer = Instantiate(
+                prefab,
+                args.Position,
+                Quaternion.Euler(0, args.CameraYaw, 0)
+            );
 
-            _spawnedPlayer = Instantiate(prefab, args.Position, Quaternion.identity);
+            // Ensure the tag is removed or changed to prevent camera from attaching
+            spawnedRemotePlayer.tag = "Untagged";
 
-            var playerScript = _spawnedPlayer.GetComponent<Player>();
+            var playerScript = spawnedRemotePlayer.GetComponent<Player>();
             if (playerScript == null)
             {
-                Debug.LogError("Spawned prefab is missing the Player component!");
+                Debug.LogError("Spawned remote player prefab is missing the Player component!");
+                Destroy(spawnedRemotePlayer); // Cleanup broken instance
                 return null;
             }
 
+            //// Ensure remote players do not have input/camera attached
+            //var input = spawnedRemotePlayer.GetComponent<PlayerInput>();
+            //if (input != null)
+            //    Destroy(input); // Remove if accidentally present
+
+            //var camera = spawnedRemotePlayer.GetComponentInChildren<Camera>();
+            //if (camera != null)
+            //    camera.gameObject.SetActive(false); // Disable any camera inside the prefab
+
             playerScript.InitializeFromSpawnData(args);
-            Debug.Log($"Spawned player '{args.UserName}' at position {args.Position}");
+            Debug.Log($"Spawned remote player '{args.UserName}' at position {args.Position}");
             return playerScript;
         }
     }

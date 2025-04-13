@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Assets.Scripts.Entity.Abstractions;
+using Assets.Scripts.Entity.Behaviors;
 using Assets.Scripts.Entity.ScriptableObjects;
 using Assets.Scripts.Managers;
 using Assets.Scripts.Models;
@@ -11,14 +12,12 @@ using JohnStairs.RCC.Inputs;
 
 using UnityEngine;
 
-using static UnityEngine.Rendering.GPUSort;
-
 namespace Assets.Scripts.Entity.Entities
 {
     public class Player : Damageable, IPlayer, IPointerInfo
     {
-        public static Player PlayerInstance { get; private set; }
-
+        // Property to expose methods related to local client
+        public PlayerMethods PlayerMethods { get; private set; } = new();
         [Header("Base Properties")]
         public WorldClient Client { get; set; }
         public bool IsLocalPlayer { get; set; }
@@ -74,26 +73,17 @@ namespace Assets.Scripts.Entity.Entities
         public LayerMask UiLayers = 32;
 
         // Equipment
-
-
         // Add any additional properties needed for in-game representation
 
-        public Player() { }
-
-        private void Awake()
+        public void Start()
         {
-            PlayerInstance = this;
-            Client = WorldClient.Instance;
-        }
-
-        private void Start()
-        {
-
+            if (IsLocalPlayer)
+                Client = WorldClient.Instance;
         }
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.L))
+            if (IsLocalPlayer && Input.GetKeyDown(KeyCode.L))
             {
                 EnableTargetLock = !EnableTargetLock;
             }
@@ -123,13 +113,6 @@ namespace Assets.Scripts.Entity.Entities
         public virtual bool LockedOnTarget() => EnableTargetLock;
 
         public virtual bool IsPointerOverGUI() => Utils.IsPointerOverGUI(UiLayers);
-
-        public void UpdateMovement(EntityMovementArgs args)
-        {
-            if (args.Serial != Serial) return;
-            Position = args.Position;
-            CameraYaw = args.CameraYaw;
-        }
 
         #endregion
 
@@ -263,7 +246,7 @@ namespace Assets.Scripts.Entity.Entities
         /// <summary>
         /// Assigns body parts to script's variables for easy access
         /// </summary>
-        public void AssignCharacterBodyParts(GameObject character)
+        private void AssignCharacterBodyParts(GameObject character)
         {
             if (character == null)
             {
