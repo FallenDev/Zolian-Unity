@@ -3,9 +3,12 @@ using Assets.Scripts.Network.Converters.ReceiveFromServer;
 using Assets.Scripts.Network.Converters.SendToServer;
 using Assets.Scripts.Network.OpCodes;
 using Assets.Scripts.Network.PacketArgs.SendToServer;
-using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using Assets.Scripts.Managers;
 using System;
+using Assets.Scripts.Entity.Entities;
+using Assets.Scripts.Models;
+using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
+using Unity.VisualScripting;
 
 namespace Assets.Scripts.Network
 {
@@ -41,7 +44,7 @@ namespace Assets.Scripts.Network
         /// <summary>
         /// Sends basic player information to the server to enter the game and sends back character information
         /// </summary>
-        private void SendEnterGame(Guid serial, string userName)
+        public void SendEnterGame(Guid serial, string userName)
         {
             try
             {
@@ -107,6 +110,70 @@ namespace Assets.Scripts.Network
                         {
                             CharacterGameManager.Instance.SpawnPlayerPrefab(playerArgs);
                         });
+                        break;
+                    }
+                case (byte)ServerOpCode.EntityMovement:
+                    {
+                        var entityArgs = (EntityMovementArgs)args;
+                        switch (entityArgs.EntityType)
+                        {
+                            case EntityType.Player:
+                                {
+                                    if (CharacterGameManager.Instance.CachedPlayers.TryGetValue(entityArgs.Serial, out var player))
+                                        player.UpdateMovement(entityArgs);
+                                }
+                                break;
+                            case EntityType.NPC:
+                                {
+                                    if (CharacterGameManager.Instance.CachedNpcs.TryGetValue(entityArgs.Serial, out var npc))
+                                    {
+                                        //npc.UpdateMovement(entityArgs);
+                                    }
+                                }
+                                break;
+                            case EntityType.Monster:
+                                {
+                                    if (CharacterGameManager.Instance.CachedMobs.TryGetValue(entityArgs.Serial, out var mob))
+                                    {
+                                        //mob.UpdateMovement(entityArgs);
+                                    }
+                                }
+                                break;
+                        }
+                        break;
+                    }
+                case (byte)ServerOpCode.AddEntity:
+                    {
+                        var entityArgs = (EntitySpawnArgs)args;
+                        switch (entityArgs.EntityType)
+                        {
+                            case EntityType.Player:
+                                {
+                                    if (CharacterGameManager.Instance.CachedPlayers.ContainsKey(entityArgs.Serial)) return;
+                                    var player = CharacterGameManager.Instance.SpawnOtherPlayerPrefab(entityArgs);
+
+                                    // Cache for future updates
+                                    CharacterGameManager.Instance.CachedPlayers[entityArgs.Serial] = player;
+                                }
+                                break;
+
+                            case EntityType.NPC:
+                                break;
+                            case EntityType.Monster:
+                                break;
+                            case EntityType.Pet:
+                                break;
+                            case EntityType.Mount:
+                                break;
+                            case EntityType.Summon:
+                                break;
+                            case EntityType.Item:
+                                break;
+                            case EntityType.Unknown:
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
                         break;
                     }
                 default:

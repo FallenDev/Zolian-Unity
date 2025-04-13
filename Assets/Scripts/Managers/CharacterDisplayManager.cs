@@ -41,7 +41,7 @@ namespace Assets.Scripts.Managers
 
             var animator = _currentCharacter.GetComponent<Animator>();
             if (animator != null)
-                animator.Play("Idle");
+                animator.Play("Standard Movement");
             else
                 Debug.LogWarning("Animator not found on character prefab.");
 

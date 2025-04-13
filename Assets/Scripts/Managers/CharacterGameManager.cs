@@ -1,6 +1,7 @@
 ﻿using System;
-
+using System.Collections.Concurrent;
 using Assets.Scripts.CharacterSelection;
+using Assets.Scripts.Entity;
 using Assets.Scripts.Entity.Entities;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 
@@ -20,6 +21,13 @@ namespace Assets.Scripts.Managers
         public Guid Serial;
         public string UserName;
         private GameObject _spawnedPlayer;
+
+        // Cache for entities nearby
+        public ConcurrentDictionary<Guid, Player> CachedPlayers { get; set; } = new();
+        public ConcurrentDictionary<Guid, Movable> CachedItems { get; set; } = new();
+        public ConcurrentDictionary<Guid, Movable> CachedNpcs { get; set; } = new();
+        public ConcurrentDictionary<Guid, Damageable> CachedMobs { get; set; } = new();
+
 
         private static CharacterGameManager _instance;
 
@@ -91,8 +99,34 @@ namespace Assets.Scripts.Managers
                 return;
             }
 
-            playerScript.InitializeFromData(args);           // Set stats and metadata
+            playerScript.InitializeLocalPlayerFromData(args);
             Debug.Log($"Spawned player '{args.UserName}' at position {args.Position}");
+        }
+
+        public Player SpawnOtherPlayerPrefab(EntitySpawnArgs args)
+        {
+            var prefab = CharacterPrefabLoader.GetPrefabForLogin(args.Sex);
+            if (prefab == null)
+            {
+                Debug.LogError($"No prefab found for gender: {args.Sex}");
+                return null;
+            }
+
+            if (_spawnedPlayer != null)
+                Destroy(_spawnedPlayer);
+
+            _spawnedPlayer = Instantiate(prefab, args.Position, Quaternion.identity);
+
+            var playerScript = _spawnedPlayer.GetComponent<Player>();
+            if (playerScript == null)
+            {
+                Debug.LogError("Spawned prefab is missing the Player component!");
+                return null;
+            }
+
+            playerScript.InitializeFromSpawnData(args);
+            Debug.Log($"Spawned player '{args.UserName}' at position {args.Position}");
+            return playerScript;
         }
     }
 }

@@ -7,7 +7,11 @@
         LoginMessage = 0x02,
         CreateCharacterFinalized = 0x03,
         CharacterData = 0x04,
+        EntityMovement = 0x05,
+        PlayAnimation = 0x06,
+        EntityAnimation = 0x07, // Might bundle this into EntityMovement
         ServerMessage = 0x0A,
+        AddEntity = 0x0D,
         RemoveEntity = 0x0E,
         Sound = 0x19,
         AcceptConnection = 0x7E

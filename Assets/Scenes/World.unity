@@ -301,7 +301,7 @@ MonoBehaviour:
   UniStormMenuKey: 27
   UniStormCanvas: {fileID: 0}
   m_MenuToggle: 0
-  TabNumber: 3
+  TabNumber: 1
   TimeTabNumbers: 0
   WeatherTabNumbers: 1
   CelestialTabNumbers: 0
@@ -383,10 +383,13 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 94210b16f951bd7469f2250796bf321d, type: 3}
   - {fileID: 8300000, guid: eae9b3e19af95944fb74ad66544f4886, type: 3}
   TimeOfDayAudioSource: {fileID: 0}
-  MorningMusic: []
-  DayMusic: []
+  MorningMusic:
+  - {fileID: 8300000, guid: 7b131cdd0224841c28271f9fdc080ef9, type: 3}
+  DayMusic:
+  - {fileID: 8300000, guid: c35d3c98ba2204f6aa3f93a8fe745a64, type: 3}
   EveningMusic: []
-  NightMusic: []
+  NightMusic:
+  - {fileID: 8300000, guid: ec8465edffbc94ac690c296ff104f009, type: 3}
   TimeOfDayMusicAudioSource: {fileID: 0}
   TimeOfDayMusicDelay: 1
   TimeOfDaySoundsDuringPrecipitationWeather: 1

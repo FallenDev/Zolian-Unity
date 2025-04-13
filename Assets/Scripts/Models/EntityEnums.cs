@@ -18,8 +18,22 @@ namespace Assets.Scripts.Models
         Chaos = 0x0A
     }
 
-    public static class ElementEnums
+    [Flags]
+    public enum EntityType
+    {
+        Player = 0,
+        NPC = 1,
+        Monster = 2,
+        Pet = 3,
+        Mount = 4,
+        Summon = 5,
+        Item = 6,
+        Unknown = 7
+    }
+
+    public static class EntityFlagsExtensions
     {
         public static bool ElementFlagIsSet(this Element self, Element flag) => (self & flag) == flag;
+        public static bool EntityTypeFlagIsSet(this EntityType self, EntityType flag) => (self & flag) == flag;
     }
 }

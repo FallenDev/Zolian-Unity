@@ -11,6 +11,8 @@ using JohnStairs.RCC.Inputs;
 
 using UnityEngine;
 
+using static UnityEngine.Rendering.GPUSort;
+
 namespace Assets.Scripts.Entity.Entities
 {
     public class Player : Damageable, IPlayer, IPointerInfo
@@ -19,6 +21,7 @@ namespace Assets.Scripts.Entity.Entities
 
         [Header("Base Properties")]
         public WorldClient Client { get; set; }
+        public bool IsLocalPlayer { get; set; }
         public DateTime LastLogged { get; set; }
         public string UserName { get; set; }
         public ClassStage Stage { get; set; }
@@ -28,6 +31,8 @@ namespace Assets.Scripts.Entity.Entities
         public BaseClass SecondClass { get; set; }
         public bool GameMaster { get; set; }
         public float CameraYaw { get; set; }
+        private Vector3 _lastServerPos;
+        private float _interpolationSpeed = 10f; // Tweak this
 
         [Header("Character Looks")]
         public CharacterSO CharacterSo { get; set; }
@@ -92,6 +97,12 @@ namespace Assets.Scripts.Entity.Entities
             {
                 EnableTargetLock = !EnableTargetLock;
             }
+
+            if (!IsLocalPlayer) // Prevent override if this is *our* character
+            {
+                transform.position = Vector3.Lerp(transform.position, _lastServerPos, Time.deltaTime * _interpolationSpeed);
+                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0, CameraYaw, 0), Time.deltaTime * _interpolationSpeed);
+            }
         }
 
         #region Character Controller
@@ -113,13 +124,21 @@ namespace Assets.Scripts.Entity.Entities
 
         public virtual bool IsPointerOverGUI() => Utils.IsPointerOverGUI(UiLayers);
 
+        public void UpdateMovement(EntityMovementArgs args)
+        {
+            if (args.Serial != Serial) return;
+            Position = args.Position;
+            CameraYaw = args.CameraYaw;
+        }
+
         #endregion
 
         #region Character Display
 
-        public void InitializeFromData(CharacterDataArgs playerArgs)
+        public void InitializeLocalPlayerFromData(CharacterDataArgs playerArgs)
         {
             Serial = playerArgs.Serial;
+            IsLocalPlayer = true;
             CurrentZoneId = 0;
             Position = playerArgs.Position;
             CameraYaw = playerArgs.CameraYaw;
@@ -162,6 +181,29 @@ namespace Assets.Scripts.Entity.Entities
             UpdateCharacterDisplay(playerArgs);
         }
 
+        public void InitializeFromSpawnData(EntitySpawnArgs data)
+        {
+            Serial = data.Serial;
+            IsLocalPlayer = false;
+            CurrentZoneId = 0;
+            Position = data.Position;
+            _lastServerPos = data.Position;
+            CameraYaw = data.CameraYaw;
+            EntityLevel = data.EntityLevel;
+            CurrentHp = data.CurrentHealth;
+            MaxHp = data.MaxHealth;
+            CurrentMp = data.CurrentMana;
+            MaxMp = data.MaxMana;
+            UserName = data.UserName;
+            Race = data.Race;
+            Gender = data.Sex;
+            CharacterSo = GetCurrentCharacterSO(Race);
+            transform.rotation = Quaternion.Euler(0, data.CameraYaw, 0);
+
+            UpdateCharacterDisplay(data);
+        }
+
+
         /// <summary>
         /// Sets the current Scriptable Object based on race
         /// </summary>
@@ -188,6 +230,23 @@ namespace Assets.Scripts.Entity.Entities
         /// Creates character prefab based on initial data
         /// </summary>
         private void UpdateCharacterDisplay(CharacterDataArgs characterData)
+        {
+            if (CharacterSo == null) return;
+            Hair = CharacterSo.Hair[characterData.Hair];
+            Bangs = CharacterSo.HairBangs[characterData.Bangs];
+            Beard = CharacterSo.HairBeard[characterData.Beard];
+            Mustache = CharacterSo.HairMustache[characterData.Mustache];
+            HairColor = CharacterSo.HairColor[characterData.HairColor];
+            HairHighlightColor = CharacterSo.HairHighlightColor[characterData.HairHighlightColor];
+            EyeColor = CharacterSo.EyeColor[characterData.EyeColor];
+            SkinColor = CharacterSo.SkinColor[characterData.SkinColor];
+            AssignCharacterBodyParts(gameObject);
+        }
+
+        /// <summary>
+        /// Create character prefab based on spawned player
+        /// </summary>
+        private void UpdateCharacterDisplay(EntitySpawnArgs characterData)
         {
             if (CharacterSo == null) return;
             Hair = CharacterSo.Hair[characterData.Hair];
