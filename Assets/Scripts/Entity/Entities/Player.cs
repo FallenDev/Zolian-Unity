@@ -207,13 +207,13 @@ namespace Assets.Scripts.Entity.Entities
             if (cc) cc.enabled = false;
             var input = GetComponent<PlayerInput>();
             if (input) input.enabled = false;
-            var networkMovement = GetComponent<NetworkMovementSender>();
+            var networkMovement = GetComponent<NetworkMovementSenderForLocal>();
             if (networkMovement) networkMovement.enabled = false;
             var mmoMotor = GetComponent<RPGMotorMMO>();
             if (mmoMotor) mmoMotor.enabled = false;
 
             // Enabled Remote
-            var networkBridge = GetComponent<RPGMotorNetworkBridge>();
+            var networkBridge = GetComponent<NetworkMovementUpdaterForRemote>();
             if (networkBridge) networkBridge.enabled = true;
             var motor = GetComponent<RemoteRPGMotor>();
             if (motor) motor.enabled = true;

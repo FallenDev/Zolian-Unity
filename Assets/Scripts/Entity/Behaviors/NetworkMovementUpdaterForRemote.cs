@@ -1,21 +1,16 @@
 ﻿using UnityEngine;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
-using Assets.Scripts.Entity.Behaviors;
 
-namespace Assets.Scripts.Managers
+namespace Assets.Scripts.Entity.Behaviors
 {
-    /// <summary>
-    /// This class needs to be separated out from RemoteRPGMotor and MMOMotor due to both local and
-    /// non-local accessing the "Get Calls" below
-    /// </summary>
-    public class RPGMotorNetworkBridge : MonoBehaviour
+    public class NetworkMovementUpdaterForRemote : MonoBehaviour
     {
         private RemoteRPGMotor _motor;
-        public Transform GetPlayerTransform => _motor.GetTransform();
-        public Vector3 GetInputDirection => _motor.GetCurrentMovementDirection(); // Extract input for simulation
-        public Vector3 GetVelocity => _motor.GetCurrentMovementDirection(); // World movement vector
-        public float GetSpeed() => _motor.GetCurrentMovementSpeed();
-        public float CameraYaw => _motor.transform.eulerAngles.y;
+
+        private void Awake()
+        {
+            _motor = GetComponent<RemoteRPGMotor>();
+        }
 
         public void ApplyRemoteState(EntityMovementArgs args)
         {

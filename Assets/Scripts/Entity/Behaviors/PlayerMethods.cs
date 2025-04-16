@@ -11,7 +11,7 @@ namespace Assets.Scripts.Entity.Behaviors
         {
             if (args.Serial != player.Serial) return;
 
-            var bridge = player.GetComponent<RPGMotorNetworkBridge>();
+            var bridge = player.GetComponent<NetworkMovementUpdaterForRemote>();
             if (bridge == null)
             {
                 Debug.LogError($"RPGMotorNetworkBridge not found on {player.name}");
