@@ -6,11 +6,6 @@ namespace Assets.Scripts.Entity.Behaviors
 {
     public class RemoteRPGMotor : RPGMotor
     {
-        public Vector3 RemoteInputDirection { get; set; }
-        public float RemoteSpeed { get; set; }
-        public float RemoteCameraYaw { get; set; }
-        public float RemoteVerticalVelocity { get; set; }
-
         /// <summary>
         /// Applies server-authoritative movement state to the motor.
         /// </summary>

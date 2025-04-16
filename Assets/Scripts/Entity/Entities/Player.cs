@@ -213,8 +213,6 @@ namespace Assets.Scripts.Entity.Entities
             if (mmoMotor) mmoMotor.enabled = false;
 
             // Enabled Remote
-            var networkBridge = GetComponent<NetworkMovementUpdaterForRemote>();
-            if (networkBridge) networkBridge.enabled = true;
             var motor = GetComponent<RemoteRPGMotor>();
             if (motor) motor.enabled = true;
         }

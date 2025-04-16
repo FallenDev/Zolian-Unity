@@ -1,5 +1,4 @@
 ﻿using Assets.Scripts.Entity.Entities;
-using Assets.Scripts.Managers;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using UnityEngine;
 
@@ -11,13 +10,21 @@ namespace Assets.Scripts.Entity.Behaviors
         {
             if (args.Serial != player.Serial) return;
 
-            var bridge = player.GetComponent<NetworkMovementUpdaterForRemote>();
-            if (bridge == null)
+            var motor = player.GetComponent<RemoteRPGMotor>();
+            if (motor == null)
             {
-                Debug.LogError($"RPGMotorNetworkBridge not found on {player.name}");
+                Debug.LogError($"RemoteRPGMotor not found on {player.name}");
                 return;
             }
-            bridge.ApplyRemoteState(args);
+
+            if (!player.IsLocalPlayer)
+                motor.ApplyRemoteState(
+                    args.Position,
+                    args.InputDirection,
+                    args.CameraYaw,
+                    args.Speed,
+                    args.VerticalVelocity
+                );
         }
     }
 }
