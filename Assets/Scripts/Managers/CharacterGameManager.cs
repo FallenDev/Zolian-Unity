@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
+
 using Assets.Scripts.CharacterSelection;
 using Assets.Scripts.Entity;
 using Assets.Scripts.Entity.Entities;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
+
+using JohnStairs.RCC.Character.Cam;
+using JohnStairs.RCC.Character.Motor;
 
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -94,6 +98,7 @@ namespace Assets.Scripts.Managers
             player.InitializeLocalPlayerFromData(args);
 
             LocalPlayer = player;
+            Serial = args.Serial;
             CachedPlayers[args.Serial] = player;
 
             return player;
@@ -101,7 +106,7 @@ namespace Assets.Scripts.Managers
 
         public Player SpawnOtherPlayerPrefab(EntitySpawnArgs args)
         {
-            var prefab = CharacterPrefabLoader.GetPrefabForSelection(args.Sex);
+            var prefab = CharacterPrefabLoader.GetPrefabForLogin(args.Sex);
             if (prefab == null)
             {
                 Debug.LogError($"No prefab found for gender: {args.Sex}");
@@ -125,15 +130,6 @@ namespace Assets.Scripts.Managers
                 Destroy(spawnedRemotePlayer); // Cleanup broken instance
                 return null;
             }
-
-            //// Ensure remote players do not have input/camera attached
-            //var input = spawnedRemotePlayer.GetComponent<PlayerInput>();
-            //if (input != null)
-            //    Destroy(input); // Remove if accidentally present
-
-            //var camera = spawnedRemotePlayer.GetComponentInChildren<Camera>();
-            //if (camera != null)
-            //    camera.gameObject.SetActive(false); // Disable any camera inside the prefab
 
             playerScript.InitializeFromSpawnData(args);
             Debug.Log($"Spawned remote player '{args.UserName}' at position {args.Position}");

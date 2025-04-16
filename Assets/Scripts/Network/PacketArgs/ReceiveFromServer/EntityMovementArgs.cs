@@ -10,6 +10,9 @@ namespace Assets.Scripts.Network.PacketArgs.ReceiveFromServer
         public EntityType EntityType { get; set; }
         public Guid Serial { get; set; }
         public Vector3 Position { get; set; }
+        public Vector3 InputDirection { get; set; }
         public float CameraYaw { get; set; }
+        public float Speed { get; set; }
+        public float VerticalVelocity { get; set; }
     }
 }

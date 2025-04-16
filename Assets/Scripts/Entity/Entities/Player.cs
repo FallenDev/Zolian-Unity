@@ -8,19 +8,23 @@ using Assets.Scripts.Models;
 using Assets.Scripts.Network;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using JohnStairs.RCC;
+using JohnStairs.RCC.Character.Cam;
+using JohnStairs.RCC.Character.Motor;
 using JohnStairs.RCC.Inputs;
 
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Assets.Scripts.Entity.Entities
 {
     public class Player : Damageable, IPlayer, IPointerInfo
     {
-        // Property to expose methods related to local client
-        public PlayerMethods PlayerMethods { get; private set; } = new();
         [Header("Base Properties")]
         public WorldClient Client { get; set; }
-        public bool IsLocalPlayer { get; set; }
+
+        public bool IsLocalPlayer => CharacterGameManager.Instance.Serial == Serial;
+        public Animator Animator { get; private set; }
+        public CharacterController CharacterController { get; private set; }
         public DateTime LastLogged { get; set; }
         public string UserName { get; set; }
         public ClassStage Stage { get; set; }
@@ -30,8 +34,8 @@ namespace Assets.Scripts.Entity.Entities
         public BaseClass SecondClass { get; set; }
         public bool GameMaster { get; set; }
         public float CameraYaw { get; set; }
-        private Vector3 _lastServerPos;
-        private float _interpolationSpeed = 10f; // Tweak this
+        public Vector3 LastServerPos;
+        [SerializeField] private float _interpolationSpeed = 10f;
 
         [Header("Character Looks")]
         public CharacterSO CharacterSo { get; set; }
@@ -71,9 +75,16 @@ namespace Assets.Scripts.Entity.Entities
         public GameObject Target;
         public bool EnableTargetLock;
         public LayerMask UiLayers = 32;
+        public Vector3 InputDirection;
+        public float Speed;
 
         // Equipment
         // Add any additional properties needed for in-game representation
+        private void Awake()
+        {
+            Animator = GetComponent<Animator>();
+            CharacterController = GetComponent<CharacterController>();
+        }
 
         public void Start()
         {
@@ -84,14 +95,13 @@ namespace Assets.Scripts.Entity.Entities
         private void Update()
         {
             if (IsLocalPlayer && Input.GetKeyDown(KeyCode.L))
-            {
                 EnableTargetLock = !EnableTargetLock;
-            }
 
-            if (!IsLocalPlayer) // Prevent override if this is *our* character
+            // Decouples physics from rendering
+            if (!IsLocalPlayer)
             {
-                transform.position = Vector3.Lerp(transform.position, _lastServerPos, Time.deltaTime * _interpolationSpeed);
-                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0, CameraYaw, 0), Time.deltaTime * _interpolationSpeed);
+                transform.position = Vector3.Lerp(transform.position, LastServerPos, Time.deltaTime * _interpolationSpeed);
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, CameraYaw, 0), Time.deltaTime * _interpolationSpeed);
             }
         }
 
@@ -121,7 +131,6 @@ namespace Assets.Scripts.Entity.Entities
         public void InitializeLocalPlayerFromData(CharacterDataArgs playerArgs)
         {
             Serial = playerArgs.Serial;
-            IsLocalPlayer = true;
             CurrentZoneId = 0;
             Position = playerArgs.Position;
             CameraYaw = playerArgs.CameraYaw;
@@ -167,10 +176,9 @@ namespace Assets.Scripts.Entity.Entities
         public void InitializeFromSpawnData(EntitySpawnArgs data)
         {
             Serial = data.Serial;
-            IsLocalPlayer = false;
             CurrentZoneId = 0;
             Position = data.Position;
-            _lastServerPos = data.Position;
+            LastServerPos = data.Position;
             CameraYaw = data.CameraYaw;
             EntityLevel = data.EntityLevel;
             CurrentHp = data.CurrentHealth;
@@ -181,11 +189,35 @@ namespace Assets.Scripts.Entity.Entities
             Race = data.Race;
             Gender = data.Sex;
             CharacterSo = GetCurrentCharacterSO(Race);
-            transform.rotation = Quaternion.Euler(0, data.CameraYaw, 0);
 
+            ConfigureRemoteComponents();
             UpdateCharacterDisplay(data);
         }
 
+        private void ConfigureRemoteComponents()
+        {
+            // Disable Local
+            var controller = GetComponent<RPGController>();
+            if (controller) controller.enabled = false;
+            var rpgCamera = GetComponentInChildren<RPGCamera>();
+            if (rpgCamera) rpgCamera.enabled = false;
+            var frustum = GetComponentInChildren<RPGViewFrustum>();
+            if (frustum) frustum.enabled = false;
+            var cc = GetComponent<CharacterController>();
+            if (cc) cc.enabled = false;
+            var input = GetComponent<PlayerInput>();
+            if (input) input.enabled = false;
+            var networkMovement = GetComponent<NetworkMovementSender>();
+            if (networkMovement) networkMovement.enabled = false;
+            var mmoMotor = GetComponent<RPGMotorMMO>();
+            if (mmoMotor) mmoMotor.enabled = false;
+
+            // Enabled Remote
+            var networkBridge = GetComponent<RPGMotorNetworkBridge>();
+            if (networkBridge) networkBridge.enabled = true;
+            var motor = GetComponent<RemoteRPGMotor>();
+            if (motor) motor.enabled = true;
+        }
 
         /// <summary>
         /// Sets the current Scriptable Object based on race

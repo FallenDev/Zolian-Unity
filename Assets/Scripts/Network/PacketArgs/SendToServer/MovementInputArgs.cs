@@ -9,7 +9,10 @@ namespace Assets.Scripts.Network.PacketArgs.SendToServer
     {
         public static byte OpCode => (byte)ClientOpCode.MovementInput;
         public Guid Serial;
-        public Vector3 MoveDirection;
-        public float CameraYaw;
+        public Vector3 Position; // Player's current position
+        public Vector3 InputDirection; // Input direction from the player
+        public float CameraYaw; // Orientation of the Camera/Player
+        public float Speed; // Current Forward Speed of movement
+        public float VerticalVelocity; // Current vertical velocity of the player
     }
 }

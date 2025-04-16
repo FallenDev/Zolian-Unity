@@ -1,16 +1,23 @@
 ﻿using Assets.Scripts.Entity.Entities;
+using Assets.Scripts.Managers;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using UnityEngine;
 
 namespace Assets.Scripts.Entity.Behaviors
 {
-    public class PlayerMethods
+    public static class PlayerMethods
     {
-        public void UpdateMovement(Player player, EntityMovementArgs args)
+        public static void UpdateMovement(Player player, EntityMovementArgs args)
         {
-            player.Position = args.Position;
-            player.CameraYaw = args.CameraYaw;
-            Debug.Log($"{player.UserName} is walking {player.Position} - {player.CameraYaw}");
+            if (args.Serial != player.Serial) return;
+
+            var bridge = player.GetComponent<RPGMotorNetworkBridge>();
+            if (bridge == null)
+            {
+                Debug.LogError($"RPGMotorNetworkBridge not found on {player.name}");
+                return;
+            }
+            bridge.ApplyRemoteState(args);
         }
     }
 }

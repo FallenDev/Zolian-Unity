@@ -5,6 +5,7 @@ using Assets.Scripts.Network.OpCodes;
 using Assets.Scripts.Network.PacketArgs.SendToServer;
 using Assets.Scripts.Managers;
 using System;
+using Assets.Scripts.Entity.Behaviors;
 using Assets.Scripts.Models;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 
@@ -61,16 +62,20 @@ namespace Assets.Scripts.Network
             }
         }
 
-        public void SendMovement(Guid serial, Vector3 position, float cameraYaw)
+        public void SendMovement(Guid serial, Vector3 position, float verticalVelocity, Vector3 inputDirection, float cameraYaw, float speed)
         {
             try
             {
                 var args = new MovementInputArgs
                 {
                     Serial = serial,
-                    MoveDirection = position,
-                    CameraYaw = cameraYaw
+                    Position = position,
+                    VerticalVelocity = verticalVelocity,
+                    InputDirection = inputDirection,
+                    CameraYaw = cameraYaw,
+                    Speed = speed
                 };
+
                 SendPacket(MovementInputArgs.OpCode, args);
             }
             catch (Exception e)
@@ -117,8 +122,11 @@ namespace Assets.Scripts.Network
                         {
                             case EntityType.Player:
                                 {
-                                    if (CharacterGameManager.Instance.CachedPlayers.TryGetValue(entityArgs.Serial, out var player))
-                                        player.PlayerMethods.UpdateMovement(player, entityArgs);
+                                    MainThreadDispatcher.RunOnMainThread(() =>
+                                    {
+                                        if (CharacterGameManager.Instance.CachedPlayers.TryGetValue(entityArgs.Serial, out var player))
+                                            PlayerMethods.UpdateMovement(player, entityArgs);
+                                    });
                                 }
                                 break;
                             case EntityType.NPC:

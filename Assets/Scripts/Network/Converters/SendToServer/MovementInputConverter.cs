@@ -10,8 +10,11 @@ namespace Assets.Scripts.Network.Converters.SendToServer
         public override void Serialize(ref SpanWriter writer, MovementInputArgs args)
         {
             writer.WriteGuid(args.Serial);
-            writer.WriteVector3(args.MoveDirection.ToNumerics());
+            writer.WriteVector3(args.Position.ToNumerics());
+            writer.WriteVector3(args.InputDirection.ToNumerics());
             writer.WriteFloat(args.CameraYaw);
+            writer.WriteFloat(args.Speed);
+            writer.WriteFloat(args.VerticalVelocity);
         }
     }
 }
