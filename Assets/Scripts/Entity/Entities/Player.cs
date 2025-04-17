@@ -21,6 +21,8 @@ namespace Assets.Scripts.Entity.Entities
     {
         [Header("Base Properties")]
         public WorldClient Client { get; set; }
+        public RPGMotorMMO LocalMotor { get; set; }
+        public RemoteRPGMotor RemoteMotor { get; set; }
 
         public bool IsLocalPlayer => CharacterGameManager.Instance.Serial == Serial;
         public Animator Animator { get; private set; }
@@ -175,6 +177,7 @@ namespace Assets.Scripts.Entity.Entities
 
         public void InitializeFromSpawnData(EntitySpawnArgs data)
         {
+            ConfigureRemoteComponents();
             Serial = data.Serial;
             CurrentZoneId = 0;
             Position = data.Position;
@@ -189,8 +192,6 @@ namespace Assets.Scripts.Entity.Entities
             Race = data.Race;
             Gender = data.Sex;
             CharacterSo = GetCurrentCharacterSO(Race);
-
-            ConfigureRemoteComponents();
             UpdateCharacterDisplay(data);
         }
 
@@ -209,12 +210,12 @@ namespace Assets.Scripts.Entity.Entities
             if (input) input.enabled = false;
             var networkMovement = GetComponent<NetworkMovementSenderForLocal>();
             if (networkMovement) networkMovement.enabled = false;
-            var mmoMotor = GetComponent<RPGMotorMMO>();
-            if (mmoMotor) mmoMotor.enabled = false;
+            LocalMotor = GetComponent<RPGMotorMMO>();
+            if (LocalMotor) LocalMotor.enabled = false;
 
             // Enabled Remote
-            var motor = GetComponent<RemoteRPGMotor>();
-            if (motor) motor.enabled = true;
+            RemoteMotor = GetComponent<RemoteRPGMotor>();
+            if (RemoteMotor) RemoteMotor.enabled = true;
         }
 
         /// <summary>
