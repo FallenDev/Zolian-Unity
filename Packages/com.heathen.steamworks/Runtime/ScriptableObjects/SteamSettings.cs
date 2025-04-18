@@ -20,7 +20,7 @@ namespace Heathen.SteamworksIntegration
     /// <see cref="server"/> in contrast deals with the configuration of Steamworks Game Server features and only comes into play for server builds.
     /// Note that the <see cref="server"/> member and its functionality are stripped out of client builds, that is it is only accessible in a server build and in the Unity Editor</para>
     /// </remarks>
-    [HelpURL("https://kb.heathen.group/assets/steamworks/objects/steam-settings")]
+    [HelpURL("https://kb.heathen.group/steamworks/configuration/unity-configuration")]
     public class SteamSettings : ScriptableObject
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -581,35 +581,35 @@ namespace Heathen.SteamworksIntegration
             //ACH_TRAVEL_FAR_ACCUM
             var ACH_TRAVEL_FAR_ACCUM_Obj = ScriptableObject.CreateInstance<AchievementObject>();
             ACH_TRAVEL_FAR_ACCUM_Obj.name = "[Ach] ACH_TRAVEL_FAR_ACCUM";
-            ACH_TRAVEL_FAR_ACCUM_Obj.Id = "ACH_TRAVEL_FAR_ACCUM";
+            ACH_TRAVEL_FAR_ACCUM_Obj.ApiName = "ACH_TRAVEL_FAR_ACCUM";
             UnityEditor.AssetDatabase.AddObjectToAsset(ACH_TRAVEL_FAR_ACCUM_Obj, settings);
             settings.achievements.Add(ACH_TRAVEL_FAR_ACCUM_Obj);
 
             //ACH_TRAVEL_FAR_SINGLE
             var ACH_TRAVEL_FAR_SINGLE_Obj = ScriptableObject.CreateInstance<AchievementObject>();
             ACH_TRAVEL_FAR_SINGLE_Obj.name = "[Ach] ACH_TRAVEL_FAR_SINGLE";
-            ACH_TRAVEL_FAR_SINGLE_Obj.Id = "ACH_TRAVEL_FAR_SINGLE";
+            ACH_TRAVEL_FAR_SINGLE_Obj.ApiName = "ACH_TRAVEL_FAR_SINGLE";
             UnityEditor.AssetDatabase.AddObjectToAsset(ACH_TRAVEL_FAR_SINGLE_Obj, settings);
             settings.achievements.Add(ACH_TRAVEL_FAR_SINGLE_Obj);
 
             //ACH_WIN_100_GAMES
             var ACH_WIN_100_GAMES_Obj = ScriptableObject.CreateInstance<AchievementObject>();
             ACH_WIN_100_GAMES_Obj.name = "[Ach] ACH_WIN_100_GAMES";
-            ACH_WIN_100_GAMES_Obj.Id = "ACH_WIN_100_GAMES";
+            ACH_WIN_100_GAMES_Obj.ApiName = "ACH_WIN_100_GAMES";
             UnityEditor.AssetDatabase.AddObjectToAsset(ACH_WIN_100_GAMES_Obj, settings);
             settings.achievements.Add(ACH_WIN_100_GAMES_Obj);
 
             //ACH_WIN_ONE_GAME
             var ACH_WIN_ONE_GAME_Obj = ScriptableObject.CreateInstance<AchievementObject>();
             ACH_WIN_ONE_GAME_Obj.name = "[Ach] ACH_WIN_ONE_GAME";
-            ACH_WIN_ONE_GAME_Obj.Id = "ACH_WIN_ONE_GAME";
+            ACH_WIN_ONE_GAME_Obj.ApiName = "ACH_WIN_ONE_GAME";
             UnityEditor.AssetDatabase.AddObjectToAsset(ACH_WIN_ONE_GAME_Obj, settings);
             settings.achievements.Add(ACH_WIN_ONE_GAME_Obj);
 
             //NEW_ACHIEVEMENT_0_4
             var NEW_ACHIEVEMENT_0_4_Obj = ScriptableObject.CreateInstance<AchievementObject>();
             NEW_ACHIEVEMENT_0_4_Obj.name = "[Ach] NEW_ACHIEVEMENT_0_4";
-            NEW_ACHIEVEMENT_0_4_Obj.Id = "NEW_ACHIEVEMENT_0_4";
+            NEW_ACHIEVEMENT_0_4_Obj.ApiName = "NEW_ACHIEVEMENT_0_4";
             UnityEditor.AssetDatabase.AddObjectToAsset(NEW_ACHIEVEMENT_0_4_Obj, settings);
             settings.achievements.Add(NEW_ACHIEVEMENT_0_4_Obj);
 

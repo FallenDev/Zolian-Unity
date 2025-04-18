@@ -334,7 +334,7 @@ namespace Heathen.SteamworksIntegration.API
 
                             while (index != -1)
                             {
-                                var first = SteamSettings.Achievements.FirstOrDefault(p => p.Id == achievementApiName);
+                                var first = SteamSettings.Achievements.FirstOrDefault(p => p.ApiName == achievementApiName);
                                 results.Add((first, percent));
 
                                 index = GetNextMostAchievedAchievementInfo(index, out achievementApiName, out percent, out achieved);

@@ -40,7 +40,7 @@ namespace Heathen.SteamworksIntegration
                 if (_so == null)
                 {
                     var nId = this;
-                    _so = SteamSettings.Achievements.FirstOrDefault(p => p.Id == nId);
+                    _so = SteamSettings.Achievements.FirstOrDefault(p => p.ApiName == nId);
                 }
 
                 return _so;
@@ -48,7 +48,7 @@ namespace Heathen.SteamworksIntegration
             set
             {
                 _so = value;
-                id = value.Id;
+                id = value.ApiName;
             }
         }
         /// <summary>
@@ -191,7 +191,7 @@ namespace Heathen.SteamworksIntegration
         public readonly AchievementObject CreateScriptableObject()
         {
             var newObject = UnityEngine.ScriptableObject.CreateInstance<AchievementObject>();
-            newObject.Id = this;
+            newObject.ApiName = this;
             return newObject;
         }
 
@@ -204,7 +204,7 @@ namespace Heathen.SteamworksIntegration
         public static AchievementObject CreateScriptableObject(string apiName)
         {
             var newObject = UnityEngine.ScriptableObject.CreateInstance<AchievementObject>();
-            newObject.Id = apiName;
+            newObject.ApiName = apiName;
             return newObject;
         }
 

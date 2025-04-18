@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-using JohnStairs.RCC;
+﻿using JohnStairs.RCC;
 using JohnStairs.RCC.Character.Motor;
 using UnityEngine;
 
@@ -47,12 +45,11 @@ namespace Assets.Scripts.Entity.Behaviors
 
             transform.position = interpolatedPosition;
             transform.rotation = Quaternion.Euler(0, interpolatedYaw, 0);
-            //transform.position = _to.Position;
-            //transform.rotation = Quaternion.Euler(0, _to.Yaw, 0);
 
             _inputDirection = Vector3.Lerp(_from.InputDirection, _to.InputDirection, t);
             _movementSpeed = Mathf.Lerp(_from.Speed, _to.Speed, t);
             _movementDirection = new Vector3(_inputDirection.x * _movementSpeed, Mathf.Lerp(_from.VerticalVelocity, _to.VerticalVelocity, t), _inputDirection.z * _movementSpeed);
+            //_currentState = 
 
             SetValuesInAnimator();
         }
@@ -74,30 +71,5 @@ namespace Assets.Scripts.Entity.Behaviors
         protected override Vector3 GetFacingDirection() => transform.forward;
         protected override float GetStandardMovementSpeed() => _movementSpeed;
         public override bool AllowsCameraAlignment() => false;
-
-        protected override void SetValuesInAnimator(Animator animator = null)
-        {
-            if (animator == null) animator = _animator;
-            if (animator == null) return;
-
-            Vector3 localMovementDir = transform.InverseTransformVector(_movementDirection.normalized);
-            localMovementDir.y = 0;
-            localMovementDir.Normalize();
-
-            float movementSpeed = Mathf.Clamp01(_movementSpeed / (RunSpeed * SprintSpeedMultiplier));
-            animator.speed = movementSpeed > 1.0f ? movementSpeed : 1.0f;
-
-            animator.SetFloat(__localMovementX, localMovementDir.x, 0.05f, Time.deltaTime);
-            animator.SetFloat(__localMovementZ, localMovementDir.z, 0.05f, Time.deltaTime);
-            animator.SetFloat(__movementSpeed, _movementSpeed);
-            animator.SetFloat(__turningDirection, 0.0f);
-            animator.SetBool(__grounded, true);
-            animator.SetBool(__crouching, false);
-            animator.SetBool(__falling, false);
-            animator.SetBool(__sliding, false);
-            animator.SetBool(__swimming, false);
-            animator.SetBool(__flying, false);
-            animator.SetInteger(__climbingState, 0);
-        }
     }
 }

@@ -15,14 +15,14 @@ namespace Heathen.SteamworksIntegration
     /// for more information please see <a href="https://partner.steamgames.com/doc/features/achievements">https://partner.steamgames.com/doc/features/achievements</a>
     /// </para>
     /// </remarks>
-    [HelpURL("https://kb.heathen.group/assets/steamworks/achievement-object")]
+    [HelpURL("https://kb.heathen.group/steamworks/features/achievements")]
     [CreateAssetMenu(menuName = "Steamworks/Achievement Object")]
     public class AchievementObject : ScriptableObject
     {
         /// <summary>
         /// The API Name of the Achievement
         /// </summary>
-        public string Id
+        public string ApiName
         {
             get => data;
             set => data = value;
@@ -36,10 +36,13 @@ namespace Heathen.SteamworksIntegration
         /// </summary>
         public string Description => data.Description;
         /// <summary>
+        /// The percentage of users who have unlocked this achievement
+        /// </summary>
+        public float GlobalPercent => data.GlobalPercent;
+        /// <summary>
         /// Is the achievement hidden from the user
         /// </summary>
         public bool Hidden => data.Hidden;
-
         /// <summary>
         /// The API Name as it appears in the Steamworks portal.
         /// </summary>
@@ -78,8 +81,8 @@ namespace Heathen.SteamworksIntegration
         /// <remarks>
         /// Only available on server builds
         /// </remarks>
-        /// <param name="user"></param>
-        public void Unlock(CSteamID user) => data.Unlock(user);
+        /// <param name="user">The user to unlock the achievement for</param>
+        public void Unlock(UserData user) => data.Unlock(user);
 
         /// <summary>
         /// Clears the achievement for the <paramref name="user"/>
@@ -87,7 +90,7 @@ namespace Heathen.SteamworksIntegration
         /// <remarks>
         /// Only available on server builds
         /// </remarks>
-        /// <param name="user"></param>
+        /// <param name="user">The user to clear for</param>
         public void ClearAchievement(UserData user) => data.ClearAchievement(user);
 
         /// <summary>
@@ -96,9 +99,9 @@ namespace Heathen.SteamworksIntegration
         /// <remarks>
         /// Only available on server builds
         /// </remarks>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        public bool GetAchievementStatus(CSteamID user) => data.GetAchievementStatus(user);
+        /// <param name="user">The user to read the status for</param>
+        /// <returns>The status of the achievement</returns>
+        public bool GetAchievementStatus(UserData user) => data.GetAchievementStatus(user);
         /// <summary>
         /// Get the unlock state and time for this achievement for a specific user.
         /// </summary>
@@ -124,7 +127,7 @@ namespace Heathen.SteamworksIntegration
         public static AchievementObject CreateScriptableObject(string apiName)
         {
             var newObject = UnityEngine.ScriptableObject.CreateInstance<AchievementObject>();
-            newObject.Id = apiName;
+            newObject.ApiName = apiName;
             return newObject;
         }
     }

@@ -13,7 +13,6 @@ namespace Heathen.SteamworksIntegration
     /// <remarks>
     /// See <see cref="DataModel{T}"/> for more information on the usage of <see cref="DataModel"/>
     /// </remarks>
-    [HelpURL("https://kb.heathen.group/assets/steamworks/data-models")]
     public abstract class DataModel : ScriptableObject
     {
         /// <summary>

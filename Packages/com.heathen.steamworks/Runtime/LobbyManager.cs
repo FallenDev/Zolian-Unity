@@ -25,7 +25,7 @@ namespace Heathen.SteamworksIntegration
     /// You can then use this object as an interface between your UI and a specific lobby to create lobby windows, party windows, lobby chats and more.
     /// </para>
     /// </remarks>
-    [HelpURL("https://kb.heathen.group/toolkit-for-steamworks-sdk/unity/ui-components/lobby-manager")]
+    [HelpURL("https://kb.heathen.group/steamworks/features/lobby/unity-lobby#lobby-manager")]
     public class LobbyManager : MonoBehaviour
     {
         public enum ManagedLobbyEvents
@@ -70,7 +70,7 @@ namespace Heathen.SteamworksIntegration
         /// <summary>
         /// Occurs when the local user tried but failed to enter a lobby
         /// </summary>
-        public LobbyResponceEvent evtEnterFailed;
+        public LobbyResponseEvent evtEnterFailed;
         /// <summary>
         /// Occurs when the local user creates a lobby
         /// </summary>

@@ -11,7 +11,7 @@ namespace Heathen.SteamworksIntegration
     /// </summary>
     /// <remarks>Steamworks DLC or Downloadable Content is defined on the Steamworks API in your Steamworks Portal.
     /// Please carfully read <a href="https://partner.steamgames.com/doc/store/application/dlc">https://partner.steamgames.com/doc/store/application/dlc</a> before designing features are this concept.</remarks>
-    [HelpURL("https://kb.heathen.group/assets/steamworks/downloadable-content-object")]
+    [HelpURL("https://kb.heathen.group/steamworks/features/downloadable-content")]
     [CreateAssetMenu(menuName = "Steamworks/Downloadable Content Object")]
     public class DownloadableContentObject : ScriptableObject
     {

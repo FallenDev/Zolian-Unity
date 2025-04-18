@@ -291,7 +291,7 @@ namespace Heathen.SteamworksIntegration
         /// </summary>
         /// <param name="id">The user to check for</param>
         /// <returns>True if they are, false if not</returns>
-        public readonly bool IsAMember(CSteamID id) => API.Matchmaking.Client.IsAMember(this, id);
+        public readonly bool IsAMember(UserData id) => API.Matchmaking.Client.IsAMember(this, id);
         /// <summary>
         /// Updates the lobby type
         /// </summary>
@@ -806,9 +806,9 @@ namespace Heathen.SteamworksIntegration
         /// Searches for a lobby that matches the arguments in <paramref name="searchArguments"/> if a lobby is found it will be joined. 
         /// If no lobby is found during the search a new lobby will be created using the <paramref name="createArguments"/>.
         /// </summary>
-        /// <param name="searchArguments">Paramiters to be used when searching for a matching lobby</param>
-        /// <param name="createArguments">Paramiters to be used when creating a new lobby</param>
-        /// <param name="callback">A deligate of the form (<see cref="EResult"/> eResult, <see cref="LobbyData"/> lobby, <see cref="bool"/> ioError) this will be invoked when the process compeltes.</param>
+        /// <param name="searchArguments">Parameters to be used when searching for a matching lobby</param>
+        /// <param name="createArguments">Parameters to be used when creating a new lobby</param>
+        /// <param name="callback">A delegate of the form (<see cref="EResult"/> eResult, <see cref="LobbyData"/> lobby, <see cref="bool"/> ioError) this will be invoked when the process compeltes.</param>
         public static void QuickMatch(SearchArguments searchArguments, CreateArguments createArguments, Action<EResult, LobbyData, bool> callback)
         {
             Request(searchArguments, 1, (results, error) =>
@@ -891,7 +891,7 @@ namespace Heathen.SteamworksIntegration
                     inventory = null
                 });
 
-                callback.Invoke(ticket, ioError);
+                callback?.Invoke(ticket, ioError);
             });
         }
         /// <summary>

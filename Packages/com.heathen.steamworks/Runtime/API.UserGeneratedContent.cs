@@ -1308,7 +1308,7 @@ namespace Heathen.SteamworksIntegration.API
                         return new PublishedFileId_t[0];
                 }
                 else
-                    return null;
+                    return new PublishedFileId_t[0];
             }
 
             /// <summary>
@@ -1318,11 +1318,18 @@ namespace Heathen.SteamworksIntegration.API
             public static void GetSubscribedItems(Action<List<WorkshopItem>> callback)
             {
                 var query = UgcQuery.GetSubscribed();
-                query.Execute(r =>
+                if (query != null)
                 {
-                    callback?.Invoke(query.ResultsList);
-                    query.Dispose();
-                });     
+                    query.Execute(r =>
+                    {
+                        callback?.Invoke(query.ResultsList);
+                        query.Dispose();
+                    });
+                }
+                else
+                {
+                    callback?.Invoke(new());
+                }
             }
 
             /// <summary>
@@ -1337,11 +1344,18 @@ namespace Heathen.SteamworksIntegration.API
             public static void GetSubscribedItems(bool withLongDescription, bool withMetadata, bool withKeyValueTags, bool withAdditionalPreviews, uint withPlayTimeStatsInDays, Action<List<WorkshopItem>> callback)
             {
                 var query = UgcQuery.GetSubscribed(withLongDescription, withMetadata, withKeyValueTags, withAdditionalPreviews, withPlayTimeStatsInDays);
-                query.Execute(r =>
+                if (query != null)
                 {
-                    callback?.Invoke(query.ResultsList);
-                    query.Dispose();
-                });
+                    query.Execute(r =>
+                    {
+                        callback?.Invoke(query.ResultsList);
+                        query.Dispose();
+                    });
+                }
+                else
+                {
+                    callback?.Invoke(new());
+                }
             }
 
             /// <summary>

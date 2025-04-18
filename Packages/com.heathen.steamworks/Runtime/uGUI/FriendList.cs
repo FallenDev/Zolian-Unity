@@ -11,7 +11,7 @@ namespace Heathen.SteamworksIntegration.UI
     /// <summary>
     /// Displays a simple linear list of friends that match the indicated filter options.
     /// </summary>
-    [HelpURL("https://kb.heathen.group/assets/steamworks/unity-engine/ui-components/friend-list")]
+    [HelpURL("https://kb.heathen.group/steamworks/features/friends#friend-list")]
     public class FriendList : MonoBehaviour
     {
         /// <summary>

@@ -7,6 +7,7 @@ using UnityEngine;
 using Heathen.SteamworksIntegration;
 //In our examples we will also work with the API so we add its namespace as well
 using Heathen.SteamworksIntegration.API;
+using Steamworks;
 //In some cases you also need the Steamworks namespace so you can work with its native enums and similar
 
 
@@ -71,6 +72,18 @@ namespace MyProperlyFormedNamespaceName
             {
                 //image is the Texture2D you can use
             });
+        }
+
+        public void Example_ProfileData(UserData user)
+        {
+            string name = user.Name;
+            string nickname = user.Nickname;
+            user.LoadAvatar(image =>
+            {
+                //image is the Texture2D you can use
+            });
+            EPersonaState status = user.State;
+            int level = user.Level;
         }
 
         public void Example_SetRichPresence()

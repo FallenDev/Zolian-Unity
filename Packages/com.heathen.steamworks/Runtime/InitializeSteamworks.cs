@@ -1,10 +1,11 @@
 ﻿#if !DISABLESTEAMWORKS  && STEAMWORKSNET
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace Heathen.SteamworksIntegration
 {
-    [HelpURL("https://kb.heathen.group/toolkit-for-steamworks/unity/getting-started#component")]
+    [HelpURL("https://kb.heathen.group/steamworks/initialization/unity-initialization#component")]
     [DisallowMultipleComponent]
     public class InitializeSteamworks : MonoBehaviour
     {
@@ -38,6 +39,10 @@ namespace Heathen.SteamworksIntegration
 #if UNITY_EDITOR
         internal void RefreshSettings()
         {
+            mainSettings = null;
+            demoSettings = null;
+            playtestSettings.Clear();
+
             mainSettings = SteamSettings.GetOrCreateSettings();
             
             if(SteamSettings.HasDemoSettings())
@@ -46,6 +51,26 @@ namespace Heathen.SteamworksIntegration
                 demoSettings = null;
 
             playtestSettings = SteamSettings.GetPlayTestSettings();
+
+            if(mainSettings != targetSettings
+                && demoSettings != targetSettings)
+            {
+                bool foundTarget = false;
+                foreach(var set in playtestSettings)
+                {
+                    if(set == targetSettings) 
+                        foundTarget = true;
+                }
+
+                if(!foundTarget)
+                    targetSettings = mainSettings;
+            }
+            else
+            {
+                // We must have found the target settings in one of the valid settings files so leave it alone.
+            }
+
+            EditorUtility.SetDirty(this);
         }
 
         [UnityEditor.CustomEditor(typeof(InitializeSteamworks))]

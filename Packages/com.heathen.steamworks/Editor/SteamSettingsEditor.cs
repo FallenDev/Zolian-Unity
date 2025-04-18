@@ -71,7 +71,7 @@ namespace Heathen.SteamworksIntegration.Editors
             }
             if (EditorGUILayout.LinkButton("Knowledge Base"))
             {
-                Application.OpenURL("https://kb.heathen.group/toolkit-for-steamworks/steamworks");
+                Application.OpenURL("https://kb.heathen.group/steamworks");
             }
             if (EditorGUILayout.LinkButton("Support"))
             {
@@ -531,7 +531,7 @@ namespace Heathen.SteamworksIntegration.Editors
                         for (int i = 0; i < settings.achievements.Count; i++)
                         {
                             var achievement = settings.achievements[i];
-                            if (!names.Contains(achievement.Id))
+                            if (!names.Contains(achievement.ApiName))
                             {
                                 toRemove.Add(achievement);
                             }
@@ -557,7 +557,7 @@ namespace Heathen.SteamworksIntegration.Editors
                         {
                             var achName = names[i];
 
-                            var achObj = settings.achievements.FirstOrDefault(p => p.Id == achName);
+                            var achObj = settings.achievements.FirstOrDefault(p => p.ApiName == achName);
 
                             bool created = false;
                             if (achObj == null)
@@ -567,7 +567,7 @@ namespace Heathen.SteamworksIntegration.Editors
                             }
 
                             achObj.name = "[Ach] " + achName;
-                            achObj.Id = achName;
+                            achObj.ApiName = achName;
 
                             if (created)
                             {
@@ -598,7 +598,7 @@ namespace Heathen.SteamworksIntegration.Editors
                 {
                     var achObj = ScriptableObject.CreateInstance<AchievementObject>();
                     achObj.name = "[Ach] " + tempAchName;
-                    achObj.Id = tempAchName;
+                    achObj.ApiName = tempAchName;
                     tempAchName = string.Empty;
                     UnityEditor.AssetDatabase.AddObjectToAsset(achObj, (SteamSettings)target);
                     settings.achievements.Add(achObj);
@@ -628,7 +628,7 @@ namespace Heathen.SteamworksIntegration.Editors
                         EditorGUIUtility.PingObject(target);
                     }
 
-                    EditorGUILayout.LabelField(target.Id);
+                    EditorGUILayout.LabelField(target.ApiName);
                     if (UnityEngine.Application.isPlaying && API.App.Initialized)
                         EditorGUILayout.LabelField(target.IsAchieved ? "Unlocked" : "Locked");
 

@@ -1,6 +1,8 @@
 ﻿#if !DISABLESTEAMWORKS && STEAMWORKSNET
 using Heathen.SteamworksIntegration;
+using Heathen.SteamworksIntegration.API;
 using Heathen.SteamworksIntegration.UI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;

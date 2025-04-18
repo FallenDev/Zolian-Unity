@@ -11,6 +11,7 @@ namespace Heathen.SteamworksIntegration
     /// <summary>
     /// Represents a Steam Inventory item definition
     /// </summary>
+    [HelpURL("https://kb.heathen.group/steamworks/features/inventory")]
     [Serializable]
     public class ItemDefinitionObject : ScriptableObject
     {

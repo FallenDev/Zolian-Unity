@@ -14,7 +14,7 @@ namespace Heathen.SteamworksIntegration
     /// for more information please see <a href="https://partner.steamgames.com/doc/features/achievements">https://partner.steamgames.com/doc/features/achievements</a>
     /// </para>
     /// </remarks>
-    [HelpURL("https://kb.heathen.group/assets/steamworks/guides/stats-object")]
+    [HelpURL("https://kb.heathen.group/steamworks/features/stats")]
     [Serializable]
     public class IntStatObject : StatObject
     {

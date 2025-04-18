@@ -12,7 +12,7 @@ namespace Heathen.SteamworksIntegration
     /// <para>To create a new <see cref="LeaderboardObject"/> object in your project right click in a folder in your project and select</para>
     /// <para>Create >> Steamworks >> Player Services >> Leaderboard Data</para>
     /// </summary>
-    [HelpURL("https://kb.heathen.group/assets/steamworks/leaderboard-object")]
+    [HelpURL("https://kb.heathen.group/steamworks/features/leaderboards")]
     [CreateAssetMenu(menuName = "Steamworks/Leaderboard Object")]
     public class LeaderboardObject : ScriptableObject
     {

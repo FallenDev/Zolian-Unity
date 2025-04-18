@@ -151,12 +151,15 @@ namespace Heathen.SteamworksIntegration
         public static UgcQuery GetSubscribed(bool withLongDescription, bool withMetadata, bool withKeyValueTags, bool withAdditionalPreviews, uint withPlayTimeStatsInDays)
         {
             var query = Get(API.UserGeneratedContent.Client.GetSubscribedItems());
-            query.SetReturnLongDescription(withLongDescription);
-            query.SetReturnMetadata(withMetadata);
-            query.SetReturnKeyValueTags(withKeyValueTags);
-            if (withPlayTimeStatsInDays > 0)
-                query.SetReturnPlaytimeStats(withPlayTimeStatsInDays);
-            query.SetReturnAdditionalPreviews(withAdditionalPreviews);
+            if (query != null)
+            {
+                query.SetReturnLongDescription(withLongDescription);
+                query.SetReturnMetadata(withMetadata);
+                query.SetReturnKeyValueTags(withKeyValueTags);
+                if (withPlayTimeStatsInDays > 0)
+                    query.SetReturnPlaytimeStats(withPlayTimeStatsInDays);
+                query.SetReturnAdditionalPreviews(withAdditionalPreviews);
+            }
             return query;
         }
 

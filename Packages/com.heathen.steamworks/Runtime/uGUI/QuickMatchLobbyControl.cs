@@ -9,7 +9,7 @@ using UnityEngine.Events;
 
 namespace Heathen.SteamworksIntegration.UI
 {
-    [HelpURL("https://kb.heathen.group/assets/steamworks/unity-engine/ui-components/quick-match-lobby-control")]
+    [HelpURL("https://kb.heathen.group/steamworks/features/lobby/unity-lobby#quick-match-lobby-control")]
     public class QuickMatchLobbyControl : MonoBehaviour
     {
         public enum Status
@@ -60,7 +60,7 @@ namespace Heathen.SteamworksIntegration.UI
         /// <summary>
         /// Occurs when the local user tried but failed to enter a lobby
         /// </summary>
-        public LobbyResponceEvent evtEnterFailed;
+        public LobbyResponseEvent evtEnterFailed;
         /// <summary>
         /// Occurs when the local user tried but failed to create a lobby
         /// </summary>

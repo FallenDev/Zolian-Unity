@@ -14,7 +14,7 @@ using UnityEngine.InputSystem;
 
 namespace Heathen.SteamworksIntegration.UI
 {
-    [HelpURL("https://kb.heathen.group/assets/steamworks/unity-engine/ui-components/party-lobby-control")]
+    [HelpURL("https://kb.heathen.group/steamworks/features/lobby/unity-lobby#party-lobby-control")]
     public class PartyLobbyControl : MonoBehaviour
     {
         [Header("Local User Features")]

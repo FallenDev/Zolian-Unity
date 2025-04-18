@@ -62,7 +62,7 @@ namespace Heathen.SteamworksIntegration.Editors
         [MenuItem("Window/Steamworks/Inspector")]
         public static void ShowExample()
         {
-            var version = SessionState.GetString("com.heathen.steamworks-version", "4.0");
+            var version = SessionState.GetString("com.heathen.steamworks-version", "4.1");
             instance = GetWindow<SteamInspector_Code>();
             instance.titleContent = new GUIContent($"Inspector v{version}", instance.icon);
         }
@@ -590,7 +590,7 @@ namespace Heathen.SteamworksIntegration.Editors
                 lblName.text = ach.Name;
 
                 Label lblId = itemList[i].Query<Label>(name = "lblAchId");
-                lblId.text = ach.Id;
+                lblId.text = ach.ApiName;
 
                 Label lblStatus = itemList[i].Query<Label>(name = "lblStatus");
                 lblStatus.text = ach.IsAchieved.ToString();

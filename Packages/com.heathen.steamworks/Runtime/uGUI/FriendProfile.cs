@@ -12,7 +12,7 @@ namespace Heathen.SteamworksIntegration.UI
     /// <summary>
     /// Friend profile is a simple implementation of the <see cref="IUserProfile"/> interface and is used in the prefab examples for <see cref="FriendList"/> and other controls. In most cases you will want to create your own "Friend Profile" UI script and can use the included FriendProfile as an example to get started with.
     /// </summary>
-    [HelpURL("https://kb.heathen.group/assets/steamworks/unity-engine/ui-components/friend-profile")]
+    [HelpURL("https://kb.heathen.group/steamworks/features/friends#friend-profile")]
     public class FriendProfile : MonoBehaviour, IUserProfile
     {
         /// <summary>

@@ -411,14 +411,6 @@ namespace Heathen.SteamworksIntegration.API
             /// <param name="value">The string to match.</param>
             /// <param name="comparison">The type of comparison to make.</param>
             public static void AddRequestLobbyListStringFilter(string key, string value, ELobbyComparison comparison) => SteamMatchmaking.AddRequestLobbyListStringFilter(key, value, comparison);
-            [Obsolete("Update your callback to take (EResult result, Lobby lobby, bool IOError)")]
-            public static void CreateLobby(ELobbyType type, int maxMembers, Action<LobbyData, bool> callback)
-            {
-                CreateLobby(type, maxMembers, (r, l, e) =>
-                    {
-                        callback?.Invoke(l, e);
-                    });
-            }
             /// <summary>
             /// Create a new matchmaking lobby.
             /// </summary>

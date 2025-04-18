@@ -12,7 +12,9 @@
         "LinuxStandalone64",
         "macOSStandalone",
         "WindowsStandalone32",
-        "WindowsStandalone64"
+        "WindowsStandalone64",
+        "WindowsStandalone32Server",
+        "WindowsStandalone64Server"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

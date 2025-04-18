@@ -8,7 +8,7 @@ namespace Heathen.SteamworksIntegration
     /// <summary>
     /// Represents a Steam Stat of type Average Rate
     /// </summary>
-    [HelpURL("https://kb.heathen.group/assets/steamworks/guides/stats-object")]
+    [HelpURL("https://kb.heathen.group/steamworks/features/stats")]
     [Serializable]
     public class AvgRateStatObject : StatObject
     {
