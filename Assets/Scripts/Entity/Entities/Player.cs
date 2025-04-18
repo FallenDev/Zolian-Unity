@@ -8,6 +8,7 @@ using Assets.Scripts.Models;
 using Assets.Scripts.Network;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using JohnStairs.RCC;
+using JohnStairs.RCC.Character;
 using JohnStairs.RCC.Character.Cam;
 using JohnStairs.RCC.Character.Motor;
 using JohnStairs.RCC.Inputs;
@@ -17,7 +18,7 @@ using UnityEngine.InputSystem;
 
 namespace Assets.Scripts.Entity.Entities
 {
-    public class Player : Damageable, IPlayer, IPointerInfo
+    public class Player : Damageable, IPlayer, IPointerInfo, IClient
     {
         [Header("Base Properties")]
         public WorldClient Client { get; set; }
@@ -37,7 +38,6 @@ namespace Assets.Scripts.Entity.Entities
         public bool GameMaster { get; set; }
         public float CameraYaw { get; set; }
         public Vector3 LastServerPos;
-        [SerializeField] private float _interpolationSpeed = 10f;
 
         [Header("Character Looks")]
         public CharacterSO CharacterSo { get; set; }
@@ -98,13 +98,6 @@ namespace Assets.Scripts.Entity.Entities
         {
             if (IsLocalPlayer && Input.GetKeyDown(KeyCode.L))
                 EnableTargetLock = !EnableTargetLock;
-
-            // Decouples physics from rendering
-            if (!IsLocalPlayer)
-            {
-                transform.position = Vector3.Lerp(transform.position, LastServerPos, Time.deltaTime * _interpolationSpeed);
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, CameraYaw, 0), Time.deltaTime * _interpolationSpeed);
-            }
         }
 
         #region Character Controller
@@ -204,8 +197,6 @@ namespace Assets.Scripts.Entity.Entities
             if (rpgCamera) rpgCamera.enabled = false;
             var frustum = GetComponentInChildren<RPGViewFrustum>();
             if (frustum) frustum.enabled = false;
-            var cc = GetComponent<CharacterController>();
-            if (cc) cc.enabled = false;
             var input = GetComponent<PlayerInput>();
             if (input) input.enabled = false;
             var networkMovement = GetComponent<NetworkMovementSenderForLocal>();

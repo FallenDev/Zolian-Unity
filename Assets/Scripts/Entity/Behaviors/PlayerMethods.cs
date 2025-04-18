@@ -21,6 +21,8 @@ namespace Assets.Scripts.Entity.Behaviors
                 }
             }
 
+            player.LastServerPos = args.Position;
+
             player.RemoteMotor.ApplyRemoteState(
                 args.Position,
                 args.InputDirection,

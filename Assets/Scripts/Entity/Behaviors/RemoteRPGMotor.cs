@@ -47,6 +47,8 @@ namespace Assets.Scripts.Entity.Behaviors
 
             transform.position = interpolatedPosition;
             transform.rotation = Quaternion.Euler(0, interpolatedYaw, 0);
+            //transform.position = _to.Position;
+            //transform.rotation = Quaternion.Euler(0, _to.Yaw, 0);
 
             _inputDirection = Vector3.Lerp(_from.InputDirection, _to.InputDirection, t);
             _movementSpeed = Mathf.Lerp(_from.Speed, _to.Speed, t);
