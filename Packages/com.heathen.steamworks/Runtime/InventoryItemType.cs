@@ -1,4 +1,4 @@
-﻿#if !DISABLESTEAMWORKS  && STEAMWORKSNET
+﻿#if !DISABLESTEAMWORKS  && (STEAMWORKSNET || STEAM_LEGACY || STEAM_161 || STEAM_162)
 
 namespace Heathen.SteamworksIntegration
 {
@@ -12,6 +12,7 @@ namespace Heathen.SteamworksIntegration
         generator,
         playtimegenerator,
         tag_generator,
+        tag_tool
     }
 }
 #endif

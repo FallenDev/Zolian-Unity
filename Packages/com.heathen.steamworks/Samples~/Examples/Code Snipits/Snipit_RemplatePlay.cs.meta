@@ -3,7 +3,7 @@ guid: dfe19ca68b8c692468ffc99c775a8d75
 AssetOrigin:
   serializedVersion: 1
   productId: 299310
-  packageName: Toolkit for Steamworks 2025
-  packageVersion: 4.1.2
+  packageName: Toolkit for Steamworks 2025 (for Unity 6+)
+  packageVersion: 4.1.4
   assetPath: Packages/com.heathen.steamworks/Samples~/Examples/Code Snipits/Snipit_RemplatePlay.cs
-  uploadId: 749890
+  uploadId: 771989

@@ -3,7 +3,7 @@ guid: cd5c392aad2557644bb76561f8b864e6
 AssetOrigin:
   serializedVersion: 1
   productId: 299310
-  packageName: Toolkit for Steamworks 2025
-  packageVersion: 4.1.2
+  packageName: Toolkit for Steamworks 2025 (for Unity 6+)
+  packageVersion: 4.1.4
   assetPath: Packages/com.heathen.steamworks/Samples~/Examples/DemoDataDisplayRecord.cs
-  uploadId: 749890
+  uploadId: 771989

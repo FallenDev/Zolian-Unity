@@ -1,4 +1,4 @@
-﻿#if !DISABLESTEAMWORKS  && STEAMWORKSNET
+﻿#if !DISABLESTEAMWORKS  && (STEAMWORKSNET || STEAM_LEGACY || STEAM_161 || STEAM_162)
 using Steamworks;
 using System;
 using System.Collections.Generic;
@@ -303,7 +303,7 @@ namespace Heathen.SteamworksIntegration.API
                 {
                     if (API.App.isDebugging || Application.isEditor)
                     {
-                        if (responseCode != EChatRoomEnterResponse.k_EChatRoomEnterResponseLimited)
+                        if (responseCode == EChatRoomEnterResponse.k_EChatRoomEnterResponseLimited)
                         {
                             Debug.LogWarning("This user is limited and cannot fully join a Steam Lobby! metadata and lobby chat will not work for this user though they may appear in the members list.");
                         }

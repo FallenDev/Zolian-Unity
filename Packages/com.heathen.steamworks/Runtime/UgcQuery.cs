@@ -1,4 +1,4 @@
-﻿#if !DISABLESTEAMWORKS  && STEAMWORKSNET
+﻿#if !DISABLESTEAMWORKS  && (STEAMWORKSNET || STEAM_LEGACY || STEAM_161 || STEAM_162)
 using Steamworks;
 using System;
 using System.Collections.Generic;
@@ -145,8 +145,6 @@ namespace Heathen.SteamworksIntegration
             query.SetReturnMetadata(true);
             return query;
         }
-
-        public static UgcQuery GetSubscribed() => Get(API.UserGeneratedContent.Client.GetSubscribedItems());
 
         public static UgcQuery GetSubscribed(bool withLongDescription, bool withMetadata, bool withKeyValueTags, bool withAdditionalPreviews, uint withPlayTimeStatsInDays)
         {
@@ -404,6 +402,13 @@ namespace Heathen.SteamworksIntegration
             }
             catch { }
         }
+
+#if STEAM_LEGACY || STEAM_161
+        public static UgcQuery GetSubscribed() => Get(API.UserGeneratedContent.Client.GetSubscribedItems());
+#endif
+#if STEAM_162
+        public static UgcQuery GetSubscribed(bool IncludeLocallyDisabled = false) => Get(API.UserGeneratedContent.Client.GetSubscribedItems(IncludeLocallyDisabled));
+#endif
     }
 }
 #endif

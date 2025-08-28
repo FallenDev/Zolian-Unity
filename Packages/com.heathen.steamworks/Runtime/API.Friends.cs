@@ -1,4 +1,4 @@
-﻿#if !DISABLESTEAMWORKS  && STEAMWORKSNET
+﻿#if !DISABLESTEAMWORKS  && (STEAMWORKSNET || STEAM_LEGACY || STEAM_161 || STEAM_162)
 using Steamworks;
 using System;
 using System.Collections;
@@ -39,7 +39,9 @@ namespace Heathen.SteamworksIntegration.API
                 m_FriendsEnumerateFollowingList_t = null;
                 m_FriendsGetFollowerCount_t = null;
                 m_FriendsIsFollowing_t = null;
+#if STEAM_LEGACY || STEAM_161
                 m_SetPersonaNameResponse_t = null;
+#endif
                 m_GameConnectedFriendChatMsg_t = null;
                 m_AvatarImageLoaded_t = null;
                 m_PersonaStateChange_t = null;
@@ -116,10 +118,13 @@ namespace Heathen.SteamworksIntegration.API
             /// Returns the local user's persona state
             /// </summary>
             public static EPersonaState PersonaState => SteamFriends.GetPersonaState();
+
+#if STEAM_LEGACY || STEAM_161
             /// <summary>
             /// Checks if current user is chat restricted. See <see cref="EUserRestriction"/>
             /// </summary>
             public static uint Restrictions => SteamFriends.GetUserRestrictions();
+#endif
 
             private static GameConnectedFriendChatMsgEvent eventFriendMessageReceived = new GameConnectedFriendChatMsgEvent();
             private static bool listeningForFriendMessages = false;
@@ -134,8 +139,9 @@ namespace Heathen.SteamworksIntegration.API
             private static CallResult<FriendsGetFollowerCount_t> m_FriendsGetFollowerCount_t;
             private static CallResult<FriendsIsFollowing_t> m_FriendsIsFollowing_t;
 
-
+#if STEAM_LEGACY || STEAM_161
             private static CallResult<SetPersonaNameResponse_t> m_SetPersonaNameResponse_t;
+#endif
 
             private static Callback<GameConnectedFriendChatMsg_t> m_GameConnectedFriendChatMsg_t;
             private static Callback<AvatarImageLoaded_t> m_AvatarImageLoaded_t;
@@ -738,6 +744,7 @@ namespace Heathen.SteamworksIntegration.API
             /// <param name="enabled"></param>
             /// <returns></returns>
             public static void SetListenForFriendsMessages(bool enabled) => SteamFriends.SetListenForFriendsMessages(enabled);
+#if STEAM_LEGACY || STEAM_161
             /// <summary>
             /// Sets the current user's persona name, stores it on the server and publishes the changes to all friends who are online.
             /// </summary>
@@ -761,6 +768,7 @@ namespace Heathen.SteamworksIntegration.API
                 var handle = SteamFriends.SetPersonaName(name);
                 m_SetPersonaNameResponse_t.Set(handle, callback.Invoke);
             }
+#endif
             /// <summary>
             /// Mark a target user as 'played with'.
             /// </summary>

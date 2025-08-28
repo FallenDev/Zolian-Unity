@@ -1,3 +1,205 @@
+v1.9.9.4
+
+   Editor
+      * Raised minimum supported Unity version to 2019.4.40
+      * Added selection/filter toggles to dependency list in "Shader Function" inspector
+      * Added gray "PREVIEW DISABLED" text to replace empty/black no preview texture
+      * Added "Preview Quality" user preferences option to lower VRAM usage
+      * Reduced default preview quality to "Medium" aka 64x64
+      * Changing to a different template now also tries to match connections via link ID
+      * Changed "Preview Disabled" text to dark gray instead of bright red
+      * Changed Surface shaders to also use uint SV_IsFrontFace (#451)
+      * Changed "Instanced Terrain" option to generate ASE_INSTANCED_TERRAIN define
+      * Fixed input port preview textures allocated even when disabled via preferences
+      * Fixed maximum interpolators for shader targets 3.5 and above (15)
+      * Fixed Start Screen interfering with Unity batch mode
+      * Fixed alignment issues with screen shot shooter gizmo (#439)
+      * Fixed BillboardOpHelper causing shader compile warnings and errors (#464)
+      * Fixed Play then Stop breaks node preview + zoom lag (#469)
+      * Fixed "Instanced Terrain" option adding duplicate Picking/Selection passes (#470)
+      * Fixed template Option defaulting when InvertActionOnDeselection added (#470)
+
+   Templates
+      * Added new template "Built-In/Wireframe"
+      * Added new Impostor category to "Built-In/Lit" with improved option logic
+      * Added proper Selection and Picking passes to "Built-In/Lit" template
+      * Added Opaque "Keep Alpha" option to URP Lit and Unlit templates
+      * Updated URP/HDRP template packages 10x to 17.2 (#459, #460, #462, #468)
+      * Fixed "Indirect Diffuse Light" duplicating pragmas when using "Built-In/Lit" (#435)
+      * Fixed "Built-In/Lit" Lambert and BlinnPhong workflows visible/usable ports
+      * Fixed port number inconsistency between passes in "Built-In/Lit" template
+      * Fixed URP 2D templates throwing errors on SRP versions below 14.0.7 (14x)
+      * Fixed URP Decal template (12x)
+      * Fixed URP Decal template throwing errors on macOS (14x)
+      * Fixed decal templates raising errors when using LOD Crossfade (URP 15 to 17x)
+
+   Nodes
+      * Fixed vector cast bug in "Texture Coordinates" node (#453)
+      * Changed "Depth Fade" default Mirror value to false
+      * Added "NaN" value node for culling vertices
+
+   Samples
+      * Added samples for Unity 6.1 (17.1) and Unity 6.2 (17.2)
+      * Fixed URP Omni Decal sample by disabling Alpha Clipping
+      * Added URP "Universal Asset" for sample Render Pipeline config
+      * Added HDRP "HD Asset" for sample Render Pipeline config
+      * Updated all BiRP, URP and HDRP sample shaders
+
+v1.9.9.3
+
+   Editor
+      * Removed call to Resource.UnloadUnusedAssets to prevent crashes (#448)
+      * Fixed "Custom Expression" copy/paste losing dependencies (#27)
+      * Fixed compile errors on Unity 6.3 (#446)
+
+   Templates
+      * Replaced guids for URP/HDRP 17.0 templates to fix replace-install
+      * Fixed "Built-In/Lit" shader Alpha Clipping not working properly
+
+   Nodes
+      * Fixed "Dither" node causing crashes on PS5 (#456)
+
+v1.9.9.2
+
+   Editor
+      * Improved complex shader loading times up to 5000x, depending on shader (#366)
+      * Improved complex shader compile times up to 50x, depending on shader (#366)
+      * Decoupled "Preview Update Frequency" controls from Scroll and/or Zoom (#428)
+      * Renamed 17x packages to 17.0
+      * Fixed copy/paste not restoring Reference connections on various nodes
+      * Fixed V_IsFrontFace vs VFACE Issues on Xbox Series X|S (#451)
+      * Fixed TemplatePostProcessor reported crashing (#409)
+      * Fixed Outline Pass does not reflect Stencil settings (#389)
+      * Fixed not being able to delete wire nodes
+      * Fixed Start Screen throwing JSON related errors
+      * Fixed custom inspector errors when default texture changes from Tex3D to Tex2D
+      * Fixed preview Update Frequency resetting to default 60hz (#431)
+      * Fixed rare GUILayout errors caused by PaletteWindow
+      * Fixed some "Triplanar Sampler" strings to "Triplanar Sample"
+      * Fixed scripting errors and warnings with Unity 6.2 beta 7+
+
+   Templates
+      * Added new shader Category option for templates: Geometry or Terrain (#337)
+      * Added "Assign Keyword" toggle to texture nodes with info/helpbox (#420)
+      * Added GBuffer pass to URP Unlit templates for SRP 17+ / Unity 6.0+ (#242)
+      * Added "Instanced Terrain Normals" option to BiRP/Lit when using Terrain category
+      * Added new "Material Toggle" state to "URP/Lit" template spec/refl logic (#441)
+      * Added new "Material Toggle" state to "BiRP/Lit" template spec/refl logic (#441)
+      * Optimized template interpolators (#393)
+      * Cleaned up keywords from Unlit templates (#419)
+      * Updated template support for SRP 17.2
+      * Removed "Fwd Specular Highlight Toggle" and similar from BiRP/Lit (#441)
+      * Fixed several "URP/Lit" template issues on all versions (10x to 17.2)
+      * Fixed "URP/Unlit" 17.1+ template "UnityGBuffer.hlsl" deprecation warning
+      * Fixed "URP/Unlit" template Receive SSAO toggle option (10x to 17.2)
+      * Fixed Per Pixel Terrain Normals not implemented in templates (#337)
+      * Fixed URP templates not using AlphaDiscard or OutputAlpha (#414)
+      * Fixed "Texture Coordinate" vector output size mismatch when using tessellation
+
+   Nodes
+      * Added "Eye Index" node (#408)
+      * Added "Camera Direction" node (#408)
+      * Added "Toggle Switch" node support for Reference mode (#447)
+      * Changed "Static Switch" nodes to show values matching their reference
+      * Changed "Generate Keyword" to "Assign ..." in "Toggle Switch" node + helpbox
+      * Changed Texture/Sampler nodes default to 2D in auto-cast w/o texture assigned
+      * Renamed "View Dir" node to "View Direction"
+      * Renamed "World Space Camera Pos" to "Camera Position"
+      * Allow "Camera Position" node search using "World Space Camera Pos"
+      * Allow "Switch" node search using "Static Switch"
+      * Allow "Texture Coordinates" node search using "texcoord"
+      * Fixed "Texture Sample" forcing *_ST prop instancing on instanced shaders (#429)
+      * Fixed "Switch" node ignoring Dymamic Branch option when using Reference (#442)
+      * Fixed issues "Function Switch" node affecting copy paste and other operations
+      * Fixed broken connections in SRP Additional Light
+      * Fixed "Tau" sometimes generating float numbers with commas instead of dots
+      * Fixed "Texture Coordinates" causing errors using global half-precision (#417)
+      * Fixed "Reflection Probe" node generating obsolete code in Unity 6.1+ (#430)
+      * Fixed "Triplanar Sample" node ignoring texture offset/scale (#374)
+      * Fixed Texture Object Preview for Mip Level and Mip Bias (#433)
+
+v1.9.9.1
+
+   Editor
+      * Added "Batch Update Shaders" tool to recompile shaders after updating ASE
+      * Added internal support for Matrix2x2/float2x2 type
+      * Added new User Preferences option "Preview Update Frequency" with default 60hz
+      * Moved Shader Function inspector "Open and Save All" button to a better location
+      * Fixed deleting nodes sometimes causing errors (#423)
+      * Fixed high CPU cost when using Time-dependent nodes (#97)
+      * Fixed "Disable Node Previews" option not having effect on performance (#306)
+      * Fixed Batch Save/Update tools multiple presses on Fetch button causing duplicates
+
+   Templates
+      * Updated templates for SRP 17+
+      * Removed "AlwaysRenderMotionVector" tag from URP17+ Lit and Unlit templates
+
+   Nodes
+      * Renamed "Matrix From Vectors" node to "Matrix Create"
+      * Added "Matrix Split" node
+      * Added "Matrix 2X2" node (#381)
+      * Added "Triplanar Weights" node (#422)
+      * Added "Hash 22" portable hash node
+      * Added subtitle with extra information to "Matrix Create" node
+      * Added subtitle with extra information to "Vector From Matrix" node
+      * Added "vec2 v2 2" style search tags to Vector2/Vector3/Vector4 nodes
+      * Updated "SRP Additional Light" node to support Unity 6.2
+      * Updated "Normal From Height" node to remove unused toggle switch
+      * Fixed "Procedural Sample" node pixelated in Stochastic mode on Metal (#421)
+      * Fixed "Not" node missing a description (#332)
+      * Fixed "Indirect Diffuse Light" node causing builds using mixed lighting to fail (#425)
+      * Fixed SRP 17.2 not recognized by "Switch By SRP Version" node
+      * Fixed "Procedural Sample" and "Stochastic Tiling" previews not working
+
+v1.9.9
+
+   Editor
+      * Added support for Unity 6.1
+      * Added preview support Unity 6.2 (#416)
+      * Renamed "Legacy/*" shaders to "Built-In/*" on template selection menus
+      * Updated template import message to show only when actually relevant
+      * Updated template import message to include [AmplifyShaderEditor] tag
+      * Fixed Project Preferences using old EditorPrefs path to get defaults
+      * Fixed using Clip Pos generating extra interpolator when already defined
+      * Fixed copy-paste from external nodes not working (e.g. Amplify Impostor Node)
+      * Fixed transparency bug when overlapping nodes over specific previews (#382)
+
+   Templates
+      * Added "Specular Highlights" toggle to URP, all versions (#383)
+      * Added "Environment Reflections" toggle to URP, all versions (#383)
+      * Updated Alpha port to always stay visible (#392)
+      * Updated URP 17.x templates to include XRMotionVectors pass
+      * Updated "Legacy/Lit" with simple lit workflow options
+      * Updated "Legacy/Lit" and "Legacy/Unlit" to save interpolators
+      * Updated all templates with extra features for Amplify Impostors compatibility
+      * Fixed Alpha Clipping not working in scene selection to URP, all versions
+      * Fixed "Receive Shadows" toggles (URP, all versions)
+      * Fixed "Switch" node not preserving keyword when changing from Fetch
+      * Fixed Decal template for URP 17x (#390)
+      * Fixed Unlit Build Error URP 17x (#391)
+      * Fixed Decal breaking in Build with baked lighting (#404)
+      * Fixed tessellation texcoord breaking URP Unlit 14 (#411)
+
+   Nodes
+      * Added a "Pixel Offset" input to "Pixelate UV" node (#381)
+      * Added Size input to "Flow" node (#401)
+      * Updated "Function Switch" node max input amount to 20 (#403)
+      * Updated "Switch By SRP Version" node to support 17.1 and 17.2
+      * Updated "Vertex TexCoord" node to display both channels and vector size
+      * Fixed "Screen Params" node ignoring Render Scale in URP
+      * Fixed typo in "Indirect Diffuse Light" node URP15 code
+      * Fixed "Object Bounds" node showing error in shader functions (#362)
+      * Fixed "Indirect Diffuse Light" node typo causing errors in URP 17+ (#376)
+      * Fixed "Dot" node preview (#386)
+      * Fixed "Dither" node not working with Render Scale (#387)
+      * Fixed "Normal From Height" node preview (#388)
+      * Fixed "Flipbook UV Animation" node Current Frame output error (#395)
+      * Fixed BatchRendererGroups Variant Creates Matrix operation Errors (#397)
+      * Fixed "Voronoi" node compiler warnings (#402)
+      * Fixed "SRP Baked GI" node using wrong probe volume directives for URP (#405)
+      * Fixed "View Dir" node not forcing o.Normal output on Surface shader (#406)
+      * Fixed "Triplanar Sample" node UnpackNormalmapRGorAG error on Unity 6.1 (#412)
+
 v1.9.8.1
 
    Editor

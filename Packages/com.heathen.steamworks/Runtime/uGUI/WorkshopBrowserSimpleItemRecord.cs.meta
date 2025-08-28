@@ -3,7 +3,7 @@ guid: e07cec4dcc8b31642a87103364770474
 AssetOrigin:
   serializedVersion: 1
   productId: 299310
-  packageName: Toolkit for Steamworks 2025
-  packageVersion: 4.1.2
+  packageName: Toolkit for Steamworks 2025 (for Unity 6+)
+  packageVersion: 4.1.4
   assetPath: Packages/com.heathen.steamworks/Runtime/uGUI/WorkshopBrowserSimpleItemRecord.cs
-  uploadId: 749890
+  uploadId: 771989

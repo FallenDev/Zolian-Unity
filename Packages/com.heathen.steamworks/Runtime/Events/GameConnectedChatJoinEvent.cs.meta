@@ -3,7 +3,7 @@ guid: 9b5661a520c42a2438150c0a4cd8a344
 AssetOrigin:
   serializedVersion: 1
   productId: 299310
-  packageName: Toolkit for Steamworks 2025
-  packageVersion: 4.1.2
+  packageName: Toolkit for Steamworks 2025 (for Unity 6+)
+  packageVersion: 4.1.4
   assetPath: Packages/com.heathen.steamworks/Runtime/Events/GameConnectedChatJoinEvent.cs
-  uploadId: 749890
+  uploadId: 771989

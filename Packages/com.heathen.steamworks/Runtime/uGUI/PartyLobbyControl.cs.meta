@@ -3,7 +3,7 @@ guid: da8aa51e2664d0a4a8ff4645e4f959c1
 AssetOrigin:
   serializedVersion: 1
   productId: 299310
-  packageName: Toolkit for Steamworks 2025
-  packageVersion: 4.1.2
+  packageName: Toolkit for Steamworks 2025 (for Unity 6+)
+  packageVersion: 4.1.4
   assetPath: Packages/com.heathen.steamworks/Runtime/uGUI/PartyLobbyControl.cs
-  uploadId: 749890
+  uploadId: 771989

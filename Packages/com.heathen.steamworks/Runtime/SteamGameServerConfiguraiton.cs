@@ -1,4 +1,4 @@
-﻿#if !DISABLESTEAMWORKS  && STEAMWORKSNET
+﻿#if !DISABLESTEAMWORKS  && (STEAMWORKSNET || STEAM_LEGACY || STEAM_161 || STEAM_162)
 using System;
 using System.IO;
 using System.Text;

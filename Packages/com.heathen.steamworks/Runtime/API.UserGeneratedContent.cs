@@ -1,4 +1,4 @@
-﻿#if !DISABLESTEAMWORKS  && STEAMWORKSNET
+﻿#if !DISABLESTEAMWORKS  && (STEAMWORKSNET || STEAM_LEGACY || STEAM_161 || STEAM_162)
 using Steamworks;
 using System;
 using System.Collections;
@@ -94,8 +94,6 @@ namespace Heathen.SteamworksIntegration.API
 
             private static Callback<DownloadItemResult_t> m_DownloadItem;
             private static Callback<ItemInstalled_t> m_ItemInstalled;
-
-
 
 #region Events
             /// <summary>
@@ -1159,13 +1157,6 @@ namespace Heathen.SteamworksIntegration.API
             }
 
             /// <summary>
-            /// Returns the number of subscribed UGC items
-            /// <para><see cref="https://partner.steamgames.com/doc/api/ISteamUGC#GetNumSubscribedItems"/></para>
-            /// </summary>
-            /// <returns>Returns 0 if called from a game server. else returns the number of subscribed items</returns>
-            public static uint GetNumSubscribedItems() => SteamUGC.GetNumSubscribedItems();
-
-            /// <summary>
             /// Request an additional preview for a UGC item
             /// <para><see cref="https://partner.steamgames.com/doc/api/ISteamUGC#GetQueryUGCAdditionalPreview"/></para>
             /// </summary>
@@ -1281,56 +1272,6 @@ namespace Heathen.SteamworksIntegration.API
             /// <param name="statValue"></param>
             /// <returns></returns>
             public static bool GetQueryStatistic(UGCQueryHandle_t handle, uint index, EItemStatistic statType, out ulong statValue) => SteamUGC.GetQueryUGCStatistic(handle, index, statType, out statValue);
-
-            /// <summary>
-            /// Get the file IDs of all subscribed UGC items up to the array size
-            /// </summary>
-            /// <param name="fileIDs"></param>
-            /// <param name="maxEntries"></param>
-            /// <returns></returns>
-            public static uint GetSubscribedItems(PublishedFileId_t[] fileIDs, uint maxEntries) => SteamUGC.GetSubscribedItems(fileIDs, maxEntries);
-
-            /// <summary>
-            /// Returns the IDs of the files this user is subscribed to
-            /// </summary>
-            /// <returns></returns>
-            public static PublishedFileId_t[] GetSubscribedItems()
-            {
-                var count = GetNumSubscribedItems();
-                if (count > 0)
-                {
-                    var fileIds = new PublishedFileId_t[count];
-                    if (GetSubscribedItems(fileIds, count) > 0)
-                    {
-                        return fileIds;
-                    }
-                    else
-                        return new PublishedFileId_t[0];
-                }
-                else
-                    return new PublishedFileId_t[0];
-            }
-
-            /// <summary>
-            /// Invokes a callback after querying the files and details of the items this user is subscribed to
-            /// </summary>
-            /// <param name="callback"></param>
-            public static void GetSubscribedItems(Action<List<WorkshopItem>> callback)
-            {
-                var query = UgcQuery.GetSubscribed();
-                if (query != null)
-                {
-                    query.Execute(r =>
-                    {
-                        callback?.Invoke(query.ResultsList);
-                        query.Dispose();
-                    });
-                }
-                else
-                {
-                    callback?.Invoke(new());
-                }
-            }
 
             /// <summary>
             /// Invokes a callback after querying the files and details of the items this user is subscribed to
@@ -1815,7 +1756,129 @@ namespace Heathen.SteamworksIntegration.API
             /// <param name="videoId"></param>
             /// <returns></returns>
             public static bool UpdateItemPreviewVideo(UGCUpdateHandle_t handle, uint index, string videoId) => SteamUGC.UpdateItemPreviewVideo(handle, index, videoId);
-#endregion
+            #endregion
+
+#if STEAM_LEGACY || STEAM_161
+            /// <summary>
+            /// Get the file IDs of all subscribed UGC items up to the array size
+            /// </summary>
+            /// <param name="fileIDs"></param>
+            /// <param name="maxEntries"></param>
+            /// <returns></returns>
+            public static uint GetSubscribedItems(PublishedFileId_t[] fileIDs, uint maxEntries) => SteamUGC.GetSubscribedItems(fileIDs, maxEntries);
+            /// <summary>
+            /// Returns the IDs of the files this user is subscribed to
+            /// </summary>
+            /// <returns></returns>
+            public static PublishedFileId_t[] GetSubscribedItems()
+            {
+                var count = GetNumSubscribedItems();
+                if (count > 0)
+                {
+                    var fileIds = new PublishedFileId_t[count];
+                    if (GetSubscribedItems(fileIds, count) > 0)
+                    {
+                        return fileIds;
+                    }
+                    else
+                        return new PublishedFileId_t[0];
+                }
+                else
+                    return new PublishedFileId_t[0];
+            }
+
+            /// <summary>
+            /// Invokes a callback after querying the files and details of the items this user is subscribed to
+            /// </summary>
+            /// <param name="callback"></param>
+            public static void GetSubscribedItems(Action<List<WorkshopItem>> callback)
+            {
+                var query = UgcQuery.GetSubscribed();
+                if (query != null)
+                {
+                    query.Execute(r =>
+                    {
+                        callback?.Invoke(query.ResultsList);
+                        query.Dispose();
+                    });
+                }
+                else
+                {
+                    callback?.Invoke(new());
+                }
+            }
+            /// <summary>
+            /// Returns the number of subscribed UGC items
+            /// <para><see cref="https://partner.steamgames.com/doc/api/ISteamUGC#GetNumSubscribedItems"/></para>
+            /// </summary>
+            /// <returns>Returns 0 if called from a game server. else returns the number of subscribed items</returns>
+            public static uint GetNumSubscribedItems() => SteamUGC.GetNumSubscribedItems();
+#endif
+
+#if STEAM_162
+            /// <summary>
+            /// <para> Set the local load order for these items. If there are any items not in the given list, they will sort by the time subscribed.</para>
+            /// </summary>
+            public static bool SetSubscriptionsLoadOrder(PublishedFileId_t[] PublishedFileIDs, uint NumPublishedFileIDs) => SteamUGC.SetSubscriptionsLoadOrder(PublishedFileIDs, NumPublishedFileIDs);
+            /// <summary>
+            /// <para> Sets whether the item should be disabled locally or not. This means that it will not be returned in GetSubscribedItems() by default.</para>
+            /// </summary>
+            public static bool SetItemsDisabledLocally(PublishedFileId_t[] PublishedFileIDs, uint NumPublishedFileIDs, bool DisabledLocally) => SteamUGC.SetItemsDisabledLocally(PublishedFileIDs, NumPublishedFileIDs, DisabledLocally);
+            /// <summary>
+            /// Get the file IDs of all subscribed UGC items up to the array size
+            /// </summary>
+            /// <param name="fileIDs"></param>
+            /// <param name="maxEntries"></param>
+            /// <returns></returns>
+            public static uint GetSubscribedItems(PublishedFileId_t[] fileIDs, uint maxEntries, bool IncludeLocallyDisabled = false) => SteamUGC.GetSubscribedItems(fileIDs, maxEntries, IncludeLocallyDisabled);
+            /// <summary>
+            /// Returns the IDs of the files this user is subscribed to
+            /// </summary>
+            /// <returns></returns>
+            public static PublishedFileId_t[] GetSubscribedItems(bool IncludeLocallyDisabled = false)
+            {
+                var count = GetNumSubscribedItems(IncludeLocallyDisabled);
+                if (count > 0)
+                {
+                    var fileIds = new PublishedFileId_t[count];
+                    if (GetSubscribedItems(fileIds, count, IncludeLocallyDisabled) > 0)
+                    {
+                        return fileIds;
+                    }
+                    else
+                        return new PublishedFileId_t[0];
+                }
+                else
+                    return new PublishedFileId_t[0];
+            }
+
+            /// <summary>
+            /// Invokes a callback after querying the files and details of the items this user is subscribed to
+            /// </summary>
+            /// <param name="callback"></param>
+            public static void GetSubscribedItems(Action<List<WorkshopItem>> callback, bool IncludeLocallyDisabled = false)
+            {
+                var query = UgcQuery.GetSubscribed(IncludeLocallyDisabled);
+                if (query != null)
+                {
+                    query.Execute(r =>
+                    {
+                        callback?.Invoke(query.ResultsList);
+                        query.Dispose();
+                    });
+                }
+                else
+                {
+                    callback?.Invoke(new());
+                }
+            }
+            /// <summary>
+            /// Returns the number of subscribed UGC items
+            /// <para><see cref="https://partner.steamgames.com/doc/api/ISteamUGC#GetNumSubscribedItems"/></para>
+            /// </summary>
+            /// <returns>Returns 0 if called from a game server. else returns the number of subscribed items</returns>
+            public static uint GetNumSubscribedItems(bool IncludeLocallyDisabled = false) => SteamUGC.GetNumSubscribedItems(IncludeLocallyDisabled);
+#endif
         }
     }
 }

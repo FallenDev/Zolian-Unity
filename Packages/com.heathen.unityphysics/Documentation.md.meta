@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f377314462b1afa49b7bdb3c8819ad05
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122368
+  packageName: Toolkit for Unity Physics 2025
+  packageVersion: 4.0.0
+  assetPath: Packages/com.heathen.unityphysics/Documentation.md
+  uploadId: 751431

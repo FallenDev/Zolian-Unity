@@ -3,7 +3,7 @@ guid: 7cb6f43936d690942af8880cb1b7c61c
 AssetOrigin:
   serializedVersion: 1
   productId: 299310
-  packageName: Toolkit for Steamworks 2025
-  packageVersion: 4.1.2
+  packageName: Toolkit for Steamworks 2025 (for Unity 6+)
+  packageVersion: 4.1.4
   assetPath: Packages/com.heathen.steamworks/Runtime/uGUI/FriendProfile.cs
-  uploadId: 749890
+  uploadId: 771989

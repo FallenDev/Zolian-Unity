@@ -1,4 +1,4 @@
-﻿#if !DISABLESTEAMWORKS  && STEAMWORKSNET
+﻿#if !DISABLESTEAMWORKS  && (STEAMWORKSNET || STEAM_LEGACY || STEAM_161 || STEAM_162)
 using Steamworks;
 using System;
 using System.Collections.Generic;
@@ -25,6 +25,11 @@ namespace Heathen.SteamworksIntegration
         /// </summary>
         [SerializeField]
         internal InventoryItemType item_type;
+        /// <summary>
+        /// The type of the item
+        /// </summary>
+        [SerializeField]
+        internal bool item_game_only;
         /// <summary>
         /// The name of the item
         /// </summary>
@@ -85,6 +90,16 @@ namespace Heathen.SteamworksIntegration
         /// </summary>
         [SerializeField]
         internal string item_icon_url_large;
+        
+        [SerializeField]
+        internal string item_accessory_tag;
+        [SerializeField]
+        internal int item_accessory_limit;
+        [SerializeField]
+        internal string item_allowed_tags_from_tools;
+        [SerializeField]
+        internal LanguageVariantNode item_accessory_description = new LanguageVariantNode { node = "accessory_description" };
+
         /// <summary>
         /// Is the item marketable
         /// </summary>
@@ -1377,6 +1392,7 @@ namespace Heathen.SteamworksIntegration
             sb.Append(",\n\t\t\"store_hidden\": " + item_store_hidden.ToString().ToLower());
             sb.Append(",\n\t\t\"granted_manually\": " + item_granted_manually.ToString().ToLower());
             sb.Append(",\n\t\t\"auto_stack\": " + item_auto_stack.ToString().ToLower());
+            sb.Append(",\n\t\t\"game_only\": " + item_game_only.ToString().ToLower());
 
             var extn = item_extendedSchema.ToString();
             if (!string.IsNullOrEmpty(extn))
@@ -1749,6 +1765,21 @@ namespace Heathen.SteamworksIntegration
         private UnityEditor.SerializedProperty item_granted_manually;
         private UnityEditor.SerializedProperty item_use_bundle_price;
         private UnityEditor.SerializedProperty item_auto_stack;
+        private UnityEditor.SerializedProperty item_game_only;
+
+        private UnityEditor.SerializedProperty item_accessory_tag;
+        private UnityEditor.SerializedProperty item_accessory_limit;
+        private UnityEditor.SerializedProperty item_allowed_tags_from_tools;
+        private UnityEditor.SerializedProperty item_accessory_description;
+        //[SerializeField]
+        //internal string item_accessory_tag;
+        //[SerializeField]
+        //internal int item_accessory_limit;
+        //[SerializeField]
+        //internal string item_allowed_tags_from_tools;
+        //[SerializeField]
+        //internal LanguageVariantNode item_accessory_description = new LanguageVariantNode { node = "accessory_description" };
+
         private UnityEditor.SerializedProperty item_extendedSchema;
 
         private void OnEnable()
@@ -1765,8 +1796,8 @@ namespace Heathen.SteamworksIntegration
             item_price = serializedObject.FindProperty("item_price");
             item_background_color = serializedObject.FindProperty("item_background_color");
             item_name_color = serializedObject.FindProperty("item_name_color");
-            item_icon_url = serializedObject.FindProperty("icon_url");
-            item_icon_url_large = serializedObject.FindProperty("icon_url_large");
+            item_icon_url = serializedObject.FindProperty("item_icon_url");
+            item_icon_url_large = serializedObject.FindProperty("item_icon_url_large");
             item_marketable = serializedObject.FindProperty("item_marketable");
             item_tradable = serializedObject.FindProperty("item_tradable");
             item_tags = serializedObject.FindProperty("item_tags");
@@ -1786,6 +1817,13 @@ namespace Heathen.SteamworksIntegration
             item_granted_manually = serializedObject.FindProperty("item_granted_manually");
             item_use_bundle_price = serializedObject.FindProperty("item_use_bundle_price");
             item_auto_stack = serializedObject.FindProperty("item_auto_stack");
+            item_game_only = serializedObject.FindProperty("item_game_only");
+
+            item_accessory_tag = serializedObject.FindProperty("item_accessory_tag");
+            item_accessory_limit = serializedObject.FindProperty("item_accessory_limit");
+            item_allowed_tags_from_tools = serializedObject.FindProperty("item_allowed_tags_from_tools");
+            item_accessory_description = serializedObject.FindProperty("item_accessory_description");
+
             item_extendedSchema = serializedObject.FindProperty("item_extendedSchema");
         }
 
@@ -1874,6 +1912,12 @@ namespace Heathen.SteamworksIntegration
                 UnityEditor.EditorGUILayout.PropertyField(item_marketable, new GUIContent("Marketable", "Whether this item can be sold to other users in the Steam Community Market."), true);
                 UnityEditor.EditorGUILayout.PropertyField(item_tradable, new GUIContent("Tradeable", "Whether this item can be traded to other users using Steam Trading."), true);
                 UnityEditor.EditorGUILayout.PropertyField(item_auto_stack, new GUIContent("Auto Stack?", "If true, item grants will automatically be added to a single stack of the given type. Grants will be visible in inventory callbacks as quantity changes."), true);
+
+                if (itemRef.item_type == InventoryItemType.item)
+                {
+                    UnityEditor.EditorGUILayout.PropertyField(item_game_only, new GUIContent("Game Only?", "If true, then items will not be shown in the user's Steam Backpack, including new item notifications. Common uses for this area items that you grant, that are immediately consumed."), true);
+                }
+
                 UnityEditor.EditorGUILayout.PropertyField(item_hidden, new GUIContent("Hidden?", "If true, the item definition will not be shown to clients. Use this to hide unused, or under-development, itemdefs."), true);
 
                 UnityEditor.EditorGUILayout.Space();
@@ -1887,6 +1931,16 @@ namespace Heathen.SteamworksIntegration
                 UnityEditor.EditorGUILayout.PropertyField(item_drop_max_per_window, new GUIContent("Drop Max per-Window", "Numbers of grants within the window permitted before Cool-down applies. "), true);
                 UnityEditor.EditorGUILayout.PropertyField(item_granted_manually, new GUIContent("Granted Manually?", "If true, will only be granted when AddPromoItem() or AddPromoItems() are called with the explicit item definition id. Otherwise, it may be granted via the GrantPromoItems() call."), true);
 
+                if (itemRef.item_type == InventoryItemType.item)
+                {
+                    UnityEditor.EditorGUILayout.Space();
+                    UnityEditor.EditorGUILayout.LabelField("Accessory Settings", UnityEditor.EditorStyles.boldLabel);
+                    UnityEditor.EditorGUILayout.PropertyField(item_accessory_tag, new GUIContent("Tag", "To mark an item as being customizable, update the ItemDef with the property \"accessory_tag\" whose value is a per-item tag category token."), true);
+                    UnityEditor.EditorGUILayout.PropertyField(item_accessory_limit, new GUIContent("Limit", "You can limit the number of accessories on a single item with the property \"accessory_limit\""), true);
+                    UnityEditor.EditorGUILayout.PropertyField(item_allowed_tags_from_tools, new GUIContent("Allowed Tags from Tools", ""), true);
+                    UnityEditor.EditorGUILayout.PropertyField(item_accessory_description, new GUIContent("Accessory Description", ""), true);
+                }
+
                 if (itemRef.item_type == InventoryItemType.item || itemRef.item_type == InventoryItemType.bundle)
                 {
                     UnityEditor.EditorGUILayout.Space();
@@ -1898,8 +1952,12 @@ namespace Heathen.SteamworksIntegration
                     UnityEditor.EditorGUILayout.PropertyField(item_store_images, new GUIContent("Store Images", "These images will be proxied and used on the detail page of the Steam item store for your app."), true);
                     UnityEditor.EditorGUILayout.PropertyField(item_store_hidden, new GUIContent("Store Hidden?", "If true, this item will be hidden in the Steam Item Store for your app. By default, any items with a price will be shown in the store."), true);
                 }
+                else if (itemRef.item_type == InventoryItemType.tag_tool)
+                {
+                    UnityEditor.EditorGUILayout.PropertyField(item_store_tags, new GUIContent("Tags", "These tags will be used to categorize/filter items in the Steam item store for your app."), true);
+                }
             }
-            else
+            else if (itemRef.item_type == InventoryItemType.tag_generator)
             {
                 UnityEditor.EditorGUILayout.PropertyField(item_tag_generator_name, new GUIContent("Tag Generator Name", "The name of the tag category token"), true);
                 UnityEditor.EditorGUILayout.PropertyField(item_tag_generator_values, new GUIContent("Tag Generator Values", "The values and the chance that they will be picked"), true);

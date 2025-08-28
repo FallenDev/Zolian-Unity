@@ -1,4 +1,4 @@
-﻿#if !DISABLESTEAMWORKS  && STEAMWORKSNET
+﻿#if !DISABLESTEAMWORKS  && (STEAMWORKSNET || STEAM_LEGACY || STEAM_161 || STEAM_162)
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -20,19 +20,23 @@ namespace Heathen.SteamworksIntegration
         internal SteamSettings demoSettings;
         [SerializeField]
         [HideInInspector]
-        internal List<SteamSettings> playtestSettings;
+        internal List<SteamSettings> playtestSettings = new();
 
         private void Start()
         {
             if (targetSettings != null && !API.App.Initialized)
                 targetSettings.Initialize();
-            else
+            else if (!API.App.Initialized)
             {
 #if !UNITY_EDITOR
                 Debug.LogError("No settings found");
 #else
                 Debug.LogError($"No settings have been selected, either you have removed the previously selected settings or you have never set the desired settings on the Initialize Steamworks object.");
 #endif
+            }
+            else
+            {
+                Debug.LogWarning("Steamworks API is already initialized, duplicate Steam initialization process detected.");
             }
         }
 
@@ -90,8 +94,29 @@ namespace Heathen.SteamworksIntegration
 
                 parent = target as InitializeSteamworks;
 
-                if (parent.targetSettings == null)
+                if (parent.mainSettings != parent.targetSettings
+                && parent.demoSettings != parent.targetSettings)
+                {
+                    bool foundTarget = false;
+                    foreach (var set in parent.playtestSettings)
+                    {
+                        if (set == parent.targetSettings)
+                            foundTarget = true;
+                    }
+
+                    if (!foundTarget)
+                    {
+                        parent.targetSettings = parent.mainSettings;
+                        UnityEditor.EditorUtility.SetDirty(target);
+                    }
+                }
+
+                if(parent.targetSettings == null)
+                {
+                    parent.mainSettings = SteamSettings.GetOrCreateSettings();
                     parent.targetSettings = parent.mainSettings;
+                    UnityEditor.EditorUtility.SetDirty(target);
+                }
 
                 List<string> names = new List<string>();
                 int index = 0;

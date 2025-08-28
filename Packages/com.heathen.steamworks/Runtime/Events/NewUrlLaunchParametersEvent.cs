@@ -1,15 +1,10 @@
-﻿#if !DISABLESTEAMWORKS  && STEAMWORKSNET
+﻿#if !DISABLESTEAMWORKS  && (STEAMWORKSNET || STEAM_LEGACY || STEAM_161 || STEAM_162)
 using Steamworks;
 using UnityEngine.Events;
 
 namespace Heathen.SteamworksIntegration
 {
-#if STEAMWORKSNET
     [System.Serializable]
     public class NewUrlLaunchParametersEvent : UnityEvent<NewUrlLaunchParameters_t> { }
-#elif FACEPUNCH
-    [System.Serializable]
-    public class NewUrlLaunchParametersEvent : UnityEvent { }
-#endif
 }
 #endif

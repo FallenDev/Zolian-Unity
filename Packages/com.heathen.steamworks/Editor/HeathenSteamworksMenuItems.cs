@@ -11,6 +11,8 @@ namespace Heathen.SteamworksIntegration.Editors
 {
     public class HeathenSteamworksMenuItems
     {
+        public const string CurrentSteamworksNetVersion = "https://github.com/rlabrecque/Steamworks.NET.git?path=/com.rlabrecque.steamworks.net#2025.161.0";
+
         [InitializeOnLoadMethod]
         public static void CheckForSteamworksInstall()
         {
@@ -47,8 +49,8 @@ namespace Heathen.SteamworksIntegration.Editors
                         yield return null;
                 }
             }
-#if !STEAMWORKSNET
-            if (EditorUtility.DisplayDialog("Heathen Installer", "Steam API not found, Steamworks.NET must be installed via the Unity Package Manager for this asset to work correctly. Would you like to install it now?", "Install Steamworks.NET", "Cancel"))
+#if !(STEAM_LEGACY || STEAM_161 || STEAM_162)
+            if (EditorUtility.DisplayDialog("Heathen Installer", "Supported Steam API version not found, Steamworks.NET must be installed via the Unity Package Manager for this asset to work correctly. Would you like to install it now?", "Install Steamworks.NET", "Cancel"))
             {
                 yield return null;
                 AddRequest steamProc = null;
@@ -56,7 +58,7 @@ namespace Heathen.SteamworksIntegration.Editors
                 if (!SessionState.GetBool("SteamInstall", false))
                 {
                     SessionState.SetBool("SteamInstall", true);
-                    steamProc = Client.Add("https://github.com/rlabrecque/Steamworks.NET.git?path=/com.rlabrecque.steamworks.net");
+                    steamProc = Client.Add(CurrentSteamworksNetVersion);
                 }
 
                 if (steamProc.Status == StatusCode.Failure)
@@ -82,7 +84,7 @@ namespace Heathen.SteamworksIntegration.Editors
 #endif
         }
 
-        [MenuItem("Help/Heathen/Steamworks/Update All Requirements (Package Manager)", priority = 0)]
+        [MenuItem("Help/Heathen/Steamworks/Update All Requirements", priority = 0)]
         public static void InstallRequirements()
         {
             if (!SessionState.GetBool("SteamInstall", false))
@@ -90,21 +92,45 @@ namespace Heathen.SteamworksIntegration.Editors
                 StartCoroutine(InstallAll());
             }
         }
-        [MenuItem("Help/Heathen/Steamworks/Update Steamworks.NET (Package Manager)", priority = 2)]
-        public static void InstallSteamworksMenuItem()
+        [MenuItem("Help/Heathen/Steamworks/Install Steamworks.NET (Legacy)", priority = 1)]
+        public static void InstallSteamworksLegacy()
         {
             if (!SessionState.GetBool("SteamInstall", false))
             {
-                StartCoroutine(InstallSteamworks());
+                StartCoroutine(InstallSteamworks_Legacy());
             }
         }
-        [MenuItem("Help/Heathen/Steamworks/Documentation", priority = 3)]
+        [MenuItem("Help/Heathen/Steamworks/Install Steamworks.NET (for 1.61 - Current)", priority = 2)]
+        public static void InstallSteamworks161()
+        {
+            if (!SessionState.GetBool("SteamInstall", false))
+            {
+                StartCoroutine(InstallSteamworks_161());
+            }
+        }
+        //[MenuItem("Help/Heathen/Steamworks/Install Steamworks.NET (for 1.62)", priority = 3)]
+        public static void InstallSteamworks162()
+        {
+            if (!SessionState.GetBool("SteamInstall", false))
+            {
+                StartCoroutine(InstallSteamworks_162());
+            }
+        }
+        [MenuItem("Help/Heathen/Steamworks/Install Steamworks.NET (Latest - Not Tested)", priority = 4)]
+        public static void InstallSteamworksLatest()
+        {
+            if (!SessionState.GetBool("SteamInstall", false))
+            {
+                StartCoroutine(InstallSteamworks_Latest());
+            }
+        }
+        [MenuItem("Help/Heathen/Steamworks/Documentation", priority = 5)]
         public static void Documentation()
         {
             Application.OpenURL("https://kb.heathen.group/assets/steamworks");
         }
 
-        [MenuItem("Help/Heathen/Steamworks/Support", priority = 4)]
+        [MenuItem("Help/Heathen/Steamworks/Support", priority = 6)]
         public static void Support()
         {
             Application.OpenURL("https://discord.gg/RMGtDXV");
@@ -118,7 +144,7 @@ namespace Heathen.SteamworksIntegration.Editors
             if (!SessionState.GetBool("SteamInstall", false))
             {
                 SessionState.SetBool("SteamInstall", true);
-                steamProc = Client.Add("https://github.com/rlabrecque/Steamworks.NET.git?path=/com.rlabrecque.steamworks.net");
+                steamProc = Client.Add(CurrentSteamworksNetVersion);
             }
 
             if (steamProc.Status == StatusCode.Failure)
@@ -142,7 +168,7 @@ namespace Heathen.SteamworksIntegration.Editors
             SessionState.SetBool("SteamInstall", false);
         }
 
-        private static IEnumerator InstallSteamworks()
+        private static IEnumerator InstallSteamworks(string uri)
         {
             yield return null;
             AddRequest steamProc = null;
@@ -150,7 +176,7 @@ namespace Heathen.SteamworksIntegration.Editors
             if (!SessionState.GetBool("SteamInstall", false))
             {
                 SessionState.SetBool("SteamInstall", true);
-                steamProc = Client.Add("https://github.com/rlabrecque/Steamworks.NET.git?path=/com.rlabrecque.steamworks.net");
+                steamProc = Client.Add(uri);
             }
 
             if (steamProc.Status == StatusCode.Failure)
@@ -173,6 +199,11 @@ namespace Heathen.SteamworksIntegration.Editors
 
             SessionState.SetBool("SteamInstall", false);
         }
+
+        private static IEnumerator InstallSteamworks_Legacy() => InstallSteamworks("https://github.com/rlabrecque/Steamworks.NET.git?path=/com.rlabrecque.steamworks.net#2024.8.0");
+        private static IEnumerator InstallSteamworks_Latest() => InstallSteamworks("https://github.com/rlabrecque/Steamworks.NET.git?path=/com.rlabrecque.steamworks.net");
+        private static IEnumerator InstallSteamworks_161() => InstallSteamworks("https://github.com/rlabrecque/Steamworks.NET.git?path=/com.rlabrecque.steamworks.net#2025.161.0");
+        private static IEnumerator InstallSteamworks_162() => InstallSteamworks("https://github.com/rlabrecque/Steamworks.NET.git?path=/com.rlabrecque.steamworks.net#2025.162.0");        
 
         private static List<IEnumerator> coroutines;
 

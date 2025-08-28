@@ -440,8 +440,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 872f6ae278cb0644882f90fe4993b93f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetSettings: {fileID: 11400000, guid: 069761fa169f9f147a2f3af24be0a5a1, type: 2}
-  mainSettings: {fileID: 11400000, guid: 069761fa169f9f147a2f3af24be0a5a1, type: 2}
+  targetSettings: {fileID: 11400000, guid: 64de2ebd58fc7fa4a919720c1bf4ace8, type: 2}
+  mainSettings: {fileID: 11400000, guid: 64de2ebd58fc7fa4a919720c1bf4ace8, type: 2}
   demoSettings: {fileID: 0}
   playtestSettings: []
 --- !u!1 &24293454

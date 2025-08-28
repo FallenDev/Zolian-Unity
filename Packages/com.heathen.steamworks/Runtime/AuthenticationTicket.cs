@@ -1,4 +1,4 @@
-﻿#if !DISABLESTEAMWORKS  && STEAMWORKSNET
+﻿#if !DISABLESTEAMWORKS  && (STEAMWORKSNET || STEAM_LEGACY || STEAM_161 || STEAM_162)
 using Steamworks;
 using System;
 using UnityEngine;
@@ -124,7 +124,8 @@ namespace Heathen.SteamworksIntegration
 
         public void Authenticate(GetTicketForWebApiResponse_t response)
         {
-            Data = response.m_rgubTicket;
+            Data = new byte[response.m_cubTicket];
+            Array.Copy(response.m_rgubTicket, Data, response.m_cubTicket);
 
             if (Handle != default && Handle != HAuthTicket.Invalid
                     && response.m_eResult == EResult.k_EResultOK)
@@ -138,7 +139,7 @@ namespace Heathen.SteamworksIntegration
                 Result = response.m_eResult;
                 Callback?.Invoke(this, true);
             }
-        }
+        }        
 
         /// <summary>
         /// The age of this ticket from the current server real time value

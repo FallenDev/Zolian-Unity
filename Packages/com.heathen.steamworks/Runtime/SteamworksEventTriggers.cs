@@ -1,4 +1,4 @@
-﻿#if !DISABLESTEAMWORKS  && STEAMWORKSNET
+﻿#if !DISABLESTEAMWORKS  && (STEAMWORKSNET || STEAM_LEGACY || STEAM_161 || STEAM_162)
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -85,7 +85,69 @@ namespace Heathen.SteamworksIntegration
 
         private void OnDestroy()
         {
+            API.App.evtSteamInitialized.RemoveListener(initSuccess.Invoke);
+            API.App.evtSteamInitializationError.RemoveListener(initFailed.Invoke);
+
             API.App.Client.EventDlcInstalled.RemoveListener(dlcInstalled.Invoke);
+            API.App.Client.EventNewUrlLaunchParameters.RemoveListener(newUrlLaunchParameters.Invoke);
+            API.App.Client.EventServersDisconnected.RemoveListener(serversDisconnected.Invoke);
+            API.App.Client.EventServersConnected.RemoveListener(serversConnected.Invoke);
+            API.App.Client.EventServersConnectFailure.RemoveListener(serversConnectFailure.Invoke);
+
+            API.BigPicture.Client.EventGamepadTextInputShown.RemoveListener(gamepadTextInputShown.Invoke);
+            API.BigPicture.Client.EventGamepadTextInputDismissed.RemoveListener(gamepadTextInputDismissed.Invoke);
+
+            API.Clans.Client.EventGameConnectedChatLeave.RemoveListener(gameConnectedChatLeave.Invoke);
+            API.Clans.Client.EventChatMessageReceived.RemoveListener(chatMessageReceived.Invoke);
+            API.Clans.Client.EventGameConnectedChatJoin.RemoveListener(gameConnectedChatJoin.Invoke);
+
+            API.Friends.Client.EventGameConnectedFriendChatMsg.RemoveListener(gameConnectedFriendChatMsg.Invoke);
+            API.Friends.Client.EventFriendRichPresenceUpdate.RemoveListener(friendRichPresenceUpdate.Invoke);
+            API.Friends.Client.EventPersonaStateChange.RemoveListener(personaStateChange.Invoke);
+
+            API.Input.Client.EventInputDataChanged.RemoveListener(inputDataChanged.Invoke);
+
+            API.Inventory.Client.EventSteamInventoryDefinitionUpdate.RemoveListener(inventoryDefinitionUpdate.Invoke);
+            API.Inventory.Client.EventSteamInventoryResultReady.RemoveListener(inventoryResultReady.Invoke);
+            API.Inventory.Client.EventSteamMicroTransactionAuthorizationResponse.RemoveListener(microTransactionAuthorizationResponse.Invoke);
+
+            API.Matchmaking.Client.EventFavoritesListChanged.RemoveListener(serverFavoritesListChanged.Invoke);
+            API.Matchmaking.Client.EventLobbyAskedToLeave.RemoveListener(lobbyAskedToLeave.Invoke);
+            API.Matchmaking.Client.EventLobbyAuthenticationRequest.RemoveListener(lobbyAuthenticationRequest.Invoke);
+            API.Matchmaking.Client.EventLobbyChatMsg.RemoveListener(lobbyChatMsg.Invoke);
+            API.Matchmaking.Client.EventLobbyChatUpdate.RemoveListener(lobbyChatUpdate.Invoke);
+            API.Matchmaking.Client.EventLobbyDataUpdate.RemoveListener(lobbyChatDataUpdate.Invoke);
+            API.Matchmaking.Client.EventLobbyEnterFailed.RemoveListener(lobbyEnterFailed.Invoke);
+            API.Matchmaking.Client.EventLobbyEnterSuccess.RemoveListener(lobbyEnterSuccess.Invoke);
+            API.Matchmaking.Client.EventLobbyGameCreated.RemoveListener(lobbyGameCreated.Invoke);
+            API.Matchmaking.Client.EventLobbyInvite.RemoveListener(lobbyInvite.Invoke);
+            API.Matchmaking.Client.EventLobbyLeave.RemoveListener(lobbyLeave.Invoke);
+
+            API.Overlay.Client.EventGameLobbyJoinRequested.RemoveListener(gameLobbyJoinRequested.Invoke);
+            API.Overlay.Client.EventGameOverlayActivated.RemoveListener(gameOverlayActivated.Invoke);
+            API.Overlay.Client.EventGameRichPresenceJoinRequested.RemoveListener(gameRichPresenceJoinRequested.Invoke);
+            API.Overlay.Client.EventGameServerChangeRequested.RemoveListener(gameServerChangeRequested.Invoke);
+
+            API.Parties.Client.EventActiveBeaconsUpdated.RemoveListener(activeBeaconsUpdated.Invoke);
+            API.Parties.Client.EventAvailableBeaconLocationsUpdated.RemoveListener(availableBeaconLocationsUpdated.Invoke);
+            API.Parties.Client.EventReservationNotificationCallback.RemoveListener(reservationNotificationCallback.Invoke);
+
+            API.RemotePlay.Client.EventSessionConnected.RemoveListener(remotePlaySessionConnected.Invoke);
+            API.RemotePlay.Client.EventSessionDisconnected.RemoveListener(remotePlaySessionDisconnected.Invoke);
+
+            API.RemoteStorage.Client.EventLocalFileChange.RemoveListener(remoteStorageFileChange.Invoke);
+
+            API.Screenshots.Client.EventScreenshotReady.RemoveListener(screenshotReady.Invoke);
+            API.Screenshots.Client.EventScreenshotRequested.RemoveListener(screenshotRequested.Invoke);
+
+            API.StatsAndAchievements.Client.EventUserAchievementStored.RemoveListener(achievementStored.Invoke);
+            API.StatsAndAchievements.Client.EventUserStatsReceived.RemoveListener(statsReceived.Invoke);
+            API.StatsAndAchievements.Client.EventUserStatsStored.RemoveListener(statsStored.Invoke);
+            API.StatsAndAchievements.Client.EventUserStatsUnloaded.RemoveListener(statsUnloaded.Invoke);
+
+            API.Utilities.Client.EventAppResumeFromSuspend.RemoveListener(appResumeFromSuspend.Invoke);
+            API.Utilities.Client.EventKeyboardClosed.RemoveListener(keyboardClosed.Invoke);
+            API.Utilities.Client.EventKeyboardShown.RemoveListener(keyboardShown.Invoke);
         }
 
         public UnityEvent initSuccess;

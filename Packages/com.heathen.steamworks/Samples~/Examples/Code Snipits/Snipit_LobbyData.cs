@@ -184,6 +184,30 @@ namespace MyProperlyFormedNamespaceName
                 // The user lost connection
             }
         }
+
+        public void LoopingLobbyMembers(LobbyData Lobby)
+        {
+            foreach(LobbyMemberData Member in Lobby.Members)
+            {
+                string MemberName = Member.user.Name;
+
+                Member.user.LoadAvatar(AvatarTexture =>
+                {
+                    // AvatarTexture is now a Texture2D use it well
+                });
+
+                string ReadMetadataValues = Member["SomeKey"];
+                
+                if(Member.IsReady)
+                {
+                    // The member is ready!
+                }
+                else
+                {
+                    // The member is NOT ready!
+                }
+            }
+        }
 #endif
     }
 }

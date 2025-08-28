@@ -1,4 +1,4 @@
-﻿#if !DISABLESTEAMWORKS  && STEAMWORKSNET
+﻿#if !DISABLESTEAMWORKS  && (STEAMWORKSNET || STEAM_LEGACY || STEAM_161 || STEAM_162)
 using Heathen.SteamworksIntegration.API;
 using Steamworks;
 using System;
@@ -189,7 +189,7 @@ namespace Heathen.SteamworksIntegration
         /// </remarks>
         public readonly bool HasServer => SteamMatchmaking.GetLobbyGameServer(this, out _, out _, out _);
         /// <summary>
-        /// Returns the <see cref="LobbyGameServer"/> data containing server connection inforation related to the lobby if any
+        /// Returns the <see cref="LobbyGameServer"/> data containing server connection information related to the lobby if any
         /// </summary>
         public readonly LobbyGameServer GameServer => API.Matchmaking.Client.GetLobbyGameServer(id);
         /// <summary>
