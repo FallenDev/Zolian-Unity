@@ -1,6 +1,6 @@
 using Assets.Scripts.Network;
 
-namespace Assets.Scripts.Entity.Abstractions
+namespace Assets.Scripts.GameEntities.Abstractions
 {
     /// <summary>
     /// The client instance that is used to send and receive packets.

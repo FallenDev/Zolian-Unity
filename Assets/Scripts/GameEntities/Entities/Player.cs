@@ -1,8 +1,7 @@
 ﻿using System;
-
-using Assets.Scripts.Entity.Abstractions;
-using Assets.Scripts.Entity.Behaviors;
-using Assets.Scripts.Entity.ScriptableObjects;
+using Assets.Scripts.GameEntities.Abstractions;
+using Assets.Scripts.GameEntities.Behaviors;
+using Assets.Scripts.GameEntities.ScriptableObjects;
 using Assets.Scripts.Managers;
 using Assets.Scripts.Models;
 using Assets.Scripts.Network;
@@ -16,7 +15,7 @@ using JohnStairs.RCC.Inputs;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Assets.Scripts.Entity.Entities
+namespace Assets.Scripts.GameEntities.Entities
 {
     public class Player : Damageable, IPlayer, IPointerInfo, IClient
     {

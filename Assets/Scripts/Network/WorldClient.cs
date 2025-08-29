@@ -5,7 +5,7 @@ using Assets.Scripts.Network.OpCodes;
 using Assets.Scripts.Network.PacketArgs.SendToServer;
 using Assets.Scripts.Managers;
 using System;
-using Assets.Scripts.Entity.Behaviors;
+using Assets.Scripts.GameEntities.Behaviors;
 using Assets.Scripts.Models;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 

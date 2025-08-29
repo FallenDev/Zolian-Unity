@@ -1,9 +1,8 @@
-﻿using Assets.Scripts.Entity.Entities;
+﻿using Assets.Scripts.GameEntities.Entities;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
-
 using UnityEngine;
 
-namespace Assets.Scripts.Entity.Behaviors
+namespace Assets.Scripts.GameEntities.Behaviors
 {
     public static class PlayerMethods
     {

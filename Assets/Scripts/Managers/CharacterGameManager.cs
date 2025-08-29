@@ -2,10 +2,9 @@
 using System.Collections.Concurrent;
 
 using Assets.Scripts.CharacterSelection;
-using Assets.Scripts.Entity;
-using Assets.Scripts.Entity.Entities;
+using Assets.Scripts.GameEntities;
+using Assets.Scripts.GameEntities.Entities;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
-
 using JohnStairs.RCC.Character.Cam;
 using JohnStairs.RCC.Character.Motor;
 

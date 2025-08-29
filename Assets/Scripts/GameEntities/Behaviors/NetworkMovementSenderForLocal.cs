@@ -1,8 +1,8 @@
-using Assets.Scripts.Entity.Entities;
+using Assets.Scripts.GameEntities.Entities;
 using JohnStairs.RCC.Character.Motor;
 using UnityEngine;
 
-namespace Assets.Scripts.Entity.Behaviors
+namespace Assets.Scripts.GameEntities.Behaviors
 {
     public class NetworkMovementSenderForLocal : MonoBehaviour
     {

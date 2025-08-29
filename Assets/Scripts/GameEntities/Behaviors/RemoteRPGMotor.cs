@@ -2,7 +2,7 @@
 using JohnStairs.RCC.Character.Motor;
 using UnityEngine;
 
-namespace Assets.Scripts.Entity.Behaviors
+namespace Assets.Scripts.GameEntities.Behaviors
 {
     public class RemoteRPGMotor : RPGMotor
     {

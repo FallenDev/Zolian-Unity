@@ -1,10 +1,11 @@
 using System;
 using Assets.Scripts.Models;
+using FishNet.Object;
 using UnityEngine;
 
-namespace Assets.Scripts.Entity
+namespace Assets.Scripts.GameEntities
 {
-    public class Entity : MonoBehaviour
+    public class GameEntity : MonoBehaviour
     {
         public Guid Serial { get; set; }
         public uint CurrentZoneId { get; set; }
@@ -51,11 +52,6 @@ namespace Assets.Scripts.Entity
         }
 
         private void Update()
-        {
-
-        }
-
-        public Entity()
         {
 
         }
