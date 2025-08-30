@@ -1,4 +1,7 @@
 using Assets.Scripts.GameEntities.Entities;
+using Assets.Scripts.Network;
+using Assets.Scripts.Network.FishNet;
+using Assets.Scripts.Network.PacketArgs.SendToServer;
 using JohnStairs.RCC.Character.Motor;
 using UnityEngine;
 
@@ -19,6 +22,8 @@ namespace Assets.Scripts.GameEntities.Behaviors
 
         private RPGMotorMMO _motor;
         private float _timer;
+        private WorldClient _worldClient;
+        private ZolianWorldClient _fishNetClient;
 
         private Transform GetPlayerTransform => _motor.GetTransform();
         private Vector3 GetInputDirection => _motor.GetCurrentMovementDirection(); // Extract input for simulation
@@ -32,9 +37,21 @@ namespace Assets.Scripts.GameEntities.Behaviors
             _motor = GetComponent<RPGMotorMMO>();
         }
 
+        private void Start()
+        {
+            // Get references to both networking systems
+            _fishNetClient = ZolianWorldClient.Instance;
+        }
+
+        public void SetWorldClient(WorldClient worldClient)
+        {
+            _worldClient = worldClient;
+        }
+
         private void Update()
         {
-            if (_player == null || !_player.IsLocalPlayer || _player.Client == null) return;
+            if (_player == null || !_player.IsLocalPlayer) return;
+            
             _timer += Time.deltaTime;
             if (_timer < _sendInterval) return;
 
@@ -44,6 +61,47 @@ namespace Assets.Scripts.GameEntities.Behaviors
 
             if (HasMovedSignificantly(position, direction, speed))
             {
+                SendMovement(position, direction, speed);
+                
+                _lastSentPosition = position;
+                _lastSentDirection = direction;
+                _lastSentSpeed = speed;
+                _timer = 0f; // Reset the timer after sending
+            }
+        }
+
+        private void SendMovement(Vector3 position, Vector3 direction, float speed)
+        {
+            var movementArgs = new MovementInputArgs
+            {
+                Serial = _player.Serial,
+                Position = position,
+                VerticalVelocity = GetVelocity.y,
+                InputDirection = direction,
+                CameraYaw = CameraYaw,
+                Speed = speed
+            };
+
+            // Send via FishNet if available and connected
+            if (_fishNetClient != null && _fishNetClient.IsClientConnected)
+            {
+                _fishNetClient.SendMovementToServer(movementArgs);
+            }
+            // Fallback to legacy WorldClient if FishNet not available
+            else if (_worldClient != null)
+            {
+                _worldClient.SendMovement(
+                    _player.Serial,
+                    position,
+                    GetVelocity.y,
+                    direction,
+                    CameraYaw,
+                    speed
+                );
+            }
+            // Last resort: use player's client reference
+            else if (_player.Client != null)
+            {
                 _player.Client.SendMovement(
                     _player.Serial,
                     position,
@@ -52,11 +110,6 @@ namespace Assets.Scripts.GameEntities.Behaviors
                     CameraYaw,
                     speed
                 );
-
-                _lastSentPosition = position;
-                _lastSentDirection = direction;
-                _lastSentSpeed = speed;
-                _timer = 0f; // Reset the timer after sending
             }
         }
 

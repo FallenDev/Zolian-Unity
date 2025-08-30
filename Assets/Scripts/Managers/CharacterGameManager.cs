@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 
 using Assets.Scripts.CharacterSelection;
@@ -24,7 +24,9 @@ namespace Assets.Scripts.Managers
         public ushort WorldPort = 4202; // ToDo: Change to a UI box to pick a world server
         public Guid Serial;
         public string UserName;
-        public Player LocalPlayer { get; private set; }
+        
+        [System.NonSerialized]
+        public Player LocalPlayer;
 
         // Cache for entities nearby
         public ConcurrentDictionary<Guid, Player> CachedPlayers { get; set; } = new();

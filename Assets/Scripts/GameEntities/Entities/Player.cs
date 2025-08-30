@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Assets.Scripts.GameEntities.Abstractions;
 using Assets.Scripts.GameEntities.Behaviors;
 using Assets.Scripts.GameEntities.ScriptableObjects;
@@ -6,12 +6,14 @@ using Assets.Scripts.Managers;
 using Assets.Scripts.Models;
 using Assets.Scripts.Network;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
+using Assets.Scripts.Network.FishNet;
 using JohnStairs.RCC;
 using JohnStairs.RCC.Character;
 using JohnStairs.RCC.Character.Cam;
 using JohnStairs.RCC.Character.Motor;
 using JohnStairs.RCC.Inputs;
-
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -27,29 +29,124 @@ namespace Assets.Scripts.GameEntities.Entities
         public bool IsLocalPlayer => CharacterGameManager.Instance.Serial == Serial;
         public Animator Animator { get; private set; }
         public CharacterController CharacterController { get; private set; }
-        public DateTime LastLogged { get; set; }
-        public string UserName { get; set; }
-        public ClassStage Stage { get; set; }
-        public JobClass Job { get; set; }
-        public uint JobLevel { get; set; }
-        public BaseClass FirstClass { get; set; }
-        public BaseClass SecondClass { get; set; }
-        public bool GameMaster { get; set; }
-        public float CameraYaw { get; set; }
+        public FishNetMovementController FishNetMovement { get; private set; }
+        
+        private readonly SyncVar<DateTime> _lastLogged = new SyncVar<DateTime>();
+        private readonly SyncVar<string> _userName = new SyncVar<string>();
+        private readonly SyncVar<ClassStage> _stage = new SyncVar<ClassStage>();
+        private readonly SyncVar<JobClass> _job = new SyncVar<JobClass>();
+        private readonly SyncVar<uint> _jobLevel = new SyncVar<uint>();
+        private readonly SyncVar<BaseClass> _firstClass = new SyncVar<BaseClass>();
+        private readonly SyncVar<BaseClass> _secondClass = new SyncVar<BaseClass>();
+        private readonly SyncVar<bool> _gameMaster = new SyncVar<bool>();
+        private readonly SyncVar<float> _cameraYaw = new SyncVar<float>();
         public Vector3 LastServerPos;
+
+        // Public properties for SyncVars
+        public DateTime LastLogged 
+        { 
+            get => _lastLogged.Value; 
+            set => _lastLogged.Value = value; 
+        }
+        
+        public string UserName 
+        { 
+            get => _userName.Value; 
+            set => _userName.Value = value; 
+        }
+        
+        public ClassStage Stage 
+        { 
+            get => _stage.Value; 
+            set => _stage.Value = value; 
+        }
+        
+        public JobClass Job 
+        { 
+            get => _job.Value; 
+            set => _job.Value = value; 
+        }
+        
+        public uint JobLevel 
+        { 
+            get => _jobLevel.Value; 
+            set => _jobLevel.Value = value; 
+        }
+        
+        public BaseClass FirstClass 
+        { 
+            get => _firstClass.Value; 
+            set => _firstClass.Value = value; 
+        }
+        
+        public BaseClass SecondClass 
+        { 
+            get => _secondClass.Value; 
+            set => _secondClass.Value = value; 
+        }
+        
+        public bool GameMaster 
+        { 
+            get => _gameMaster.Value; 
+            set => _gameMaster.Value = value; 
+        }
+        
+        public float CameraYaw 
+        { 
+            get => _cameraYaw.Value; 
+            set => _cameraYaw.Value = value; 
+        }
 
         [Header("Character Looks")]
         public CharacterSO CharacterSo { get; set; }
-        public Race Race { get; set; }
-        public Sex Gender { get; set; }
+        
+        private readonly SyncVar<Race> _race = new SyncVar<Race>();
+        private readonly SyncVar<Sex> _gender = new SyncVar<Sex>();
         public GameObject Hair { get; set; }
-        public Color HairColor { get; set; }
-        public Color HairHighlightColor { get; set; }
-        public Color SkinColor { get; set; }
-        public Color EyeColor { get; set; }
+        private readonly SyncVar<Color> _hairColor = new SyncVar<Color>();
+        private readonly SyncVar<Color> _hairHighlightColor = new SyncVar<Color>();
+        private readonly SyncVar<Color> _skinColor = new SyncVar<Color>();
+        private readonly SyncVar<Color> _eyeColor = new SyncVar<Color>();
         public GameObject Beard { get; set; }
         public GameObject Mustache { get; set; }
         public GameObject Bangs { get; set; }
+
+        // Public properties for character looks
+        public Race Race 
+        { 
+            get => _race.Value; 
+            set => _race.Value = value; 
+        }
+        
+        public Sex Gender 
+        { 
+            get => _gender.Value; 
+            set => _gender.Value = value; 
+        }
+        
+        public Color HairColor 
+        { 
+            get => _hairColor.Value; 
+            set => _hairColor.Value = value; 
+        }
+        
+        public Color HairHighlightColor 
+        { 
+            get => _hairHighlightColor.Value; 
+            set => _hairHighlightColor.Value = value; 
+        }
+        
+        public Color SkinColor 
+        { 
+            get => _skinColor.Value; 
+            set => _skinColor.Value = value; 
+        }
+        
+        public Color EyeColor 
+        { 
+            get => _eyeColor.Value; 
+            set => _eyeColor.Value = value; 
+        }
 
         [Header("Character BodyPart References")]
         private GameObject BaseHead;
@@ -85,12 +182,38 @@ namespace Assets.Scripts.GameEntities.Entities
         {
             Animator = GetComponent<Animator>();
             CharacterController = GetComponent<CharacterController>();
+            FishNetMovement = GetComponent<FishNetMovementController>();
         }
 
-        public void Start()
+        public override void OnStartNetwork()
         {
-            if (IsLocalPlayer)
-                Client = WorldClient.Instance;
+            base.OnStartNetwork();
+            
+            if (base.Owner.IsLocalClient)
+            {
+                // Local player setup
+                SetupLocalPlayer();
+            }
+            else
+            {
+                // Remote player setup
+                SetupRemotePlayer();
+            }
+        }
+
+        private void SetupLocalPlayer()
+        {
+            if (CharacterGameManager.Instance != null)
+            {
+                CharacterGameManager.Instance.LocalPlayer = this;
+            }
+            
+            Client = WorldClient.Instance;
+        }
+
+        private void SetupRemotePlayer()
+        {
+            ConfigureRemoteComponents();
         }
 
         private void Update()
@@ -189,11 +312,13 @@ namespace Assets.Scripts.GameEntities.Entities
 
         private void ConfigureRemoteComponents()
         {
-            // Disable Local
-            var controller = GetComponent<RPGController>();
-            if (controller) controller.enabled = false;
+            // Disable Local RCC components if they exist
+            var localMotor = GetComponent<RPGController>();
+            if (localMotor) localMotor.enabled = false;
+            
             var rpgCamera = GetComponentInChildren<RPGCamera>();
             if (rpgCamera) rpgCamera.enabled = false;
+            
             var frustum = GetComponentInChildren<RPGViewFrustum>();
             if (frustum) frustum.enabled = false;
             var input = GetComponent<PlayerInput>();
