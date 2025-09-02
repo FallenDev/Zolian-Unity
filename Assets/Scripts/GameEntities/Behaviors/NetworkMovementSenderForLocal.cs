@@ -1,6 +1,6 @@
 using Assets.Scripts.GameEntities.Entities;
 using Assets.Scripts.Network;
-using Assets.Scripts.Network.FishNet;
+using Assets.Scripts.Network.FishNetPro;
 using Assets.Scripts.Network.PacketArgs.SendToServer;
 using JohnStairs.RCC.Character.Motor;
 using UnityEngine;

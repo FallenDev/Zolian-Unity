@@ -11,8 +11,9 @@ using Assets.Scripts.Models;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using Assets.Scripts.Network.PacketArgs.SendToServer;
 using Assets.Scripts.Managers;
+using Assets.Scripts.Network.FishNetPro.Auth;
 
-namespace Assets.Scripts.Network.FishNet
+namespace Assets.Scripts.Network.FishNetPro
 {
     public class ZolianWorldClient : MonoBehaviour
     {
@@ -20,16 +21,16 @@ namespace Assets.Scripts.Network.FishNet
         public string serverAddress = "localhost";
         public ushort serverPort = 7777;
         public bool autoConnect = false;
-        
+
         [Header("Debug Settings")]
         public bool enableDebugLogs = true;
-        
+
         private NetworkManager _networkManager;
         private WorldClient _legacyWorldClient;
         private readonly Dictionary<Guid, Player> _networkedPlayers = new();
-        
+
         public static ZolianWorldClient Instance { get; private set; }
-        
+
         public bool IsClientConnected => _networkManager != null && _networkManager.ClientManager.Started;
         public Dictionary<Guid, Player> NetworkedPlayers => _networkedPlayers;
 
@@ -45,7 +46,7 @@ namespace Assets.Scripts.Network.FishNet
                 Destroy(gameObject);
                 return;
             }
-            
+
             InitializeClient();
         }
 
@@ -60,7 +61,7 @@ namespace Assets.Scripts.Network.FishNet
 
             // Subscribe to FishNet events
             _networkManager.ClientManager.OnClientConnectionState += OnClientConnectionState;
-            
+
             DebugLog("ZolianWorldClient initialized");
         }
 
@@ -68,7 +69,7 @@ namespace Assets.Scripts.Network.FishNet
         {
             // Get reference to legacy WorldClient for bridging
             _legacyWorldClient = WorldClient.Instance;
-            
+
             if (autoConnect)
             {
                 ConnectToServer();
@@ -100,6 +101,27 @@ namespace Assets.Scripts.Network.FishNet
             {
                 Debug.LogError($"Failed to connect to server: {e.Message}");
             }
+        }
+
+        private void SendAuthTicket()
+        {
+            // ToDo: Implement actual authentication ticket sending logic
+            var ticket = PlayerPrefs.GetString("Zolian.WorldTicket", "");
+            var steamId = PlayerPrefs.HasKey("Zolian.SteamId") ? PlayerPrefs.GetString("ZolianSteamId") : "123456";
+            long.TryParse(steamId, out var steamIdLong);
+            var characterManager = CharacterGameManager.Instance;
+            var characterGuid = characterManager != null ? characterManager.Serial : System.Guid.Empty;
+
+            var msg = new Assets.Scripts.Network.FishNetPro.Auth.AuthTicketBroadcast
+            {
+                Ticket = ticket,
+                SteamId = steamIdLong,
+                AccountId = System.Guid.Empty,
+                CharacterId = characterGuid
+            };
+
+            DebugLog("Sending AuthTicketBroadcast.");
+            InstanceFinder.NetworkManager.ClientManager.Broadcast(msg);
         }
 
         public void DisconnectFromServer()
@@ -143,9 +165,12 @@ namespace Assets.Scripts.Network.FishNet
 
         private void OnConnectedToServer()
         {
-            // Send enter game request to server
+            // Send AuthTicket immediately after starting (pre-spawn)
+            SendAuthTicket();
+
+            // After server PassAuthentication, send EnterGameRequest
             SendEnterGameRequest();
-            
+
             // Notify ZolianNetworkManager
             var networkManager = ZolianNetworkManager.Instance;
             if (networkManager != null)
@@ -159,7 +184,7 @@ namespace Assets.Scripts.Network.FishNet
         {
             // Clear all networked players
             _networkedPlayers.Clear();
-            
+
             // Clean up CharacterGameManager references
             var characterManager = CharacterGameManager.Instance;
             if (characterManager != null)
@@ -168,36 +193,25 @@ namespace Assets.Scripts.Network.FishNet
                 characterManager.LocalPlayer = null;
                 // Note: We don't clear CachedPlayers as they might include non-networked players
             }
-            
+
             DebugLog("Cleaned up after server disconnection");
         }
 
         #endregion
-
-        #region Player Management
-
-        // Player management will be handled by NetworkBehaviour spawning
-        // This is simplified to work with existing systems
-
-        #endregion
-
-        #region Legacy System Bridge
 
         private void SendEnterGameRequest()
         {
             var characterManager = CharacterGameManager.Instance;
             if (characterManager != null)
             {
-                var enterGameArgs = new EnterGameArgs
+                var req = new Assets.Scripts.Network.FishNetPro.Auth.EnterGameRequest
                 {
                     Serial = characterManager.Serial,
                     UserName = characterManager.UserName
                 };
-                
-                DebugLog($"Sending enter game request for character: {enterGameArgs.UserName} with serial: {enterGameArgs.Serial}");
-                
-                // In a full implementation, this would be sent via RPC to the server
-                // For now, we'll assume the server will spawn the player automatically
+
+                DebugLog($"Sending EnterGame for {req.UserName} ({req.Serial})");
+                InstanceFinder.NetworkManager.ClientManager.Broadcast(req);
             }
             else
             {
@@ -209,7 +223,7 @@ namespace Assets.Scripts.Network.FishNet
         {
             // Handle legacy packet system player spawn
             DebugLog($"Legacy player spawn received: {spawnArgs.UserName} at {spawnArgs.Position}");
-            
+
             // In the FishNet system, this is handled automatically by OnNetworkObjectSpawned
             // This method exists for compatibility with the legacy packet bridge
         }
@@ -227,7 +241,7 @@ namespace Assets.Scripts.Network.FishNet
                     player.CameraYaw = movementArgs.CameraYaw;
                     player.Speed = movementArgs.Speed;
                     player.InputDirection = movementArgs.InputDirection;
-                    
+
                     DebugLog($"Updated remote player position via legacy packet: {player.UserName}");
                 }
             }
@@ -238,11 +252,9 @@ namespace Assets.Scripts.Network.FishNet
             // Bridge method for legacy movement system
             // In the new FishNet system, movement is handled by FishNetMovementController
             DebugLog($"Legacy movement packet received: {movementArgs.Position}");
-            
+
             // This can be used as a fallback or for additional validation
         }
-
-        #endregion
 
         #region Utility Methods
 
@@ -279,7 +291,7 @@ namespace Assets.Scripts.Network.FishNet
             {
                 _networkManager.ClientManager.OnClientConnectionState -= OnClientConnectionState;
             }
-            
+
             DebugLog("ZolianWorldClient destroyed and cleaned up");
         }
 

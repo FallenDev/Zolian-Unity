@@ -11,25 +11,26 @@ using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
 using Assets.Scripts.Network.PacketArgs.SendToServer;
 using Assets.Scripts.Managers;
 
-namespace Assets.Scripts.Network.FishNet
+namespace Assets.Scripts.Network.FishNetPro
 {
     public class ZolianWorldServer : MonoBehaviour
     {
         [Header("Server Configuration")]
         public int maxConnections = 100;
         public ushort port = 7777;
-        
+
         [Header("Physics Settings")]
         public float tickRate = 60f;
         public bool enablePhysics = true;
-        
+
         private NetworkManager _networkManager;
         private WorldClient _worldClient;
         private readonly Dictionary<Guid, Player> _serverPlayers = new();
         private readonly Dictionary<int, Guid> _connectionToSerial = new();
-        
+        private readonly Dictionary<Guid, NetworkConnection> _serialToConnection = new();
+
         public static ZolianWorldServer Instance { get; private set; }
-        
+
         public bool IsServerRunning => _networkManager != null && _networkManager.ServerManager.Started;
         public Dictionary<Guid, Player> ServerPlayers => _serverPlayers;
 
@@ -45,7 +46,7 @@ namespace Assets.Scripts.Network.FishNet
                 Destroy(gameObject);
                 return;
             }
-            
+
             InitializeServer();
         }
 
@@ -61,14 +62,14 @@ namespace Assets.Scripts.Network.FishNet
             // Subscribe to FishNet events
             _networkManager.ServerManager.OnServerConnectionState += OnServerConnectionState;
             _networkManager.ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
-            
+
             // Configure physics if enabled
             if (enablePhysics)
             {
                 // Note: In FishNet, TickRate is often configured in the NetworkManager's inspector
                 // or may be read-only at runtime. We'll set up physics simulation instead.
                 Physics.simulationMode = SimulationMode.Script;
-                
+
                 // Log the current tick rate for reference
                 Debug.Log($"FishNet TimeManager TickRate: {_networkManager.TimeManager.TickRate}");
             }
@@ -78,7 +79,7 @@ namespace Assets.Scripts.Network.FishNet
         {
             // Initialize World Client for hybrid server mode
             _worldClient = WorldClient.Instance;
-            
+
             // Start server automatically if this is a server build
             if (IsServerBuild())
             {
@@ -156,13 +157,19 @@ namespace Assets.Scripts.Network.FishNet
             // Clear all server data
             _serverPlayers.Clear();
             _connectionToSerial.Clear();
-            
+
             // Reset physics simulation
             if (enablePhysics)
             {
                 Physics.autoSimulation = true;
                 Physics.simulationMode = SimulationMode.FixedUpdate;
             }
+        }
+
+        /// <summary>Used by ZolianNetworkManager to find the FishNet connection for a Serial.</summary>
+        public bool TryGetConnection(Guid serial, out NetworkConnection connection)
+        {
+            return _serialToConnection.TryGetValue(serial, out connection);
         }
 
         private void OnClientConnected(NetworkConnection connection)
@@ -176,6 +183,8 @@ namespace Assets.Scripts.Network.FishNet
             // Handle client disconnection
             if (_connectionToSerial.TryGetValue(connection.ClientId, out var serial))
             {
+                _serialToConnection.Remove(serial);
+
                 if (_serverPlayers.TryGetValue(serial, out var player))
                 {
                     // Despawn the player
@@ -183,10 +192,10 @@ namespace Assets.Scripts.Network.FishNet
                     {
                         _networkManager.ServerManager.Despawn(player.gameObject);
                     }
-                    
+
                     _serverPlayers.Remove(serial);
                 }
-                
+
                 _connectionToSerial.Remove(connection.ClientId);
             }
         }
@@ -203,10 +212,11 @@ namespace Assets.Scripts.Network.FishNet
             {
                 // Store connection mapping
                 _connectionToSerial[connection.ClientId] = args.Serial;
-                
+                _serialToConnection[args.Serial] = connection;
+
                 // Spawn player for this client
                 SpawnPlayerForClient(connection, args);
-                
+
                 Debug.Log($"Client {connection.ClientId} entered game with serial {args.Serial}");
             }
             catch (Exception e)
@@ -228,7 +238,7 @@ namespace Assets.Scripts.Network.FishNet
             // Spawn player object
             var playerObject = Instantiate(playerPrefab);
             var player = playerObject.GetComponent<Player>();
-            
+
             if (player == null)
             {
                 Debug.LogError("Player component not found on prefab");
@@ -239,13 +249,13 @@ namespace Assets.Scripts.Network.FishNet
             // Initialize player data (this would normally come from your database)
             // For now, we'll use placeholder data
             InitializePlayerData(player, args);
-            
+
             // Spawn the network object for the specific client
             _networkManager.ServerManager.Spawn(playerObject, connection);
-            
+
             // Store in server players collection
             _serverPlayers[args.Serial] = player;
-            
+
             // Notify other clients about this player
             NotifyOtherPlayersAboutNewPlayer(player, connection);
         }
@@ -258,7 +268,7 @@ namespace Assets.Scripts.Network.FishNet
             {
                 prefab = GameObject.FindGameObjectWithTag("Player");
             }
-            
+
             return prefab;
         }
 
@@ -267,23 +277,23 @@ namespace Assets.Scripts.Network.FishNet
             // Set basic properties
             player.Serial = args.Serial;
             player.UserName = args.UserName;
-            
+
             // Set default position (this should come from your database)
             player.Position = Vector3.zero;
             player.transform.position = player.Position;
-            
+
             // Set default stats (these should come from your database)
             player.EntityLevel = 1;
             player.CurrentHp = 100;
             player.MaxHp = 100;
             player.CurrentMp = 50;
             player.MaxMp = 50;
-            
+
             // Initialize other default values
             player.CurrentStamina = 100;
             player.MaxStamina = 100;
             player.ArmorClass = 10;
-            
+
             // Basic stats
             player.Str = 10;
             player.Int = 10;
@@ -340,7 +350,7 @@ namespace Assets.Scripts.Network.FishNet
 
             // Validate and process movement on server
             ProcessPlayerMovement(player, args);
-            
+
             // Broadcast movement to other clients
             BroadcastPlayerMovement(player, connection);
         }
@@ -349,7 +359,7 @@ namespace Assets.Scripts.Network.FishNet
         {
             // Server-side movement validation and processing
             var newPosition = args.Position;
-            
+
             // Validate movement (anti-cheat checks)
             if (IsValidMovement(player.Position, newPosition, args.Speed))
             {
@@ -371,7 +381,7 @@ namespace Assets.Scripts.Network.FishNet
             // Basic movement validation
             var distance = Vector3.Distance(oldPos, newPos);
             var maxDistance = speed * Time.fixedDeltaTime * 2f; // Allow some tolerance
-            
+
             return distance <= maxDistance;
         }
 

@@ -10,7 +10,7 @@ using Assets.Scripts.Managers;
 using System;
 using System.Collections.Generic;
 
-namespace Assets.Scripts.Network.FishNet
+namespace Assets.Scripts.Network.FishNetPro
 {
     /// <summary>
     /// Unified network manager that bridges the existing Zolian packet system with FishNet
@@ -253,14 +253,8 @@ namespace Assets.Scripts.Network.FishNet
 
         private NetworkConnection GetConnectionForSerial(Guid serial)
         {
-            // Find the FishNet connection associated with a character serial
-            // This would need to be implemented based on your connection tracking
-            if (_worldServer != null && _worldServer.ServerPlayers.ContainsKey(serial))
-            {
-                // You'd need to track connection IDs to serials in ZolianWorldServer
-                // Return the appropriate NetworkConnection
-            }
-            return null;
+            if (_worldServer == null || !_worldServer.IsServerRunning) return null;
+            return _worldServer.TryGetConnection(serial, out var conn) ? conn : null;
         }
 
         private bool IsServerBuild()

@@ -6,7 +6,7 @@ using Assets.Scripts.Managers;
 using Assets.Scripts.Models;
 using Assets.Scripts.Network;
 using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
-using Assets.Scripts.Network.FishNet;
+using Assets.Scripts.Network.FishNetPro;
 using JohnStairs.RCC;
 using JohnStairs.RCC.Character;
 using JohnStairs.RCC.Character.Cam;

@@ -1,7 +1,7 @@
 using UnityEngine;
 using FishNet.Managing;
 
-namespace Assets.Scripts.Network.FishNet
+namespace Assets.Scripts.Network.FishNetPro
 {
     [CreateAssetMenu(fileName = "ZolianNetworkConfig", menuName = "Zolian/Network Configuration")]
     public class ZolianNetworkConfig : ScriptableObject

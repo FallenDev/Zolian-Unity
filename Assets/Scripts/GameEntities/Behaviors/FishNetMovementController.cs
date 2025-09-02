@@ -4,7 +4,7 @@ using FishNet.Object.Synchronizing;
 using FishNet.Connection;
 using Assets.Scripts.GameEntities.Entities;
 using Assets.Scripts.Network.PacketArgs.SendToServer;
-using Assets.Scripts.Network.FishNet;
+using Assets.Scripts.Network.FishNetPro;
 
 namespace Assets.Scripts.GameEntities.Behaviors
 {
