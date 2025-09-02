@@ -1,0 +1,26 @@
+using UnityEngine;
+
+namespace AnyRPG {
+    public class ConfiguredClass {
+
+        protected SystemGameManager systemGameManager = null;
+        protected SystemConfigurationManager systemConfigurationManager = null;
+        protected SystemDataFactory systemDataFactory = null;
+        protected NetworkManagerServer networkManagerServer = null;
+
+        public virtual void Configure(SystemGameManager systemGameManager) {
+            //Debug.Log("ConfiguredClass.Configure(" + (systemGameManager == null ? "null" : systemGameManager.gameObject.name) + ")");
+            this.systemGameManager = systemGameManager;
+            SetGameManagerReferences();
+        }
+
+        public virtual void SetGameManagerReferences() {
+            //Debug.Log("ConfiguredClass.SetGameManagerReferences() systemGameManager = " + (systemGameManager == null ? "null" : systemGameManager.gameObject.name));
+            systemConfigurationManager = systemGameManager.SystemConfigurationManager;
+            systemDataFactory = systemGameManager.SystemDataFactory;
+            networkManagerServer = systemGameManager.NetworkManagerServer;
+        }
+
+    }
+
+}
